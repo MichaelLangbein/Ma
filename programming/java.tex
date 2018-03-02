@@ -1,0 +1,1305 @@
+\section{Java}
+
+We tend to use java when we want to create enterprise level software. The whole development-experience is way different from c. While in c you control every detail of the program, a java-app has you reuse as many standardized components as possible. There are layers upon layers of abstraction. Usually, there is some way to build on top of a framework, leaving you to only fill out a few xml-configurations and implement a few skeleton-beans with loads of annotations.
+
+
+\subsection{General}
+
+\subsubsection{Basic theory}
+
+\subsubsection{Environment variables} 
+
+First things first, to find out if you're using a 64 bit version of the jdk, just execute
+\begin{lstlisting}
+java -d64 -version
+\end{lstlisting}
+This will throw an error if your version is not made for 64 bit. 
+
+There are a few environment variables that you should know about: 
+\begin{itemize}
+    \item PATH: Sys looks for exes here. Your JAVA\_HOME/bin should be part of PATH
+    \item CLASSPATH: Java looks for code here
+    \item JAVA\_HOME: location jdk (example: /usr/lib/jvm/java-7-openjdk-amd64/bin)
+    \item JRE\_HOME: location jre (example: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin)
+\end{itemize}
+
+The most important setting for the JVM is the heap size: how much memory will we allocate to the java-process? There are two settings: 
+\begin{itemize}
+    \item \inlinecode{-Xms<size>} - Set initial Java heap size
+    \item \inlinecode{-Xmx<size>} - Set maximum Java heap size
+\end{itemize}
+These are either set in .... or used directly when invoking java with \inlinecode{java -Xms512m -Xmx1024m JavaApp}.
+
+You can display the default settings like this: 
+\begin{lstlisting}
+$ java -XX:+PrintFlagsFinal -version | grep -iE 'HeapSize|PermSize|ThreadStackSize'
+
+    uintx InitialHeapSize                          := 64781184        {product}
+    uintx MaxHeapSize                              := 1038090240      {product}
+    uintx PermSize                                  = 21757952        {pd product}
+    uintx MaxPermSize                               = 174063616       {pd product}
+     intx ThreadStackSize                           = 1024            {pd product}
+java version "1.7.0_51"
+OpenJDK Runtime Environment (IcedTea 2.4.4) (7u51-2.4.4-0ubuntu0.13.10.1)
+OpenJDK 64-Bit Server VM (build 24.45-b08, mixed mode)
+\end{lstlisting}
+
+Here are some suggested values: 
+\begin{itemize}
+    \item Heap = -Xms512m -Xmx1024m
+    \item PermGen = -XX:PermSize=64m -XX:MaxPermSize=128m
+    \item Thread = -Xss512k
+\end{itemize}
+
+
+\subsection{Maven}
+
+Maven is a build- and dependency-resolution tool. Building eg. webprojects with maven is encouraged, also because maven takes away buildsteps from your IDE. Relying on maven instead of an IDE to do your building then makes your builds portable between different developement environments. 
+
+Maven can initialise a project structure for you from the command-line:
+\begin{verbatim}
+mvn archetype:generate -DarchetypeArtifactId=maven-archetype-quickstart
+\end{verbatim} 
+It will then ask you all further neccessary information. 
+
+\paragraph{cli syntax} 
+The syntax generally consists of mvn [lifecycle]:[phase]:[args]
+
+\begin{lstlisting}[language=bash]
+mvn default:package
+mvn [lifecyle]:[phase]
+mvn default:package:help
+\end{lstlisting}
+		
+		
+\paragraph{build lifecyles} 
+
+Maven has a quite hierarchical structure to it. 
+
+\begin{itemize}
+    \item lifecycles: default (compiling et al), clean (remove artifacts), site (create documentation). Plugins might add further lifecycles. 
+    \begin{itemize}
+        \item phases : default build lifecycle consists of several phases: validate, compile, test, package, verify, install, deploy
+        \begin{itemize}
+            \item goals: each phase executes one or more goals. these are the actual code instuctions. 
+        \end{itemize}
+        \item profiles : here we can adjust some environment settings. should never really be neccessary.
+    \end{itemize}
+    \item plugin: a set of extra goals for maven. plugins might even define whole new lifecycles like 'mvn jetty:run', or hook into the build cycle to generate code from xml like cxf does. 
+    \begin{itemize}
+        \item mojo : maven pojo. a class representing an executable goal
+        \item configuration of plugins. executions : specifies how the mojo should be executed; ie in which phase of the maven build-lifecycle
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Directory structure}
+Everything that you put under \emph{src/main/resources} during development will be put under the root-directory on compilation. Same thing holds for the contents of \emph{src/test/resources}: they will be on the root path during execution of tests. So, when using relative paths, \emph{src/*/resources/} must be omitted.
+
+
+\paragraph{Custom archetypes}
+
+\paragraph{Custom plugins}
+
+
+
+
+\subsection{Threading}
+
+Java was designed to make threading easy (though, contrary to clojure, it was not designed to make threading \emph{save}). 
+
+\paragraph{Basic threading with shared data} is the simplest, but somewhat dangerous method. 
+\begin{lstlisting}[language=java]
+public class Main {
+	
+	public static void main(String[] args) throws InterruptedException {
+		
+		LinkedList<Integer> sharedData = new LinkedList<Integer>();
+		Producer p = new Producer(sharedData);
+		Consumer c = new Consumer(sharedData);
+		p.start();
+		Thread.sleep(1000);
+		c.start();
+		
+	}
+
+}
+\end{lstlisting}
+\begin{lstlisting}[language=java]
+public class Producer extends Thread {
+
+	private LinkedList<Integer> sharedData;
+
+	public Producer(LinkedList<Integer> sharedData) {
+		this.sharedData = sharedData;
+	}
+	
+	@Override
+	public void run() {
+		Random r = new Random();
+		while(true) {
+			try {
+			    Integer i = r.nextInt(5);
+				Thread.sleep(100 * i);
+    			sharedData.add(i);
+    			System.out.println("Producer just added " + i + " to the shared data.");
+    			System.out.println("Data now looks like this: " + sharedData.toString());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
+\end{lstlisting}
+\begin{lstlisting}[language=java]
+public class Consumer extends Thread {
+
+	private LinkedList<Integer> sharedData;
+
+	public Consumer(LinkedList<Integer> sharedData) {
+		this.sharedData = sharedData;
+	}
+	
+	@Override
+	public void run() {
+		Random r = new Random();
+		while(true) {
+			try {
+				Thread.sleep(100 * r.nextInt(5));
+				i = sharedData.removeFirst();
+    			System.out.println("Consumer just took " + i + " from the shared data.");
+    			System.out.println("Data now looks like this: " + sharedData.toString());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+}
+\end{lstlisting}
+
+This results in an output like this: 
+\begin{lstlisting}
+Producer just added 3 to the shared data.
+Data now looks like this: [0, 0, 3]
+Consumer just took 0 from the shared data.
+Data now looks like this: [0, 3]
+Consumer just took 0 from the shared data.
+Data now looks like this: [3]
+Consumer just took 3 from the shared data.
+Data now looks like this: []
+Exception in thread "Thread-1" java.util.NoSuchElementException
+	at java.util.LinkedList.removeFirst(LinkedList.java:270)
+	at threadingStuff.Consumer.run(Consumer.java:20)
+\end{lstlisting}
+
+Notice how at some point the consumer overtook the producer, leading to a \verb NoSuchElementException  . We can use signaling to handle this kind of situation: 
+\begin{itemize}
+    \item \inlinecode{wait()}
+    \item \inlinecode{notify()}
+\end{itemize}
+
+Alternatively, a blocking queue would automatically handle such a case by just blocking the consumer until data is available again.
+
+\paragraph{Using a blocking queue} makes sense when 
+\begin{itemize}
+    \item you need protection from \verb NoSuchElementException  .
+    \item it is ok for the consumer to sometimes be blocked while waiting for data to arrive.
+\end{itemize}
+\begin{lstlisting}[language=java]
+public class Main {
+	
+	public static void main(String[] args) throws InterruptedException {
+		
+		ArrayBlockingQueue<Integer> sharedData = new ArrayBlockingQueue<Integer>(100);
+		Producer p = new Producer(sharedData);
+		Consumer c = new Consumer(sharedData);
+		p.start();
+		Thread.sleep(1000);
+		c.start();
+		
+	}
+
+}
+\end{lstlisting}
+\begin{lstlisting}[language=java]
+public class Producer extends Thread {
+
+	private ArrayBlockingQueue<Integer> sharedData;
+
+	public Producer(ArrayBlockingQueue<Integer> sharedData) {
+		this.sharedData = sharedData;
+	}
+	
+	@Override
+	public void run() {
+		Random r = new Random();
+		while(true) {
+			try {
+				Integer i = r.nextInt(5);
+				Thread.sleep(100 * i);
+				sharedData.put(i);
+				System.out.println("Producer just added " + " to the shared data.");
+				System.out.println("Data now looks like this: " + sharedData.toString());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
+\end{lstlisting}
+\begin{lstlisting}[language=java]
+public class Consumer extends Thread {
+
+	private ArrayBlockingQueue<Integer> sharedData;
+
+	public Consumer(ArrayBlockingQueue<Integer> sharedData) {
+		this.sharedData = sharedData;
+	}
+	
+	@Override
+	public void run() {
+		Random r = new Random();
+		Integer i;
+		while(true) {
+			i = null;
+			try {
+				Thread.sleep(100 * r.nextInt(5));
+				i = sharedData.take();
+				System.out.println("Consumer just took " + i + " from the shared data.");
+				System.out.println("Data now looks like this: " + sharedData.toString());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+}
+\end{lstlisting}
+
+This results in an output like this: 
+\begin{lstlisting}
+Producer just added 3 to the shared data.
+Data now looks like this: [0, 0, 3]
+Consumer just took 0 from the shared data.
+Data now looks like this: [0, 3]
+Consumer just took 0 from the shared data.
+Data now looks like this: [3]
+Consumer just took 3 from the shared data.
+Data now looks like this: []     // <------ no exception thrown here! Consumer just has to wait. 
+Producer just added 3 to the shared data.
+Data now looks like this: [3]
+Producer just added 4 to the shared data.
+Data now looks like this: [3, 4]
+\end{lstlisting}
+
+
+\paragraph{Using a pipe} makes only sense under very specific conditions. A pipe is optimized for serialized in- and output, so you'd first have to serialize and then deserialize anything that has to pass through the pipe. Also, a pipe can always only exist between exactly two threads, no more. 
+
+\paragraph{Using an executor service} makes sense when ...
+
+\paragraph{Calling another thread's mehtods} is actually possible without much ado: 
+\begin{lstlisting}[language=java]
+class Main {
+    public static void main() {
+        RT rt = new RT();
+        rt.start();
+        rt.updateV(3);
+    }
+}
+\end{lstlisting}
+\begin{lstlisting}[language=java]
+class RT extends Thread {
+    private int v; 
+    
+    public RT() {
+        v = 1;
+    }
+
+    public void run() {
+        while(true){
+            Thread ct = Thread.currentThread();
+            String name = ct.getName();
+            System.out.println("Method run() being executed on " + name);
+            System.out.println("v now is: " + v);
+        }
+    }
+    
+    public void updateV(int newV) {
+        Thread ct = Thread.currentThread();
+        String name = ct.getName();
+        System.out.println("Method updateV() being executed on " + name);
+        v = newV;
+    }
+}
+\end{lstlisting}
+%The main thread can call \inlinecode{accessibleMethod()} without problems. The method will be executed on the \inlinecode{RT}-thread. The execution of that method temporarily halts the execution of the \inlinecode{run()} method. Using \inlinecode{getState()} you will see that the thread is in the \inlinecode{BLOCKED}  state while the \inlinecode{accessibleMethod()} is being executed. 
+A thread's public methods may be called from anywhere. So the main thread can call \inlinecode{accessibleMethod()} without problems.  However, the execution of that public method will than take place on the calling thread - in that case, the main thread. You can verify this by sparkling your code with a few \inlinecode{Thread.currentThread().getName()} calls. But the called method may still manipulate a variable that is private to the called thread; so the main thread may manipulate \inlinecode{v}. This is possible because threads share the same memory base. 
+
+\subsection{Functional programming}
+
+Java 8 exposes a few new Classes that can be used as functions. 
+\begin{itemize}
+    \item \inlinecode{Function<Integer,Integer> add3 = a -> a + 3;}
+    \item \inlinecode{BiFunction<Integer, Integer, Integer> add = (a, b) -> a + b;}
+    \item \inlinecode{Predicate<Integer> isEven = a -> a\%2 == 0;} A predicate always returns a boolean.
+    \item \inlinecode{Consumer<Book> storeAway = b -> b.save();} A consumer returns void. 
+\end{itemize}
+
+\begin{lstlisting}[language=java]
+
+public static void main() {
+    BiFunction<Integer, Integer, Integer> add = (a, b) -> a + b;
+    BiFunction<Integer, Integer, Integer> sub = (a, b) -> a - b;
+    Integer result1 = compute(add, 3, 4);
+    Integer result2 = compute(sub, 3, 4);
+}
+
+public static Integer compute(BiFunction<Integer, Integer, Integer> function, Integer a, Integer b) {
+    return function.apply(a, b);
+}
+\end{lstlisting}
+
+These functions could also have been passed anonymously: 
+\begin{lstlisting}[language=java]
+
+public static void main() {
+    Integer result1 = compute((a, b) -> a + b, 3, 4);
+    Integer result2 = compute((a, b) -> a - b, 3, 4);
+}
+
+public static Integer compute(BiFunction<Integer, Integer, Integer> function, Integer a, Integer b) {
+    return function.apply(a, b);
+}
+\end{lstlisting}
+
+
+\subsection{Annotations}
+We mostly use annotations to let others read out meta-information about our pojos. Consider the following example. 
+
+In this code, we define what kind of metadata we want to create. 
+\begin{lstlisting}[language=java]
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TableRecord {
+	String table();
+	String database();
+}
+
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TableField {
+	String name();
+}
+\end{lstlisting}
+
+Then we decorate a pojo with the new annotations. 
+\begin{lstlisting}[language=java]
+import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
+import org.apache.camel.dataformat.bindy.annotation.DataField;
+
+@CsvRecord( separator = ";")
+@TableRecord(table="iw_mn", database="gkddat")
+public class Messnetz {
+
+	@DataField(pos = 1)
+	@TableField(name="Messnetznummer")
+	private int Messnetznummer;
+	
+	@DataField(pos = 2)
+	@TableField(name="Messnetzname")
+	private String Messnetzname;
+
+	public Messnetz() {}
+	
+	public Messnetz(int msnr, String mnname) {
+		Messnetznummer = msnr; 
+		Messnetzname = mnname;
+	}
+	
+	... getters and setters ...
+}
+
+\end{lstlisting}
+
+And finally we read out the annotations to create an sql-query: 
+\begin{lstlisting}[language=java]
+public class SqlConverter implements DataFormat {
+
+	/**
+	 * This is to convert any object into a "INSERT" sql statement.
+	 * Makes use of the @TableRecord and @TableField annotations to figure out 
+	 * what parts of the pojo need to be persisted.
+	 */
+	@Override
+	public void marshal(Exchange ex, Object graph, OutputStream stream) throws Exception {
+		
+		Object pojo = ex.getIn().getBody();
+		TableRecord tr = pojo.getClass().getAnnotation(TableRecord.class);
+		Field[] fields = pojo.getClass().getDeclaredFields();
+		
+		String database = tr.database();
+		String table = tr.table();
+		
+		ArrayList<String> fieldNames = new ArrayList<String>();
+		ArrayList<String> fieldValues = new ArrayList<String>();
+		for(Field f : fields) {
+			TableField tf = f.getAnnotation(TableField.class);
+			if(tf == null) continue;
+			
+			String fieldName = tf.name();
+			fieldNames.add(fieldName);
+			
+			f.setAccessible(true);
+			Object objFieldValue = f.get(pojo);
+			String fieldValue = objFieldValue.toString();
+			if(f.getType() == String.class) {
+				fieldValue = "'" + fieldValue + "'";
+			}
+			fieldValues.add(fieldValue);
+		}
+		String fieldList = StringUtils.join(fieldNames);
+		String valueList = StringUtils.join(fieldValues);
+		
+		String sql = "insert into "+ database +"." + table + " (" + fieldList + ") values (" + valueList + ");";
+		
+		stream.write(sql.getBytes());
+	}
+}
+\end{lstlisting}
+
+\subsection{Transforming textformats: marshaling}
+
+This is known as marshaling. The general idea is always a simple two-step proces. 
+To convert one format into another, 
+\begin{itemize}
+    \item Unmasrshal the file (that uses format 1) into a pojo,
+    \item then marshal the pojo into another file (that uses format 2). 
+\end{itemize}
+
+\subsubsection{CSV to POJO and back: Bindy}
+Important annotations in the pojo are: 
+
+\subsubsection{JSON to POJO and back: Jackson}
+Important annotations in the pojo are: 
+
+\subsubsection{XML to POJO and back: JAXB}
+Important annotations in the pojo are: 
+
+
+\subsection{Reading from documents}
+You don't always want to load a whole file into a pojo. Sometimes it's enough to just extract one simple information out of the file. 
+
+\subsubsection{Extracting from xml: XPath}
+
+\subsubsection{Extracting from json: JsonPath}
+
+
+\subsection{Databases}
+Java allows for simple query-based database access (JDBC) and for automated marshaling of pojos into tables (JPA and hibernate).
+
+\subsubsection{First level db-access: JDBC}
+
+Every kind of database (MySQL, JavaDB, filesystembased, ...) can be accessed by its own \emph{driver}. Because those drivers are vendor-specific, they are abstracted away using a \emph{driver manager}. 
+
+\begin{lstlisting}[language=java]
+Connection conn = DriverManager.getConnection("jdbc:mysql://10.112.70.133", "michael", "meinpw");
+Statement stmt = conn.createStatement();
+ResultSet res = stmt.executeQuery("select * from amoado.meldung");
+while(res.next()){
+    ...
+}
+\end{lstlisting}
+
+However, nowadays it is more common to set up a DataSource instead of using the driver manager. The datasource will take care of managing a pool of connections, whereas with a drivermanager you would have to handle a connection-pool manually. Note how the concrete implementation of the Datasource is vendor specific. It therefore makes sense to create a factory. 
+
+\begin{lstlisting}[language=java]
+MysqlDataSource mysqlDS = new MysqlDataSource();
+mysqlDS.setURL("jdbc:mysql://localhost:3306/UserDB");
+mysqlDS.setUser("michael");
+mysqlDS.setPassword("meinpw");
+
+...
+
+DataSource ds = myFactory.getDs("mysql");
+Connection con = ds.getConnection();
+Statement stmt = con.createStatement();
+ResultSet rs = stmt.executeQuery("select empid, name from Employee");
+while(rs.next()){
+    ...
+}
+\end{lstlisting}
+
+\subsubsection{Second level db-access: JPA and Hibernate}
+The JPA is a specification implemented by Hibernate (say: hibernate is a "jpa provider"), among others. Its function is to persist pojos in a relational database - it's an ORM. Hibernate will accept pojos and scan them for annotations explaining how the pojo should be persisted (if you don't want to use annotations, you can instead create a mapping.xml). 
+
+\paragraph{Hibernate} Hibernate will generate automatic sql for you. It will also create tables where needed. Therefore, it makes no sense to use it on an existing database where the structure mustn't change. Under such conditions, you're way better off using JDBC (or even better spring jdbc-template). 
+
+\begin{lstlisting}[language=xml]
+<dependency>
+	<groupId>org.hibernate</groupId>
+	<artifactId>hibernate-core</artifactId>
+	<version>4.3.5.Final</version>
+</dependency>
+<!-- Hibernate 4 uses Jboss logging, but older versions slf4j for logging -->
+<dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-simple</artifactId>
+	<version>1.7.5</version>
+</dependency>
+<dependency>
+	<groupId>mysql</groupId>
+	<artifactId>mysql-connector-java</artifactId>
+	<version>5.0.5</version>
+</dependency>
+\end{lstlisting}
+
+\begin{lstlisting}[language=java]
+package hibernate;
+
+import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+@Entity
+@Table(name="Employees", uniqueConstraints= {@UniqueConstraint(columnNames = { "id" })})
+public class Employee {
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int id;
+	private String name;
+	private String role;
+	private Date insertTime;
+	
+	... bunch of getters and setters ...
+}
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=xml, name=hibernate-annotation.cfg.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+		
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost/testdb</property>
+		<property name="hibernate.current_session_context_class">thread</property>
+		<mapping class="hibernate.Employee"/>
+	</session-factory>
+</hibernate-configuration>
+\end{lstlisting}
+
+\begin{lstlisting}[language=java]
+public class AppMain {
+
+	public static void main(String[] args) {
+		Configuration conf = new Configuration();
+		conf.configure("hibernate-annotation.cfg.xml");
+		ServiceRegistry sr = (ServiceRegistry) new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
+		SessionFactory sf = conf.buildSessionFactory(sr);
+		Session s = sf.getCurrentSession();
+		
+		
+		Employee e = new Employee();
+		e.setName("Michael");
+		e.setRole("programmer");
+		e.setInsertTime(new Date());
+		
+		s.beginTransaction();
+		s.save(e);
+		s.getTransaction().commit();
+		
+		System.out.println("Employee id: " + e.getId());
+		
+		HibernateUtil.getSessionFactory().close();
+	}
+}
+\end{lstlisting}
+
+
+\paragraph{JPA} Hibernate has later been generalised to JPA. JPA can use hibernate as backend, but might also use eclipselink or any other ORM. Unfortunately, JPA comes with a few changes compared to the hibernate syntax, not all of them for the better.
+
+See here for an example-application: 
+
+\begin{lstlisting}[language=java]
+EntityManagerFactory emp = Persistence.createEntityManagerFactory("employeeDB"); 
+// This is a factory-factory. Talk about over-engineering :)
+// employeeDB is the name of a persistance unit in your persistence.xml. 
+// Note that the position of this xml is defined nowhere - it MUST be placed in classroot/META-INF/persistence.xml
+// and have exactly this name.
+
+EntityManager em = emf.createEntityManager();
+// The entity-manager is the most important class and basically your CRUD-Interface to the database.
+
+EntityTransaction tx = em.getTransaction();
+
+tx.begin();
+Employee empl = new Employee("Homer", "Simpson", "97G");
+em.persist(empl);
+tx.commit();
+em.close();
+\end{lstlisting}
+
+This class makes use of a \inlinecode{META-INF/persistence.xml} file. If this file is not found under this exact name in that specific location, a \inlinecode{"no persistence provider found"} exception is thrown. 
+
+\begin{lstlisting}[language=xml]
+<persistence 
+    xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    version="1.0">
+
+    <!-- Value given to createEntityManagerFactory -->
+    <persistence-unit name="employeeDB" transaction-type="RESOURCE_LOCAL">
+    
+        <!-- All beans that you want to persist must be mentioned here -->
+        <class>org.langbein.michael.Employee</class>
+        
+        <!-- Database-driver, credentials, and JPA-settings (differ per vendor, but generally logging, create tables etc) -->
+        <properties>
+            <property name="openjpa.ConnectionDriverName" value="org.hsqldb.jdbcDriver" />
+            <property name="openjpa.ConnectionURL" value="jdbc:hsqldb:mem:order" />
+            <property name="openjpa.ConnectionUserName" value="sa" />
+            <property name="openjpa.ConnectionPassword" value="" />
+            <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
+        </properties>
+    </persistence-unit>
+    
+</persistence>
+\end{lstlisting}
+
+This is not a very convenient setup. In the spring appendix we'll describe using the spring data jpa starter as an alternative way of using jpa.
+
+\subsection{Swing}
+ 
+ Swing is a event based GUI-Framework.
+ Data is wrapped in components. Components mainly do two things: tell the swing environment how they are to be rendered, and babble with other components or the user through listening to and sending of events. 
+ 
+ 
+ Most components like buttons, labels etc. are trivial. But the interesting ones are JList, JTable and JTree. These all fire custom events. 
+ You can set a custom event-listener for these events. You can also pass a model to them to create a mapping between your actual data and the JList, and you can pass a renderer to them to instruct them how your data is supposed to be displayed. 
+ 
+ 
+ \subsubsection{Lists}
+ 
+ Lists will be the first component we look at in more detail to illustrate how Swing handles subcomponents and subcomponent-models. As stated before, there are three ways in which we can customise a default list: add custom event handlers, add a model to map our data to the list, and add a renderer to customise the display of the elements. 
+ 
+ \paragraph{Adding a custom event-handler for JListEvents} This is as simple as passing in a implementation of a single method interface.
+ 
+ \paragraph{Defining a model} With almost any Swing component, you can separate the underlying data structure containing the data from the GUI control that displays the data. It is rare to want to do that with simple controls like buttons, but with lists, tables, and trees, it is inconvenient to have to copy data out of an existing hash table, array, linked list, or other structure into the format needed by the GUI control. So Swing lets you use your existing structure directly. You simply implement an interface that tells Swing how to access the data, and then use the data directly in the component. 
+ 
+ So you could add simple strings to a list, that JList can handle without any kind of a model:
+ 
+ \begin{lstlisting}[language=java]
+    String[] options = {"Option1", "Option2", "Option3"};
+    JList optionList = new JList<String>(options);
+ \end{lstlisting}
+ 
+Instead of predetermining the data structure that holds list elements, Swing lets you use your own data structure as long as you tell it how to get the data into or out of that structure. You could either implement the ListModel-interface or extend the AbstractListModel-class.
+ 
+ \begin{lstlisting}[language=java]
+        Location[] locations = {
+			new Location("Berlin", "Germany", "nice"),
+			new Location("Ghent", "Belgium", "awesome"),
+			new Location("Gera", "Germany", "sucking balls")
+		};
+		JList list = new JList<Location>(new LocationListModel(locations));
+		
+		public class LocationListModel extends AbstractListModel<Location>{
+        	private Location[] locations;
+        	public LocationListModel(Location[] locations) {
+        		this.locations = locations;
+        	}
+        	public Location getElementAt(int index) {
+        		return locations[index];
+        	}
+        	public int getSize() {
+        		return locations.length;
+        	}
+        
+        }
+        
+        public class Location {
+        	private String name;
+        	private String country;
+        	private String description;
+        	public Location(String name, String country, String description) {
+        		this.name = name;
+        		this.country = country;
+        		this.description = description;
+        	}
+        	public String toString() {
+        		return (name + " in " + country + " is " + description);
+        	}
+        }
+ \end{lstlisting}
+ 
+ \paragraph{Defining a renderer} Swing has a few simple defaults for displaying values in lists, trees, and tables. In a JList, values that are Icons are drawn directly, while other objects are converted to strings via their toString method, then displayed via a JLabel. However, Swing also lets you define arbitrary mappings between values and display components, yielding whatever visual representation you want for values of specified types. This is done by building a "cell renderer" that takes the containing component, the value of the entry, a few state parameters that say things like whether or not the value is currently selected, and then returns a Component that is used to draw the value. 
+ 
+Normally Swing uses a JLabel, either directly from the String representation of the entry or directly from the value if the value is an Icon. But in this example, which continues the previous one, I want to include an image of the flag of the country for each JavaLocation. So I define a class that implements the ListCellRender interface, with a method getListCellRendererComponent that constructs the Component of interest given the list entry. I then associate that renderer with the JList via the JList's setCellRenderer method. 
+
+\begin{lstlisting}
+     public class AppMain {
+    	public static void main(String[] args) {
+    		Location[] locations = {
+    				new Location("Berlin", "Germany", "nice"),
+    				new Location("Ghent", "Belgium", "awesome"),
+    				new Location("Gera", "Germany", "sucking balls")
+    		};
+    		JList list = new JList<Location>(new LocationListModel(locations));
+    		list.setCellRenderer(new MyCellRenderer());
+    		...
+    	}
+	}
+	
+	public class MyCellRenderer extends DefaultListCellRenderer {
+    	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    		JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+    		Component out = label;
+    		if(isSelected) {
+    			JButton but = new JButton();
+    			but.setText(label.getText());
+    			out = but;
+    		}
+    		return out;
+    	}
+    }
+\end{lstlisting}
+ 
+ 
+ \subsubsection{Trees}
+ 
+ Trees are very similar to lists. Here, too, we can define custom handlers, add models and add renderers.
+ 
+ \paragraph{Adding custom handlers for JTreeEvents}
+ 
+ \paragraph{Adding a model} A JTree uses a TreeModel to get its data. As with JList, you can replace the model altogether, specifying how to extract data from the custom model. In the case of JTree, however, the default TreeModel is very useful as it is. It is then most often better to write a custom TreeNode (by extending DefaultMutableTreeNode) and notify your datastructure of changes through the user by creating a TreeModelListener.
+ 
+ \begin{lstlisting}
+      class AppMain {
+        public static void main(String[] args) {
+		  Place e = new Place(null, "Europe");
+		  Place g = new Place(e, "Germany");
+		  Place m = new Place(g, "Munich");
+		  Place i = new Place(e, "Italy");
+	 	  Place r = new Place(i, "Rome");
+		  Place b = new Place(g, "Berlin");
+		
+		  MyTreeCell cont = new MyTreeCell(e);
+		  cont.add(new MyTreeCell(g));
+		  cont.add(new MyTreeCell(i));
+
+		  JTree tree = new JTree(cont);
+        }
+      }
+      
+      public class MyTreeCell extends DefaultMutableTreeNode {
+    	public MyTreeCell(Place p) {
+		  super(p.getName());
+    	}
+      }
+ \end{lstlisting}
+ 
+ 
+ \paragraph{Adding a renderer} Renderers can be changed just like you can in JLists.
+ 
+ \begin{lstlisting}[language=java]
+    public abstract class MyCellRenderer extends DefaultTreeCellRenderer {
+	    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+		  return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+	    }
+}
+ \end{lstlisting}
+ 
+ 
+ 
+ 
+ \subsubsection{Writing custom components}
+ 
+ \paragraph{Extending JComponent} Everything in Swing is a component. A component does the following things: 
+ \begin{itemize}
+    \item contain data
+    \item listen to user events
+    \item fire own events in response
+    \item provide a way for API-users to define event-listeners
+ \end{itemize}
+ Concretely, a implememtation might look like this: 
+ 
+ \begin{itemize}
+    \item Extend JComponent
+    \item In the constructor, pass your actual data.
+    \item Also in the constructor, add a few of these: 
+        \begin{lstlisting}[language=java]
+            addMouseListener(new MouseAdapter( ) {
+              public void mousePressed(MouseEvent e) { myMouseEventHandler(e); }
+            });
+        \end{lstlisting}
+    \item implement your myXEventHandler(e) methods.
+    \item write a method fireEvent(), that goes through all the Listeners in the listenerList and allows them to react to a MyCompEvent. 
+    \item write a method addListener(Listener l), that accepts a listenerfunction (single method interface).
+    \item Overwrite the method paintComponent
+ \end{itemize}
+ 
+ 
+
+
+
+\subsection{Servlets and JSP}
+
+Contrary to CGI programs, a servlet only is started once and then sits there running waiting for requests to arrive via the servlet-container (such as tomcat, jetty or undertow). For every client request, the servlet spawns a new thread (not a whole proces like in cgi).
+
+For a servlet to run in a servlet-container, it must simply extend the class HttpServlet. Also, the servlet needs a web.xml file. That file tells the container which requests should go to this servlet, where the base dir is, which class extended HttpServlet.
+
+
+Place the following in an eclipse "dynamic-web-project"'s src-folder:
+
+\begin{lstlisting}[language=java]
+package meinServlet;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class MainServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    public MainServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+}
+\end{lstlisting}
+
+And put this DD in the projects WebContent/WEB-INF folder: 
+
+\begin{lstlisting}[language=xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	id="WebApp_ID" version="3.1">
+
+	<servlet>
+		<servlet-name>Main</servlet-name>
+		<servlet-class>meinServlet.MainServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Main</servlet-name>
+		<url-pattern>/hallo</url-pattern>
+	</servlet-mapping>
+
+</web-app>
+\end{lstlisting}
+
+With these two files, tomcat will know how to handle the servlet. Now if you go to \verb http://localhost:8080/meinServlet/hallo you should see the site. 
+
+
+\subsubsection{Building with maven}
+
+\begin{itemize}
+    \item \inlinecode{mvn archetype:generate} with maven-archetype-webapp
+    \item add folder \inlinecode{src/main/java} 
+    \item add package \inlinecode{org.langbein.michael.qa}
+    \item add dependencies to pom, especially \inlinecode{httpservlet}
+    \item add servlet in  \inlinecode{org.langbein.michael.qa}
+    \item add \inlinecode{web.xml} in \inlinecode{src/main/webapp/WEB-INF}
+    \item \inlinecode{mvn compile war:war}
+    \item copy new war into \inlinecode{<tomcat>/webapps}
+    \item restart tomcat
+    \item visit \inlinecode{localhost:8080/qa/}
+\end{itemize}
+
+This is a ridiculously complex setup, especially since you'll have to repeat the last four steps for every iteration. That's why during development you should use the jetty plugin:
+
+\begin{itemize}
+    \item Add the jetty-plugin to your pom: 
+        \begin{lstlisting}
+        <build>
+		<finalName>qa3</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.4.7.v20170914</version>
+				<configuration>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<connectors>
+						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+							<port>8080</port>
+							<maxIdleTime>60000</maxIdleTime>
+						</connector>
+					</connectors>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+        \end{lstlisting}
+        \item run jetty with \inlinecode{mvn jetty:run}
+\end{itemize}
+
+\subsubsection{Jsp and forms}
+
+It's really easy to template html and forms. Consider this servlet: 
+
+\begin{lstlisting}[language=java]
+package ct;
+
+public class QAController extends HttpServlet{
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    request.getRequestDispatcher("/WEB-INF/qa.jsp").forward(request, response);
+	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String answer = request.getParameter("answer");
+		System.out.println("Got the answer " + answer);
+		request.setAttribute("lastAnswer", answer);
+		doGet(request, response);
+	}
+
+}
+\end{lstlisting}
+
+When a GET-requests arrives  at the server, it forwards this request to a jsp-page located under \inlinecode{/WEB-INF/qa.jsp}. That page looks like this: 
+
+\begin{lstlisting}[language=html]
+<%@ page 
+	language="java" 
+	contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Welcome to Michael's Q & A site!</title>
+	</head>
+	
+	<body>
+		<form name="qaForm" method="post" action="qa">
+			Your last answer was: ${lastAnswer} <br />
+			Question: ... blah ... <br /> 
+			Answer:  <input type="text" name="answer" />  <br /> 
+			<input type="submit" value="Submit your answer" />
+		</form>
+		This page was generated at <%= new java.util.Date() %>
+	</body>
+</html>
+\end{lstlisting}
+
+Note three important aspects about this form: 
+\begin{itemize}
+    \item It has a POST-method and an input-element of the "submit" type
+    \item The post is mapped to a relative url named "qa". This is the url of the servlet (could also be another servlet)
+    \item The file uses a variable named \inlinecode{lastAnswer}. This variable has been set during the last request by the doPost-method. 
+\end{itemize}
+
+
+
+\subsubsection{Servlet context listener}
+Especially when our application depends on a database to exist on the server, ...
+Integrating a database requires us to do three things: 
+\begin{itemize}
+    \item add the connector jar to the apps libraries
+    \item add the db credentials to the web.xml using \inlinecode{<context-param>}
+    \item add a context listener, that has the servlet read out the database credentials on initialisation.
+\end{itemize}
+
+\subsubsection{Servlet lifecycle}
+\begin{itemize}
+    \item Container creates \emph{one} instance of the servlet. 
+    \item Container calls the \inlinecode{init()} method (\emph{once}).
+    \item From now on, every request is passed to that one instance's \inlinecode{doGet()} and \inlinecode{doPost()} methods.
+\end{itemize}
+
+
+\subsection{Webservices}
+
+There are basically two kinds of webservices. Both build up on top of http.
+
+\begin{itemize}
+    \item REST: a simple service using nothing but http's get, post etc. The details are defined in the JAX-RS specification. A concrete implementation of JAX-RS is called Jersey\footnote{Its good to know that there is a popular alternative to jersey known as restlet.}. A rest-service is described to the consumer using WADL. 
+    \item SOAP: a more complex service. SOAP is a xml-protocol that defines what kind of xml-documents the client may send and what kind of xml-documents the server sends in response. The details are defined in the JAX-WS specification. A concrete implementation of JAX-WS is Apache CXF. A soap-service is described to the consumer using WSDL. 
+\end{itemize}
+
+\subsubsection{Rest-container: Jersey}
+
+Jersey is a server and container to be used as a REST-frontend to your application. You just feed it annoted beans like the following, and jersey takes care of receiving the http-request and mapping them to the right point in your bean.
+
+\begin{lstlisting}[language=java,title=MyController.java]
+package myrest;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+@Path("/hello")
+public class MyController {
+
+	@GET
+	@Produces("text/plain")
+	public String getClichedMessage() {
+		return "Hello World";
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=xml,title=web.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	id="WebApp_ID" version="3.1">
+
+	<servlet>
+	    <servlet-name>MyRestApp</servlet-name>
+	    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+	    <init-param>
+	        <param-name>jersey.config.server.provider.packages</param-name>
+	        <param-value>myrest.MyController</param-value>
+	    </init-param>
+    	<load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>MyRestApp</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=xml,title=pom.xml]
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.langbein.michael</groupId>
+	<artifactId>myrest</artifactId>
+	<version>1</version>
+
+	<packaging>war</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>2.17</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+			<version>2.17</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<warSourceDirectory>WebContent</warSourceDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+\end{lstlisting}
+
+
+
+
+\subsubsection{Soap-container: Apache CXF}
+JXF is a server and container to be used as either a REST- or a SOAP-frontend to your application\footnote{Actually, cxf can speak even more protocols than just REST and SOAP, like CORBA. Also, it can not only listen to HTTP, but also JMS or JBI}. You configure JXF as one of the two by ....
+
+Then you feed it your beans like this: 
+
+....
+
+
+\subsubsection{JSP and JSTL}
+ 
+ JSTL is meant as an extension of html. It allows you to create script-like logic in html, but without inserting any java (or php) code in html. Here an example: 
+ 
+ \begin{lstlisting}[language=html]
+ <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<html>
+ <head>
+  <title>Count to 10 Example (using JSTL)</title>
+ </head>
+
+ <body>
+  <c:forEach var="i" begin="1" end="10" step="1">
+   <c:out value="${i}" />
+
+   <br />
+  </c:forEach>
+ </body>
+</html>
+ \end{lstlisting}
+ 
+ 
+ 
+ 
+ \subsection{Unit testing}
+ JUnit is the primary tool for testing in Java. It is a container like tomcat: it takes classes and runs them according to instructions that in finds in those testclasses in the form of annotations.  Every such testclass extends \inlinecode{TestCase}, this primarily gives you access to different \inlinecode{assert} methods. 
+ It is important to know in what order junit executes tests that it finds in a testclass: 
+ \begin{itemize}
+     \item Junit counts the number of \inlinecode{@Test} methods you have in your class and creates that many different instances of the class. So if you have five tests, five separate instances are created, by calling the constructor five times. 
+     \item Then, for each instance, 
+        \begin{itemize}
+            \item JUnit calls the method \inlinecode{setUp()} and any method annoted with \inlinecode{@Before}
+            \item Junit calls the one \inlinecode{@Test} method that the instance has been created for
+            \item Junit calls the method \inlinecode{tearDown()} and any method annoted with \inlinecode{@After}
+        \end{itemize}
+ \end{itemize}
+ 
+ 
+ 
+ \subsection{Logging}
+ That's right, in an enterprise-application, not even logging is done without a framework. This section will introduce logback. 
+ 
+ To inlcude logback, you should add the following dependency: 
+ \begin{lstlisting}[language=xml]
+ <dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.2.3</version>
+</dependency>
+<dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-jdk14</artifactId>
+	<version>1.7.25</version>
+</dependency>
+ \end{lstlisting}
+ This single dependency is enough, as it will transitively pull in the logback-core and slf4j-api dependencies. If you use spring boot, there is no need for that dependency; logback is already contained within the starter.
+ 
+\paragraph{The usage} of logback is rather simple. 
+\begin{lstlisting}[language=java]
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+ 
+public class SomeApp {
+    private final Logger logger = LoggerFactory.getLogger("MeinDefaultLogger");
+    
+    public void someMethod(){
+        logger.debug("This is a debug message");
+        logger.info("This is an info message. It can have {} of {}", "all kinds of", "parameters");
+        logger.warn("This is a warn message");
+        logger.error("This is an error message");
+    }
+}
+\end{lstlisting}
+
+\paragraph{configuration} It is on you to decide how the different log-statements should be handled. To do so, place a \verb logback.xml  in your \verb src/main/resources  folder. This configuration file contains the following elements: 
+\begin{itemize}
+    \item An \verb appender  is responsible for writing out the logstatments to a destination. Properties: \verb name  , \verb class  , \verb level  . There are several types (indicated by the \verb class  attribute): 
+        \begin{itemize}
+            \item RollingFileAppender
+            \item SMTPAppender (email)
+            \item ConsoleAppender
+            \item SiftingAppender (separates logs based on a runtime attribute)
+        \end{itemize}
+        An \verb appender  can also have a \verb filter, that decides what kind of messages it would display.
+        \begin{itemize}
+            \item \verb filter  .
+        \end{itemize}
+    \item \verb root  is the logger's software interface. Properties: \verb level  (the log-level threshold that should actually be used).
+        \begin{itemize}
+            \item \verb appender-ref  's list all the elements appenders that should actually be used. 
+        \end{itemize}
+    \item \verb logger  is just like the \verb root  logger, but with a different name. You can get the logger "meinBesondererLogger" with \inlinecode{Logger mbl = LoggerFactory.getLogger("meinBesondererLogger"); mbl.warn("Pass besser auf!");}. Loggers can have ancestors; to create a child to an ancestor, just give it a name that includes the ancestors name, like "meinBesondererLogger.sonderFall". 
+\end{itemize}
+
+An example would be: 
+\begin{lstlisting}[language=xml]
+<configuration debug="true" scan="true">
+
+    <property name="meineLogFile" value="log/meinlog.txt" />
+    <property name="meinLogFileArchiv" value="log/meinlog" />
+    
+    <appender name="consolenOutput" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder  class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <target>System.err</target>
+        </encoder>
+    </appender>
+    
+    <appender name="fileOutput" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder  class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <file>${meineLogFile}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${meinLogFileArchiv}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>5MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+    </appender>
+    
+    <appender name="roleSiftingAppender" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>userRole</key>
+            <defaultValue>ANONYMOUS</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="fileAppender" class="ch.qos.logback.core.FileAppender">
+                <file>${userRole}.log</file>
+                <encoder>
+                    <pattern>%d [%thread] %level %mdc %logger{50} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+    
+    <root level="debug">
+        <appender-ref ref="consolenOutput" />
+    </root>
+    
+    <logger level="info" name="meinBesondererLogger">
+        <appender-ref ref="rollingFileAppender" />
+    </logger>
+    
+</configuration>
+\end{lstlisting}
+For the discriminator to have access to the userRole key, you need to place it in the MDC (Mapped Diagnostic Context). Simply put, MDC allows you to set information to be later retrieved by other Logback components, using a simple, static API:
+\begin{lstlisting}[language=java]
+MDC.put("userRole", "ADMIN");
+logger.info("Admin Action");
+\end{lstlisting}

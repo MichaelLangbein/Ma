@@ -1,0 +1,192 @@
+\section{Fourier and Laplace}
+
+\subsection{Discrete Fourier Analysis}
+
+We'll begin with the discrete case. For one, this case is the basis of the FFT. Also, the math is a lot easier in the discrete case. Let $N$ be the samplesize and $\delta$ be the samplefrequency (often equal to 44100 Hz or 48000 Hz). Let $V$ be the samplespace of signals of size $N$. This is a vectorspace, equipped with an inner product of the form $\innerprodbr{\vec{a}}{\vec{b}} = \frac{1}{N} \sum_{k=0}^{N-1} a_k (b_k)^*$, where $()^*$ is the complex complement.
+
+\subsubsection{The Fourier Base}
+
+
+We'll use the base $B = \{ \vec{w}_N^n | n \in [0, N-1]\}$. Here, $\vec{w}_N^n$ is the vector we get by evaluating $e^{i 2\pi \frac{n}{N} k}$ at the points $k=0, k=1, ..., k=N-1$. Thus if we call $w_N = e^{i 2 \pi \frac{1}{N}}$, then the vector $\vec{w}_N^n$ consists of the elements $w_N^{nk}$. Throughout this chapter, $k$ will be the index of time/the signalvector and $n$ will be the index of frequency/the basevectors.
+
+The Fourier-base is a very particular choice: each element of each base-vector turns out to be one of the $N$ complex $N$th roots of one. We could have chosen any base-vectors, but these complex roots will turn out to have a few useful properties that we will exploit to speed up the Fourier transformation. These properties are:
+
+\begin{enumerate}
+    \item $w_N^x = (w_N)^x$
+    \item $w_N^{2x} = w_{N/2}^x$
+    \item $w_N^{2x+N} = w_N^{2x}$
+    \item $w_N^{x+N/2} = - w_N^x$
+\end{enumerate}
+
+It is also easy to prove that this base is orthogonal.
+\begin{proof} The vectors $\vec{w}_N^n$ are orthogonal. \\
+\subprf{Suppose $n \neq m$.}
+    {$\innerprodbr{\vec{w}_N^n}{\vec{w}_N^m} = 0$ }{
+    
+    $\innerprodbr{\vec{w}_N^n}{\vec{w}_N^m} = \frac{1}{N} \sum_{k=0}^{N-1} e^{i 2\pi \frac{n-m}{N} k} $ \\
+    
+    Using the result $\sum_{n=0}^{N-1} e^{xn} = \frac{1-e^{xN}}{1-e^{x}}$, we find: \\
+    
+    $\frac{1}{N} \sum_{k=0}^{N-1} e^{i 2\pi \frac{n-m}{N} k} = \frac{1}{N} \frac{1-e^{i 2\pi (n-m)}}{1-e^{i 2\pi \frac{n-m}{N}}}$ \\
+    
+    It is easy to see that $e^{i 2\pi (n-m)} = 1$. So the above term must equal 0.
+    
+    
+}
+\subprf{Suppose $n = m$.}
+    {$\innerprodbr{\vec{w}_N^n}{\vec{w}_N^m} = 1$ }{
+
+    We use the same line of reasoning as above to obtain: \\
+    
+    $ \innerprodbr{\vec{w}_N^n}{\vec{w}_N^m} = \frac{1}{N} \frac{1-e^{i 2\pi (0)}}{1-e^{i 2\pi \frac{0}{N}}}$ \\
+    
+    In the limit, this equals 1.
+}
+\end{proof}
+
+
+Proof of spanning
+
+\subsubsection{Obtaining the amplitudes}
+After having proven that $B$ is an orthonormal base for $V$, we can get to the core of the Fourier analysis: given a signal $\vec{v}$, how do we obtain the amplitudes in $\vec{v} = \sum_{n=0}^{N-1} \alpha_n \vec{w}_n$ ? Well, from paragraph \ref{fourierDecomposition} we know that 
+
+$$ \alpha_n = \innerprodbr{\vec{v}}{\vec{w}_N^n} = \frac{1}{N} \sum_{k=0}^{N-1} v_k e^{i 2\pi \frac{n}{N} k} $$
+
+Using Horners method, this is a \BigTheta{n} operation. Executing it on all $n$ coefficients, the whole proces becomes a \BigTheta{n^2} operation. A naive implementation might look like this: 
+
+\begin{lstlisting}[language=python]
+import numpy as np
+
+def amplitudes(signal):
+    amps = []
+    for n in range(N):
+        sm = 0
+        for k in range(N):
+            wnk = np.exp(-1j * 2 * np.pi * n * k / N) 
+            sm += signal[k] * wnk
+        amps.insert(n, sm/N)
+    return amps
+
+
+sig = [2, 1, 1, 4]
+print amplitudes(sig)
+\end{lstlisting}
+
+But it turns out we can do better. 
+
+\subsection{Fast Fourier Transform}
+
+In the previous section we have evaluated the polynomal $\sum_{k=0}^{N-1} v_k e^{i 2 \pi \frac{n}{N} k}$ like this:
+\begin{lstlisting}[language=python]
+for k in range(N):
+    wnk = np.exp(1j * 2 * np.pi * n * k / N) 
+    sm += signal[k] * wnk
+\end{lstlisting}
+
+Really, this is just the same as evaluating the polynomal $A(x) = \sum_{k=0}^{N-1} v_k x^k$, where $x = e^{i 2 \pi \frac{n}{N} 1} = w_N^n$ (using property 1). In other words, we calculated $A(w_N^n)$.
+
+However, it turns out that we can simplify this process. Before we detail how exactly this section is to be simplified, we need to realize that for any polynomal $A(x)$, it holds that $A(x) = A_{even}(x^2) + x A_{odd}(x^2)$
+
+
+Knowing that, we can split the evaluation in half:
+$$ A(w_N^n) = A_{even}(w_N^{2n}) + w_N^n A_{odd}(w_N^{2n})$$
+
+
+And using the properties 2-4 of $w_N^n$, we can calculate:
+\begin{equation} 
+\begin{split} 
+    A(w_N^n) & = A_{even}(w_N^{2n})   + w_N^n A_{odd}(w_N^{2n})   \\
+             & = A_{even}(w_{N/2}^n)  + w_N^n A_{odd}(w_{N/2}^n)
+\end{split}
+\end{equation}
+
+\begin{equation} 
+\begin{split}  
+A(w_N^{n + N/2})  & = A_{even}(w_N^{2n+ N}) + w_N^{n+N/2} A_{odd}(w_N^{2n + N}) \\
+                  & = A_{even}(w_N^{2n}) - w_N^n A_{odd}(w_N^{2n})   \\
+                  & = A_{even}(w_{N/2}^n) - w_N^n A_{odd}(w_{N/2}^n)
+\end{split}
+\end{equation}
+
+This way, we obtain:
+\begin{lstlisting}[language=python]
+def fft(signal):
+    N = len(signal)
+
+    if N == 1:
+        return signal
+
+    sigE = []
+    sigU = []
+    for k in range(N):
+        if k%2 == 0:
+            sigE.append(signal[k])
+        else:
+            sigU.append(signal[k])
+
+    ampsE = fft(sigE)
+    ampsU = fft(sigU)
+
+    amps = []
+    for n in range(N/2):
+        wn = np.exp(1j * 2 * np.pi * n / N)
+        an   = ampsE[n] + wn * ampsU[n]
+        an2N = ampsE[n] - wn * ampsU[n]
+        amps.insert(n,       an   )
+        amps.insert(n + N/2, an2N )
+
+    return amps
+\end{lstlisting}
+
+\subsubsection{Backtransformation}
+
+\subsection{Fourier for musical frequencies}
+Musical notes are special. Here, we don't want to get the full spectrum that FFT delivers, but only a few selected frequencies. 
+\subsubsection{Goertzel}
+Goertzel continues to work with the Fourier base. It differs from FFT in that only a few of the elements that FFT returns are actually evaluated. 
+\subsubsection{PCI}
+PCI discards of the Fourier base and instead uses the musical frequencies in the base. This results in a non-orthogonal base, but that won't hinder us. 
+
+\subsection{Continuous Fourier Analysis}
+
+In Fourier analysis, we deal with the innerproduct space $C_{[a,b]}^2$: the space of square-integrable functions that are continuous from $a$ to $b$. An orthogonal base for this vectorspace would be the Fourier base $\{ sin(\frac{j 2 \pi}{b-a} t), cos(\frac{j 2 \pi}{b-a}  t) | j \in \naturals \}$. Often, making use of Eulers formula, we instead write this base as $\{ e^{i \frac{n 2 \pi}{b-a} t} | j \in \naturals \}$. 
+
+\subsubsection{Comparing Fourier to other important series}
+
+\paragraph{Fourier versus Taylor} Another famous expansion of functions is the Taylor-expansion. It is important to note that the Taylor expansion is a completely different beast from the Fourier expansion.
+
+\begin{itemize}
+    \item Taylor works on locally differentiable functions, whereas Fourier works on globally integrable functions. You cannot recover the full function from its Taylor-expansion.
+    
+    \item The Taylor-base is non-orthogonal\footnote{proof required}
+\end{itemize}
+
+\begin{table}[ht]
+\centering
+\caption{Fourier versus Taylor}
+\begin{tabular}{@{}lll@{}}
+\toprule
+        & coefficients                                              & basevectors                       \\ \midrule
+Fourier & $f(t) \innerprod e^{i \frac{n 2 \pi}{b-a} t}$             & $e^{i \frac{n 2 \pi}{b-a}  t}$    \\
+Taylor  & $f^{(n)}(t)|t_0$                                          & $\frac{(x- x_0)^n}{n!}$          
+\end{tabular}
+\end{table}
+
+\paragraph{Fourier versus PCA} PCA comes a lot closer to Fourier in that in PCA we represent our data as a linear combination of orthogonal base-vectors. There are two differences though. In PCA the data is usually a matrix instead of a vector. And in PCA we don't know in advance what the set of base-vectors is going to be, but much rather chose the most fitting one for our datamatrix. It turns out that we can use the set of eigenvectors of the datamatrix\footnote{Strictly speaking, we don't work with the raw datamatrix, but rather its correaltion matrix. This is because for the eigenvector thing to work , we need the matrix to be symetric and centered around the origin, which the raw data matrix usually isn't.}.
+
+\begin{proof}There is a set of eigenvectors $E$ of a matrix $M$ that is an orthogonal basis for $\solspace{M}$
+    \subprf{}{}{}
+\end{proof}
+
+
+
+\subsubsection{Proving that Fourier functions form a basis}
+
+We can use Fourier to describe any functionspace - if we can prove that the Fourier functions do indeed form a basis for that space. This takes two steps: proving orthogonality and proving span.
+
+\paragraph{Orthogonality} This is very straightforward: 
+
+\paragraph{Span} This  requires more work.  We're first going to have to prove The Weierstrass-Theorem. This theorem states that the set $B = \{ x^j | j \in \naturals \}$ forms a basis for $C_{[a,b]}$.
+https://psychedai.wordpress.com/2016/11/15/the-intuition-behind-bernsteins-proof-of-the-weierstrass-approximation-theorem/
+
+

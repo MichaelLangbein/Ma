@@ -1,0 +1,23 @@
+\section{Strategies}
+
+\subsection{Dependencies versus microservices}
+
+Dependencies can be included right in your sourcode. Microservices on the other hand are not included at all, but called remotely from your programm. 
+
+
+\begin{table}[h]
+\centering
+\caption{Dependencies versus microservices}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+        & Dependencies                                             & Microservices                                                      &  &  \\ \midrule
+Changes & You can include the exact needed version of a dependency & Your program needs to adapt immediately if the service API changes &  &  \\
+        &                                                          &                                                                    &  &  \\
+        &                                                          &                                                                    &  &  \\ \bottomrule
+\end{tabular}
+\end{table}
+
+
+
+
+\subsection{Branching strategies}

@@ -1,0 +1,225 @@
+\section{Spring Boot}
+
+Spring boot takes away a lot of the boilerplate from spring. It reads all your classes and wires them together mostly by itself.
+
+
+\subsection{Example}
+We can reimplement the knight example like this: 
+
+\begin{lstlisting}[language=java, title=TtAplication]
+@SpringBootApplication
+public class TtApplication {
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context = SpringApplication.run(TtApplication.class, args);
+		Knight k = context.getBean(Knight.class);
+		String result = k.goOnQuest();
+		System.out.println(result);
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=java, title=TtConfig]
+@Configuration
+public class TtConfig {
+	@Bean
+	public Knight knight(Quest quest) {
+		return new NotSoBraveKnight(quest);
+	}
+	@Bean 
+	public Quest quest() {
+		return new ScaryQuest();
+	}
+}
+\end{lstlisting}
+
+Running this results in \inlinecode{"The not-so-brave knight reluctantly goes on a quest to slay a dangerous dragon"}.
+
+
+
+\subsection{Configuration}
+Spring boot will automatically detect any classes marked with \inlinecode{@Configuration}  in your classpath.
+
+
+
+
+\subsection{Database access}
+
+You can create a Jpa instance by just creating an interface extending the interface \inlinecode{JpaRepository}.  Spring boot will automatically check your classpath for any jpa-provider and use that to create the actual implementation of the interface. 
+If you don't want to use jpa, you can instead ...
+
+
+
+
+
+
+
+
+\subsection{Websites}
+Spring is primarily a framework for web-enabled apps. Consequently, spring boot makes developing webapps quite easily. 
+First of all, we add two dependencies to our pom: \verb starter-web, starter-thymeleaf   and \verb devtools  . 
+\begin{lstlisting}[language=xml]
+  <parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.9.RELEASE</version>
+	</parent>
+  
+  
+  <!-- Add typical dependencies for a web application -->
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+	</dependencies>
+
+	<!-- Package as an executable jar -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+\end{lstlisting}
+
+Now we need a main-class from where spring can run, a controller for the webrequests, and finally a file in the resources folder that contains the template.
+\begin{lstlisting}[language=java]
+@SpringBootApplication
+public class Main {
+    public static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=java]
+@Controller
+public class WebsiteMainController {
+	
+	@RequestMapping("/greeting")
+	public String startSite( @RequestParam(value="name", required=false, defaultValue="World") String name, Model model) {
+		model.addAttribute("name", name);
+		return "greeting"; // name of the template html-file to be used
+	}
+}
+\end{lstlisting}
+
+Here is the template, situated in \verb src/main/resources/templates/greeting.html  .
+
+\begin{lstlisting}[language=html]
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <p th:text="'Hello, ' + ${name} + '!'" />
+</body>
+</html>
+\end{lstlisting}
+
+You can start the app with the command \inlinecode{mvn spring-boot:run}. Going to the url \verb localhost:8080/greeting?name=Michael  will show you the expected site. Spring will automatically detect all changes you make to the source, and then rebuild and restart the app. You can also build the app with \inlinecode{mvn clean package} and then run it with \inlinecode{java -jar target/myWebApp-1.0.jar}
+
+
+
+
+
+
+
+
+\subsection{Testing}
+For all your model classes, you can use the usual procedure of JUnit tests. But you might also want to test that spring itself is working fine. This section describes how to do this. 
+
+First, add Testing-support as a dependency: 
+\begin{lstlisting}
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+\end{lstlisting}
+
+Now you can create Tests. For spring stuff, we use two special annotations: \inlinecode{@RunWith} and \inlinecode{@SpringBootTest} (Tells the Testser to go look for a main configuration class (one with @SpringBootApplication for instance), and start spring from there).
+\begin{lstlisting}
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MainTest {
+	@Test
+	public void contextLoads() throws Exception {
+	}
+}
+\end{lstlisting}
+Tests are run by simply calling \inlinecode{mvn test}.
+
+
+
+\subsection{Camel}
+
+Camel is quite easily integrated into spring boot. 
+
+\begin{lstlisting}[language=java]
+package org.langbein.michael.springcamel;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SpringcamelApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SpringcamelApplication.class, args);
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=java]
+package org.langbein.michael.springcamel.controllers;
+
+import org.apache.camel.ProducerTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class CamelController {
+
+	@Autowired
+	ProducerTemplate producerTemplate;
+	
+	@RequestMapping(value="/")
+	public void startCamel() {
+		producerTemplate.sendBody("direct:firstRoute", "Calling via Spring Boot Rest Controller");
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=java]
+package org.langbein.michael.springcamel.routes;
+
+import org.apache.camel.builder.RouteBuilder;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CamelRoutes extends RouteBuilder {
+
+	@Override
+	public void configure() throws Exception {
+		from("direct:firstRoute")
+		.log("camel body: ${body}");
+	}
+
+	
+}
+\end{lstlisting}

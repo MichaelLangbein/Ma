@@ -1,0 +1,118 @@
+\section{Emacs}
+
+\subsection{Basics}
+
+\inlinecode{c-g}: cancel current action.
+
+
+\paragraph{help} show a lot of info on the right sidebar: 
+\begin{itemize}
+\item \inlinecode{C-h k key-binding}: Describe the function bound to the key binding. To get this to work, you actually perform the key sequence after typing C-h k.
+\item \inlinecode{C-h f}: Describe function. 
+\end{itemize}
+
+\paragraph{buffers} are the content of files:
+\begin{itemize}
+    \item \inlinecode{c-x b}: create new buffer.
+    \item \inlinecode{c-x k}: kill buffer.
+\end{itemize}
+
+
+\paragraph{files} are what we usually work with instead of buffers (technically, a buffer is just the content of a file, or some content not yet saved to a file):
+\begin{itemize}
+    \item \inlinecode{c-x c-f}: opens a file
+    \item \inlinecode{c-x c-s}: save file
+    \item \inlinecode{c-x c-c}: close file
+\end{itemize}
+
+
+\paragraph{Modes} Emacs has a dedicated mode for almost everything. There is a python mode, a git mode, a compare mode, and much more:
+\begin{itemize}
+    \item Chosing a mode: \inlinecode{M-x}
+    \item Refreshing package-list: \inlinecode{M-x package-refresh}
+    \item \inlinecode{M-x package-list}
+    \item \inlinecode{M-x package-install}
+    \item \inlinecode{M-x replace-string}
+    \item \inlinecode{M-x ediff}: compare mode
+    \item \inlinecode{M-x dired}: file manager
+\end{itemize}
+You have one major mode (decided on by the file type) and many minor modes. A minor mode is toggled on or off with the same command. 
+
+
+\paragraph{moving}:
+\begin{itemize}
+    \item \inlinecode{C-a} 	Move to beginning of line.
+    \item \inlinecode{M-m} 	Move to first non-whitespace character on the line.
+    \item \inlinecode{C-e} 	Move to end of line.
+    \item \inlinecode{C-f} 	Move forward one character.
+    \item \inlinecode{C-b} 	Move backward one character.
+    \item \inlinecode{M-f} 	Move forward one word (I use this a lot).
+    \item \inlinecode{M-b} 	Move backward one word (I use this a lot, too).
+    \item \inlinecode{C-s} 	Regex search for text in current buffer and move to it. Press C-s again to move to next match.
+    \item \inlinecode{C-r} 	Same as C-s, but search in reverse.
+    \item \inlinecode{M-<} 	Move to beginning of buffer.
+    \item \inlinecode{M->} 	Move to end of buffer.
+    \item \inlinecode{M-g g} Go to line. 
+\end{itemize}
+
+\paragraph{Selecting} (or, rather, creating regions):
+\begin{itemize}
+    \item \inlinecode{C-spc}  start selecting
+    \item 
+\end{itemize}
+
+\paragraph{copy-pasting}:
+\begin{itemize}
+    \item \inlinecode{c-/}: undo
+    \item \inlinecode{C-w}:	Kill region.
+    \item \inlinecode{M-w}: 	Copy region to kill ring.
+    \item \inlinecode{C-y}: 	Yank.
+    \item \inlinecode{M-y}: 	Cycle through kill ring after yanking.
+    \item \inlinecode{M-d}: 	Kill word.
+    \item \inlinecode{C-k }:	Kill line. 
+\end{itemize}
+
+\paragraph{spacing and expanding}:
+\begin{itemize}
+    \item \inlinecode{Tab}: 	Indent line.
+    \item \inlinecode{C-j}: 	New line and indent, equivalent to enter followed by tab.
+    \item \inlinecode{M-/}: 	Hippie expand; cycles through possible expansions of the text before point.
+    \item \inlinecode{M-\\}: 	Delete all spaces and tabs around point. (I use this one a lot.) 
+\end{itemize}
+
+\paragraph{windows and frames}:
+\begin{itemize}
+    \item \inlinecode{C-x o}: 	Switch cursor to another window. Try this now to switch between your Clojure file and the REPL.
+    \item \inlinecode{C-x 1}: 	Delete all other windows, leaving only the current window in the frame. This doesn’t close your buffers, and it won’t cause you to lose any work.
+    \item \inlinecode{C-x 2}: 	Split frame above and below.
+    \item \inlinecode{C-x 3}: 	Split frame side by side.
+    \item \inlinecode{C-x 0}: 	Delete current window. 
+\end{itemize}
+
+
+\subsection{Clojure}
+
+
+
+\subsection{Writing custom commands}
+This is a really simple two step process: 
+
+In your \inlinecode{.emacs.d/init.el} file, create a function
+\begin{lstlisting}[language=lisp]
+(defun insert-line-before () 
+    (interactive)           ;; <--- a function call that tells emacs that this is a function the user can call
+    (save-excurstion 
+        (move-beginning-of-line 1)
+        (newline)))    ;; <--- the actual function body
+\end{lstlisting}
+
+Now the function call already be executed using \inlinecode{M-x insert-line-before}.
+
+But to make the function available via a shortcut, you also need to do: 
+\begin{lstlisting}[language=lisp]
+(global-set-key 
+    (kbd "C-S-i")
+    'insert-line-before)
+\end{lstlisting}
+
+

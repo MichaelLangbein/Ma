@@ -1,0 +1,583 @@
+\section{C++}
+
+C++ is the best compromise between raw power and versatility. Fortran is faster in large matrix-operations, but lacks the abstraction of OOP and any multi-media support. Java is even better abstracted and has an unbeatable ecosystem with modules for everything, but slower. 
+
+
+
+\subsection{Some weird syntax and new concepts}
+Contrary to garbage-collected languages, where you only need to care about who knows about a given object, in cpp you also net to worry about where that object lives. 
+
+\subsubsection{References}
+Refences are really just syntactic sugar around pointers. It's still useful to know a few of their basic properties, since they are intended to help you avoid errors in memory management. 
+
+Using pointers, to mutate an object you need to use pointer syntax for any operation on the object. This is known as dereferencing: using \inlinecode{*vpt} and \inlinecode{vpt->}.
+\begin{lstlisting}[language=c++]
+void foo(Vec* vpt){
+    vpt->increment(1);
+}
+
+Vec vec = Vec();
+foo(&vec);
+\end{lstlisting}
+
+Using references we can act as if the actual object and not just a pointer to it was in the function scope.
+\begin{lstlisting}[language=c++]
+void foo(Vec& v){
+    v.increment(1);
+}
+
+Vec vec = Vec();
+foo(vec);
+\end{lstlisting}
+
+Syntax: 
+\begin{lstlisting}[language=c++]
+int i = 3;
+int* i_ptr = &i;
+int& i_ref = i;
+\end{lstlisting}
+
+There are a few more noteworthy properties of references that are intended to make your life easier:
+\begin{itemize}
+    \item A pointer may point to nothing\footnote{However, this is very bad practice. Always initialize your free pointers to null using \inlinecode{int* ap = nullptr;}} - you may write \inlinecode{int* nullpt;}. A reference however mustn't do that. This will not compile: \inlinecode{int& nullrf;}.
+    \item You can point a pointer to a new object, but a reference allways points to the same object. This will have \inlinecode{ap} point to \inlinecode{b}: 
+    \begin{lstlisting}
+    int a = 1; 
+    int b = 2; 
+    int& ar = a; 
+    ar = b;
+    \end{lstlisting}
+    This, however, will overwrite \inlinecode{a}: 
+    \begin{lstlisting}
+    int a = 1; 
+    int b = 2; 
+    int& ar = a; 
+    ar = b;
+    cout << a << endl;  // yields 2 (!)
+    \end{lstlisting}
+\end{itemize}
+\subsubsection{Const keyword}
+Sometimes you want immutability; in cpp probably even more than in other languages, for security reasons. That is what the \inlinecode{const} keyword is there for. In most cases, you'll use this keyword when a function is passed some objects that it mustn't alter. Passing the objects as consts guarantees that the function has no sideeffects on the objects. 
+\begin{lstlisting}[language=c++]
+bool isEqual(const Vec & v1, const Vec & v2) {
+    bool eq = false;
+    if( v1.x == v2.x && v1.y == v2.y ){
+        eq = true;
+    }
+    return eq;
+}
+\end{lstlisting}
+
+Of course, we could also have avoided side-effects on v1 and v2 by just passing by value, because then the function would have only altered it's own copies of v1 and v2. But creating those copies is a costly operation, so we're cheeper of by passing by reference and using const to achieve immutability. 
+
+Unfortunately, \inlinecode{const} has some weird syntax rules. The trick is in figuring out whether a value or a pointer to a value is to be constant. The rule is that \inlinecode{const} allways applies to the keyword to it's left. If there is nothing on the left, it applies to the keyword on the right. 
+\begin{lstlisting}
+const int a = 1;                // a constant integer
+const int* a_ptr = nullptr;     // a variable pointer to a constant integer
+int const* a_ptr;               // a variable pointer to a constant integer
+int * const a_ptr;              // a constant pointer to a variable integer (you will rarely need this)
+\end{lstlisting}
+
+
+
+
+\subsection{Object orientation}
+Here is a simple example of the class-syntax in cpp.
+
+\begin{lstlisting}[language=c++]
+#include <iostream>
+#include <string>
+
+using std::string;
+
+class Robot {
+  
+  private:
+    string name;
+    int hitpoints;
+  
+  public:
+    Robot(string n, int hp) : name(n), hitpoints(hp){
+      std::cout << "Created " << name << " with " << hitpoints << " health" << std::endl;
+    }
+    
+    void hit(Robot* other){
+      other->takeHit(10);
+    }
+    
+    void takeHit(int strength){
+      hitpoints -= strength;
+      std::cout << name << " now has " << hitpoints << " health" << std::endl;
+    }
+    
+    ~Robot(){
+      std::cout << name << " destroyed." << std::endl;
+    }
+};
+
+int main() {
+  Robot b("Bender", 100);
+  Robot v("Vender", 100);
+  b.hit(&v);
+  return 0;
+}
+\end{lstlisting}
+
+From this basic example we can already note a few important points.
+
+
+\paragraph{Constructors} cpp knows \emph{three} ways of creating objects: 
+\begin{itemize}
+    \item The default constructor \inlinecode{Robot b("Bender", 100);} is what you should usually make use of. 
+    \item Construction by assignment operator \inlinecode{Robot b = Robot("Bender", 100);} requires a functioning implementation of the assignment operator \inlinecode{Robot& operator=(const Robot& otherRobot)\{ ... return *this;\}}. If this isn't provided, the compiler generates one automatically. 
+    \item Construction by copying an existing instance \inlinecode{Robot b("Bender", 100); Robot v(b);} requires a functioning implementation of the copy constructor \inlinecode{Robot(const Robot& otherRobot)}. If this isn't provided, the compiler generates one automatically. 
+\end{itemize}
+
+\paragraph{Constructors as objects or as pointers} Objects can be constructed as objects or as pointers to objects. 
+
+Construction as object: 
+\begin{lstlisting}[language=c++]
+Particle p = Particle(20, 30);
+p.move();
+\end{lstlisting}
+Here the object is automatically destroyed once it goes out of scope. Note the missing \inlinecode{new} keyword.
+
+Construction as pointer: 
+\begin{lstlisting}[language=c++]
+Particle* p = new Particle(20, 30);
+p->move();
+delete p;
+\end{lstlisting}
+Here, the object survives until you manually call \inlinecode{delete p}.
+
+Whenever possible, you should prefer the first method. However, there are some situations when it makes sense to use pointers: 
+
+\begin{itemize}
+    \item when the object is returned from a function (or any other situation where the object needs to outlive its scope)
+    \item When you're passing the object to a function and you want that function to change the object and not just a copy of the object. 
+\end{itemize}
+
+
+
+\paragraph{Initialisation} Note also this important difference. In java, when you write \inlinecode{Perticle p;} this creates an uninitialized reference. In c++ however, this same command already does the initialisation by calling the default constructor.
+
+
+
+\subsubsection{Operator overloading}
+You can override any operator, as long as the operation makes use of at least one custom datatype. 
+
+\begin{lstlisting}[language=c++]
+#include <iostream>
+#include <string>
+
+using std::string;
+
+class Vector {
+  public:
+    int x;
+    int y;
+    int z;
+    Vector(int _x, int _y, int _z) : x(_x), y(_y), z(_z) {
+      std::cout << "Created: [" << x << "," << y << "," << z << "]" << std::endl;
+    }
+    ~Vector(){
+      std::cout << "Going out of scope: [" << x << "," << y << "," << z << "]" << std::endl;
+    }
+};
+
+
+Vector operator+(Vector const & v1, Vector const & v2) {
+  int x = v1.x + v2.x;
+  int y = v1.y + v2.y;
+  int z = v1.z + v2.z;
+  Vector v3 = Vector(x, y, z);
+  return v3;
+}
+
+int main() {
+  
+  Vector a = Vector(1, 2, 3);
+  Vector b = Vector(2, 3, 4);
+  Vector c = a + b;
+  return 0;
+}
+\end{lstlisting}
+
+\paragraph{A very special case: assignment operator} The assignment operator is a very special case. It is only allowed to be defined inside a class. But it is very useful to get an insight into what happens when you do an assignment in c++.
+example with overwriting an object
+
+From this we learn a very important lesson about the assignment operator. When one object is assigned to another, a copy of the actual values is made. In Java, copying an object variable merely establishes a second reference to the object. Copying a C++ object is just like calling clone in Java. Modifying the copy does not change the original.
+\begin{lstlisting}[language=c++]
+Point q = p; /* copies p into q */
+q.move(1, 1); /* moves q but not p */
+\end{lstlisting}
+
+
+\paragraph{Assignment by copying versus assignment by moving} The last paragraph was not absolutely honest with you: you can force cpp to move an object instead of copying it when doing an assignment. 
+ex with std::move
+
+
+
+\subsubsection{Rule of three}
+The rule of three states that if you write a custom constructor or destructor, you're also going to need a custom copy-constructor and a custom assignment-operator. The rule basically comes down to this: if you do any memory management during construction, you will also do memory management during copying and during destruction. The compiler cannot guess that memory management for you, so you need to specify it yourself. 
+
+\begin{lstlisting}[language=c++]
+class Ball {
+    private:
+        int xpos;
+		int ypos;
+		int xvel;
+		int yvel;
+
+    public:
+        Ball(int x, int y) : xpos(x), ypos(y) {   // Standard constructor
+        	std::cout << "ball created" << std::endl;
+        }
+        		
+        ~Ball() {
+        	std::cout << "ball deleted" << std::endl;
+        }
+        
+        Ball(const Ball&) = delete;    // Copy constructor (note that argument has no name when using delete)
+		Ball& operator=(const Ball&) = delete;     // Assignment operator (note that argument has no name when using delete)
+        
+        void move() {
+        	xpos += xvel;
+        	ypos += yvel;
+        }
+        		
+        void push(int dvx, int dvy) {
+        	xvel += dvx;
+        	yvel += dvy;
+        }
+};
+\end{lstlisting}
+
+
+
+\subsubsection{Smart pointers}
+With a \inlinecode{unique_ptr} you can make sure that only one object, the owner of the pointer, can access the value behind the pointer. Consider this epic tale of a king and his magic sword: 
+\begin{lstlisting}[language=c++]
+#include <iostream>
+#include <string>
+#include <memory>
+
+using std::string;
+
+class Weapon {
+  private:
+    string name;
+  
+  public:
+    Weapon(string n = "rusty sword") : name(n) {
+    
+    }
+    
+    ~Weapon(){
+      std::cout << name << " destroyed" << std::endl;
+    }
+    
+    string getName() {
+      return name;
+    }
+};
+
+class Hero {
+  private:
+    string name;
+    Weapon* weapon_ptr;
+  
+  public:
+    Hero(string n) : name(n), weapon_ptr(nullptr) {}
+    
+    ~Hero(){
+      if(weapon_ptr != nullptr){ 
+        std::cout << name << " now destroying " << weapon_ptr->getName() << std::endl;
+        delete weapon_ptr;
+      }
+      std::cout << name << " destroyed." << std::endl;
+    }
+    
+    void pickUpWeapon(Weapon* w) {
+      if(weapon_ptr != nullptr) delete weapon_ptr;
+      weapon_ptr = w;
+    }
+    
+    string describe() {
+      if(weapon_ptr != nullptr){
+        return name + " now swings " + weapon_ptr->getName();
+      } else {
+        return name + " now swings his bare hands";
+      }
+    }
+};
+
+Weapon* blacksmithForge(string name){
+  Weapon* wp = new Weapon(name);
+  return wp;
+}
+
+
+int main() {
+  
+  Hero arthur = Hero("Arthur");
+  Hero mordred = Hero("Mordred");
+  Weapon* excalibur = blacksmithForge("Excalibur");
+  
+  std::cout << arthur.describe() << std::endl;
+  arthur.pickUpWeapon(excalibur);
+  std::cout << arthur.describe() << std::endl;
+  mordred.pickUpWeapon(excalibur);
+  std::cout << mordred.describe() << std::endl;
+  std::cout << "Everything going out of scope." << std::endl;
+  
+  return 0;
+}
+\end{lstlisting}
+
+Note how Mordred has snatched away Arthurs sword. When mordred dies, he takes Excalibur with him into the grave. When Arthur dies, he tries to do the same, but has to find that the sword he thought he had was no longer there. We can fix this problem by using \inlinecode{unique_ptr}'s:
+
+\begin{lstlisting}[language=c++]
+#include <iostream>
+#include <string>
+#include <memory>
+
+using std::string;
+
+class Weapon {
+  private:
+    string name;
+  
+  public:
+    Weapon(string n = "rusty sword") : name(n) {};
+    
+    string getName() {
+      return name;
+    }
+};
+
+class Hero {
+  private:
+    string name;
+    std::unique_ptr<Weapon> weapon_ptr;
+  
+  public:
+    Hero(string n) : name(n), weapon_ptr(new Weapon(n + "'s bare hands")) {}
+    
+    void pickUpWeapon(std::unique_ptr<Weapon> w) {
+      if(!w){
+        std::cout << "Nothing to pick up." << std::endl;
+        return;
+      }
+      weapon_ptr = std::move(w);
+    }
+    
+    string describe() {
+        return name + " now swings " + weapon_ptr->getName();
+    }
+};
+
+std::unique_ptr<Weapon> blacksmithForge(string name){
+  std::unique_ptr<Weapon> wp(new Weapon(name));
+  return wp;
+}
+
+
+int main() {
+  
+  Hero arthur = Hero("Arthur");
+  Hero mordred = Hero("Mordred");
+  std::unique_ptr<Weapon> excalibur = blacksmithForge("Excalibur");
+  
+  std::cout << arthur.describe() << std::endl;
+  arthur.pickUpWeapon(std::move(excalibur));
+  std::cout << arthur.describe() << std::endl;
+  
+  std::cout << "Mordred now tries to snatch Excalibur." << std::endl;
+  mordred.pickUpWeapon(std::move(excalibur));
+  std::cout << mordred.describe() << std::endl;
+  
+
+  std::cout << "Everything going out of scope." << std::endl;
+  
+  return 0;
+}
+\end{lstlisting}
+
+
+
+
+\subsubsection{Ownership: unique, shared and weak pointers}
+Let us explain in a bit more detail what a smart pointer is. Really, it i just a class encapsulating a raw pointer. The idea is that by wrapping a pointer in a class, we can have the class object be allocated on the stack and have it free the memory behind the pointer when the object is destroyed. This way, you don't have to manually delete a pointer.
+
+\begin{lstlisting}[language=c++]
+class SmartPointer{
+    private:
+        T* ptr;
+    public:
+        SmartPointer(T* p){
+            ptr = p;
+        }
+        ~SmartPointer(){
+            free(ptr);
+        }
+}
+\end{lstlisting}
+
+In this example, we allocate Excalibur on the heap. But because we're using smart pointers, we never have to clean up memory manually:
+\begin{lstlisting}[language=c++]
+#include <iostream>
+#include <memory>
+
+using std::string;
+
+class Weapon{
+  private:
+    string name;
+  public:
+    Weapon(string n) : name(n){}
+    string getName(){
+      return name;
+    }
+    ~Weapon(){
+      std::cout << name << " is being destroyed" << std::endl;
+    }
+};
+
+class Hero{
+  private:
+    string name;
+    std::unique_ptr<Weapon> weapon;
+  public:
+    Hero(string n) : name(n), weapon(new Weapon("rusty sword")) {}
+    void pickWeapon(std::unique_ptr<Weapon> w){
+      std::cout << name << " picked up " << w->getName() << std::endl;
+      weapon = std::move(w);
+      std::cout << weapon->getName()  << " is now on " << name << std::endl;
+    }
+    ~Hero(){
+      std::cout << name << " is being destroyed" << std::endl;
+    }
+};
+
+int main() {
+  
+  Hero arthur("Arthur");
+  std::unique_ptr<Weapon> w(new Weapon("Excalibur"));
+  arthur.pickWeapon(std::move(w));
+  
+  return 0;
+}
+\end{lstlisting}
+
+Note how we used \inlinecode{move(w)} to overwrite \inlinecode{weapon}. What happens here is this: In the main-scope, the \inlinecode{w}'s internal pointer to Excalibur is replaced by a \inlinecode{nullptr}. Any further attempt of accessing \inlinecode{w} will cause a runtime-error. Inside the \inlinecode{pickWeapon} method, the old smartpointer to the rusty sword is destroyed, causing the sword itself to be free'd.  
+We could'nt have used \inlinecode{weapon = w;}; that would have caused an error (because \inlinecode{unique_ptr}'s copy-assignment method is delted). This is deliberate: we don't want copies of a unique pointer to exist. We want a unique pointer to only ever exist in one place (in this case: first in the \inlinecode{main} function, later in the \inlinecode{arthur} instance), so that the memory behind the pointer can only get freed once (in this case: when \inlinecode{arthur} is destroyed).
+
+Generally, we can proclaim the following rules:
+\begin{itemize}
+    \item When you're given a reference, someone else will clean up the original. 
+    \item When you're given a unique pointer, you are now the sole owner of the smartpointer. If you move the pointer, it will go out of scope once you do; if you don't, it will go out of scope once your method ends. Passing a unique pointer to a method that doesn't move the pointer means destroying the object! To pass a unique pointer to a method without it being destroyed or moved, don't pass the unique pointer, pass a \inlinecode{unique_ptr<T> const &}.
+    \item When you're given a shared pointer, ... . Shared pointers use reference counting just like the java garbage collector.  
+\end{itemize}
+There are a lot more useful tips \hyperlink{https://herbsutter.com/2013/06/05/gotw-91-solution-smart-pointer-parameters/}{here} and \hyperlink{https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function}{here}.
+
+
+\paragraph{Using ownership wisely} Based on this, we can define different ownership strategies depending on whether an object is a value-object or an id-object. 
+
+
+\subsection{Templates}
+Templates are like java generics. 
+
+\subsubsection{Function template}
+
+\begin{lstlisting}[language=c++]
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+template <typename T>
+inline T const& Max (T const& a, T const& b) { 
+   return a < b ? b:a; 
+}
+
+int main () {
+   int i = 39;
+   int j = 20;
+   cout << "Max(i, j): " << Max(i, j) << endl; 
+
+   double f1 = 13.5; 
+   double f2 = 20.7; 
+   cout << "Max(f1, f2): " << Max(f1, f2) << endl; 
+
+   string s1 = "Hello"; 
+   string s2 = "World"; 
+   cout << "Max(s1, s2): " << Max(s1, s2) << endl; 
+
+   return 0;
+}
+\end{lstlisting}
+
+
+\subsubsection{Class template}
+
+
+\subsection{Threading} 
+Comared to c's posix threads, c++ has somewhat simplified it's core threading library. 
+\begin{lstlisting}[language=c++]
+#include <iostream>
+#include <thread>
+
+void threadFunc(int i) {
+  for(int j = 0; j < 100; j++){
+    std::cout << "hi! this is operation " << j <<" from thread nr " << i << std::endl;
+  }
+}
+
+int main(){
+  std::thread threads[10];
+  
+  for(int i = 0; i<10; i++){
+    threads[i] = std::thread(threadFunc, i);
+  }
+  
+  for(int i = 0; i<10; i++){
+    threads[i].join();
+  }
+  
+  return 0;
+}
+\end{lstlisting}
+You can avoid some of the above problem using barriers in your code (\inlinecode{std::mutex}) which will let you synchronize the way a group of threads share a resource.
+
+\subsection{SDL}
+
+Sdl is even simpler than openframeworks, but lacks some of of's more advanced features. However, to get started with simple programs, it seems ideal. 
+
+\subsubsection{setup}
+
+
+\subsection{OpenFrameworks}
+
+This is the C++ equivalent of processing. There are a few basics you need to be aware of. 
+
+\begin{itemize}
+    \item Your \inlinecode{ofApp} extends \inlinecode{ofBasicApp} which exposes a bunch of virtual methods that you may or may not implement to hook into their functionality. 
+    \item \inlinecode{ofApp}'s are threaded, so you might need mutex'es to synchronise audio and video, for example. 
+\end{itemize}
+
+
+\subsubsection{of native fuctions}
+
+
+\paragraph{audioReceived}
+
+\paragraph{ofThread}
+
+\paragraph{ofMutex} This has all other threads wait with outputting anything until the action inside the lock is completed. 
+\begin{lstlisting}
+ofMutex soundMutex;
+soundMutex.lock();
+// do stuff here
+soundMutex.unlock();
+\end{lstlisting}

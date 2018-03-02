@@ -1,0 +1,18 @@
+\section{Where should we meet?}
+
+$n$ people want to decide at who's house to meet up. Does it matter? Can the sum of the paths that each person needs to travel vary? In fact, it can! Imagine that $n-1$ of them live in the same town, while the last of them lives far away on the other side of the country. If they all meet in the town, only one person has to travel very far, whereas if they meet on the other side of the country, $n-1$ people need to travel a large distance.
+
+
+The distance to travel can be represented by a weighted connection matrix. Consider this example:
+
+$$
+\begin{bmatrix}
+    0 &  1 &  1 &  1 &  11 \\
+    1 &  0 &  1 &  1 &  11 \\
+    1 &  1 &  0 &  1 &  11 \\
+    1 &  1 &  1 &  0 &  10 \\
+    11 & 11 & 11 & 10 & 0 \\
+\end{bmatrix}
+$$
+
+It is now trivial to see that we can find the optimal place to meet up as the column with the smallest sum - in this case this would be at the place of person $d$.

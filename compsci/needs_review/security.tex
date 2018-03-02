@@ -1,0 +1,47 @@
+\section{Security}
+
+\subsection{HTTPS}
+
+\paragraph{The mechanism} of https 
+
+\paragraph{HTTPS versus SSH}
+
+\paragraph{Setup}
+
+
+\subsection{XSS}
+
+Cross-site-scripting is a form of attack where a hacker sneaks in a malicious js-script that another, unwitting user of the site then executes. The website is thusly used as a vehicle to carry the malicious payload to other customers. 
+
+\paragraph{The mechanism} of XSS exploits any place in the website, where a user is presented data that has been put in there from the ouside. 
+
+Maybe your site has the following section in it: 
+\begin{lstlisting}
+print "<html>"
+print "<h1>Most recent comment</h1>"
+print database.latestComment
+print "</html>"
+\end{lstlisting}
+This code gets the latest comment from the database and prints it to the site. 
+A hacker will put some malicious js into the comment, like this: \inlinecode{<script>doSomethingEvil();</script>}. That code will then be stored in the db and presented to an unwitting user who just wanted to see the latest comments.  
+
+Malicious code doesn't neccessarily come from an evil users input in a form. It could also have been brought into the site anywhere where 
+\begin{itemize}
+    \item a users form input is stored in the database unchecked
+    \item external js is loaded from the web instead of being stored lokally
+    \item 
+\end{itemize}
+
+\paragraph{The potential damage} of a XSS is large. Of course, javascript cannot reach out of the browser to the computer. BUT the js can grab hold of any cookies the visitor uses. From the cookie, an attacker can get session-ids and then impersonate the user. Alternatively, the js could alter the sites DOM in such a way as to trick the user into entering personal data into a form. 
+
+\paragraph{Prevention} of XSS is based on avoiding stuff-from-the-outside (aka. "untrusted data") to be shown anywhere on your site except for a few carefully controlled locations. Especially, stuff-from-the-outside should never be allowed to end up between \inlinecode{<script>} tags, \inlinecode{<!-- ... -->} html-comments, \inlinecode{<style>} tags, or appear as div-names, div-attribute-names, or the like. Here is the whitelist of the few places where it is ok to have stuff-from-the-outside:
+\begin{itemize}
+    \item \inlinecode{<body>...ESCAPED UNTRUSTED DATA...</body>} 
+    \item \inlinecode{<div>...ESCAPED UNTRUSTED DATA...</div>} 
+    \item \inlinecode{<div attr="...ESCAPED UNTRUSTED DATA...">content</div>}
+\end{itemize}
+Even in these few places, make sure that you used \inlinecode{html_entity_decode} on the stuff you want to paste there before you let it be shown on the site. This makes sure that the untrusted data doesn't, for example, contain any \inlinecode{"} which would allow it to break out of the attribute like so: 
+\begin{lstlisting}
+    <div attr="someFakeAttr" onload="doEvilStuff();">content</div>
+\end{lstlisting}
+where \inlinecode{someFakeAttr" onload="doEvilStuff();"} is UNTRUSTED DATA.

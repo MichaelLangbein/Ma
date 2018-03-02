@@ -1,0 +1,350 @@
+\section{Using camel inside spring}
+
+This differs from a camel-standalone setup in a few ways. 
+\begin{itemize}
+    \item Instead of the camel-context, we use the spring-camel-context.
+    \item Instead of having routes implement \verb RouteBuilder, we have them implement \verb SpringRouteBuilder (this is optional and only done if we want the route to be discoverable with the \verb @Component annotation). 
+\end{itemize}
+
+The good thing however is that for the rest each camel-route can be configured like it was just another bean. 
+
+
+
+\begin{lstlisting}[language=java, name=AppMain.java]
+public class AppMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctxt = new ClassPathXmlApplicationContext("app.xml");
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=xml, name=app.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+	
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+		<routeBuilder ref="testRoute"/>
+	</camelContext>
+
+	<bean class="springcamelxml.TestRoute" id="testRoute"></bean>
+	
+
+</beans>
+\end{lstlisting}
+
+\begin{lstlisting}[language=java, name=TestRoute.java]
+public class TestRoute extends SpringRouteBuilder{
+
+	@Override
+	public void configure() throws Exception {
+		from("timer://myTimer?fixedRate=true&period=1000")
+		.process(new Processor() {
+			public void process(Exchange exchange) throws Exception {
+				System.out.println("I got the following message: " + exchange.getIn());
+			}
+		})
+		.to("mock:endpoint");
+	}
+
+}
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=xml, name=pom.xml]
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.langbein.michael</groupId>
+	<artifactId>springcamelxml</artifactId>
+	<version>1</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.3.10.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-core</artifactId>
+			<version>2.19.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.camel/camel-jms -->
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jms</artifactId>
+			<version>2.19.2</version>
+		</dependency>
+	</dependencies>
+
+	<packaging>jar</packaging>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<!-- this is for being able to run camel with camel:run -->
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-maven-plugin</artifactId>
+				<!-- optional, default value: org.apache.camel.spring.Main -->
+				<configuration>
+					<mainClass>springcamelxml.AppMain</mainClass>
+				</configuration>
+			</plugin>
+
+			<!-- download source code in Eclipse, best practice -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>false</downloadJavadocs>
+				</configuration>
+			</plugin>
+
+			<!-- Set a JDK compiler level -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- Make this jar executable -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<!-- Jar file entry point -->
+							<mainClass>springcamelxml.AppMain</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+</project>
+\end{lstlisting}
+
+\subsection{Alternative ways of embedding camel in spring}
+
+\subsubsection{Making context a bean}
+
+This is certainly the easiest way of embedding camel in spring. 
+
+\begin{lstlisting}[language=java]
+@RestController
+public class CamelController {
+
+	@Autowired
+	RouteBuilder getMail;
+	
+	@Autowired
+	RouteBuilder sendMail;
+	
+	@Autowired
+	CamelContext camelContext;
+	
+	
+	@RequestMapping(value="/sendMail", method=RequestMethod.GET)
+	public void sendMail(@RequestParam(defaultValue="michael", name="person", required=false) String person) throws Exception {
+		String body = "Hello, " + person + "!";
+		camelContext.createProducerTemplate().sendBody("direct:sendMail", body);
+	}
+	
+	@RequestMapping(value="/getMails", method=RequestMethod.GET)
+	public void getMails(@RequestParam(defaultValue="", name="folder", required=false) String folder) throws Exception {
+		camelContext.createProducerTemplate().sendBody("direct:getMail", folder);
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=java]
+@Component
+public class SendMailRoute extends RouteBuilder {
+
+	@Override
+	public void configure() throws Exception {
+		from("direct:sendMail")
+		.setHeader("Subject", constant("camelnachricht"))
+		.setHeader("To", constant("michael.langbein@lfu.bayern.de"))
+		.to("smtp://UMWELT\\Langbein_M@relay.rz-sued.bayern.de:25?password=michael86&from=alarmplaene@lfu.bayern.de");
+	}
+
+}
+\end{lstlisting}
+
+\subsubsection{MVC: registering camel as a second servlet}
+
+The previous approach is certainly the easiest. It has one drawback, though: you cannot use the camel rest-component as a route starting-point. The reason is that all requests go straight to the dispatcher servlet and from there to a controller. The controller can then call a camel route using the \verb direct  component just fine. But if the controller was to call the camel-rest-component, that would mean actually creating a second http-request. 
+
+An alternative would be to handle some requests comming to your spring app not by springs default dispatcher servlet, but by camel. This makes sense when you want to expose camels rest-component to the internet. The camel sevlet will then coexist next to the spring dispatcher-servlet. By creating a ServletRegistrationBean, we tell the dispatcher servlet which requests should go straight to the camel context. 
+
+\begin{lstlisting}[language=java]
+@Component
+public class HelloRoute extends RouteBuilder {
+ 
+    @Bean
+    ServletRegistrationBean camelServlet() {
+        ServletRegistrationBean mapping = new ServletRegistrationBean();
+        mapping.setName("CamelServlet");
+        mapping.setLoadOnStartup(1);
+        mapping.setServlet(new CamelHttpTransportServlet());
+        mapping.addUrlMappings("/camel/*");
+        return mapping;
+    }
+ 
+    @Override
+    public void configure() throws Exception {
+        rest("/").produces("text/plain")
+            .get("hello")
+            .to("direct:hello");
+ 
+        from("direct:hello")
+            .to("geocoder:address:current")
+            .transform().simple("Hello. We are at: ${body}");
+    }
+}
+\end{lstlisting}
+
+
+
+\subsubsection{MVC: registering camel as a service}
+
+This makes sense when ...
+
+\begin{lstlisting}[language=java]
+@Service
+public class RouteManager implements CamelContextAware { 
+
+    protected CamelContext camelContext;
+
+    public CamelContext getCamelContext() {
+     return camelContext;
+    }
+
+    public void setCamelContext(CamelContext camelContext) {
+     this.camelContext = camelContext;
+    }
+}
+\end{lstlisting}
+
+
+\subsection{Camel REST}
+Camel has a rest-component that you can use as the from-part of your route to respond to rest-requests (and an equivalent soap-component).
+
+One simple way would be to make camel do this task standalone: 
+
+\begin{lstlisting}[language=java]
+from("restlet:http://localhost:8080/users/{id}/basic")
+.process(new Processor() {
+    public void process(Exchange ex) {
+        String id = ex.getIn().getHeader("id", String.class);
+        exchange.getOut().setBody(id + ", Donald Duck");
+    }
+});
+\end{lstlisting}
+
+
+\subsection{Integration in spring boot}
+It is really simple to integrate camel in spring boot. 
+However, it is really important to note that camel requires the web-starter, not only the spring boot starter. 
+
+\begin{lstlisting}[language=xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.bayern.lfu</groupId>
+	<artifactId>SpringBootCamel</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>SpringBootCamel</name>
+	<description>Demo project for Spring Boot</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.7.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring-boot-starter</artifactId>
+			<version>2.19.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>
+\end{lstlisting}
+
+With this pom, you only need \emph{one single class} as the minimal camel program: 
+
+\begin{lstlisting}[language=java]
+package de.bayern.lfu.SpringBootCamel;
+
+import org.apache.camel.builder.RouteBuilder;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SimplestRoute extends RouteBuilder {
+
+	@Override
+	public void configure() throws Exception {
+		from("timer:foo")
+		.to("log:bar");
+	}
+
+}
+\end{lstlisting}
+
+

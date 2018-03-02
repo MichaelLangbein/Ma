@@ -1,0 +1,624 @@
+\section{Python}
+
+Python is a wonderful calculator. It is not intended for large projects, but for one-off scripts, prototypes, data-analyses and the like. 
+
+\subsection{List comprehensions}
+
+List comprehensions allow us to write set-notation like declarative definitions of lists.
+
+\begin{lstlisting}[language=python]
+S = [x**2 for x in range(10)]
+M = [x for x in S if x%2 == 0]
+\end{lstlisting}
+
+\subsection{Functional programming}
+
+Anonymous functions are declared by using the \inlinecode{lambda} keyword. 
+\begin{lstlisting}[language=python]
+ls = [0, 1, 2, 3, 4]
+squares = map(lambda x: x * x, ls)
+evens = filter(lambda x: x%2 == 0, ls)
+\end{lstlisting}
+
+There is also support for currying: 
+\begin{lstlisting}[language=python]
+from functools import partial
+\end{lstlisting}
+
+\subsection{Decorators}
+Python decorators are annotations that extend the behavior of the function over which they are written. That lends them to do, for example, aspect oriented programming.
+
+In vanilla python, we could do this: 
+
+\begin{lstlisting}[language=python]
+def myDecorator(someFunc):
+    def wrapper():
+        print("This is printed before the function is called")
+        someFunc()
+        print("This is printed after the function is called")
+    return wrapper
+
+def sayWhee():
+    print("Wheee!")
+    
+wrappedWhee = myDecorator(sayWhee)
+wrappedWhee()
+
+# >> "This is printed before the function is called"
+# >> "Whee!"
+# >> "This is printed after the function is called"
+\end{lstlisting}
+
+
+But there is syntactic sugar for this. 
+\begin{lstlisting}[language=python]
+@myDecorator
+def sayWhee():
+    print("Wheee!")
+    
+sayWhee()
+\end{lstlisting}
+
+
+\subsection{Metaprogramming}
+
+On one hand we can change the way an object handles the standard operators (linke +, -, == etc); on the other we can define our own new operators (like innerprod, crossprod etc).And finally we can extend existing datastructures to change their behaviour to suite our needs. 
+
+\subsubsection{Changing the way an object handles operations}
+
+Python has a lot of built-in methods that are added to every class by default\footnote{This is because internally, every class inherits from a default-class named 'type'}. One of them is \inlinecode{__add__}.
+Consider this example: 
+
+\begin{lstlisting}[language=python]
+class MyVec:
+
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
+		
+	def __add__(self, other):
+		x = self.x + other.x
+		y = self.y + other.y
+		return MyVec(x, y)
+		
+	def __str__(self):
+		return "[{},{}]".format(self.x, self.y)
+		
+v1 = MyVec(1, 2)
+v2 = MyVec(2, 3)
+print v1 + v2  # >> [3, 5]
+\end{lstlisting}
+
+
+\subsubsection{Creating new operators}
+
+Defining custom operators is not internally supported by python, but you can use this: 
+
+\begin{lstlisting}[language=python]
+# From http://code.activestate.com/recipes/384122/
+
+class Infix:
+    def __init__(self, function):
+        self.function = function
+    def __ror__(self, other):
+        return Infix(lambda x, self=self, other=other: self.function(other, x))
+    def __or__(self, other):
+        return self.function(other)
+    def __rlshift__(self, other):
+        return Infix(lambda x, self=self, other=other: self.function(other, x))
+    def __rshift__(self, other):
+        return self.function(other)
+    def __call__(self, value1, value2):
+        return self.function(value1, value2)
+
+
+x=Infix(lambda x,y: x*y)
+print 2 |x| 4
+\end{lstlisting}
+
+Update: this has now made it into its own package: https://pypi.python.org/pypi/infix/
+
+\begin{lstlisting}[language=python]
+from infix import or_infix as infix
+
+@infix
+def add(a, b):
+    return a + b
+
+a |add| b
+\end{lstlisting}
+
+
+\subsubsection{Extending existing datastructures}
+
+Say you want lists to be indexed at 1. 
+\begin{lstlisting}[language=python]
+class MyList(list):
+    def __getitem__(self, key):
+        return list.__getitem__(self, key-1)
+\end{lstlisting}
+
+However, it is often problematic to change basic data-structures because other modules might depend on their predefined behaviour. For that reason python exposes a few abstract base types. Extending from these base types is like forking from abstract list instead of commiting to list trunk. A classical case of an existing datastructure that we might want to extend from is dictionaries for use as timeseries: 
+
+\begin{lstlisting}[language=python]
+import datetime as dt
+from UserDict import *;
+
+class TimeSeries(IterableUserDict):
+    """ self.data verhaelt sich wie ein ganz normales dict """
+    
+    def __init__(self, formDtTime='%d.%m.%Y %H:%M'):
+        UserDict.__init__(self)
+        self.formDtTime = formDtTime
+
+    def __setitem__(self, time, value):
+        if isinstance(time, basestring):
+            time = self.stringToDtTime(time)
+        if not isinstance(time, dt.datetime):
+            raise ValueError('Schluessel muss ein Zeitstring oder ein Datetime sein')
+        UserDict.__setitem__(self,time,value)
+
+    def stringToDt(self, timeString, form = None):
+        dtTime = self.stringToDtTime(timeString, form)
+        return dtTime.date()
+
+    def stringToDtTime(self, timeString, form = None):
+        if not form:
+            form = self.formDtTime
+        return dt.datetime.strptime(timeString, form)
+
+    def getFirstTime(self):
+        return min(self.data)
+
+    def getLastTime(self):
+        return max(self.data)
+
+    def getFirstVal(self):
+        return self.data[self.getFirstTime()]
+
+    def getLastVal(self):
+        return self.data[self.getLastTime()]
+
+    def getFirstPoint(self):
+        time = self.getFirstTime()
+        return [time, self.data[time]]
+
+    def getLastPoint(self):
+        time = self.getFirstTime()
+        return [time, self.data[time]]
+
+    def getSpan(self):
+        return self.getLastTime() - self.getFirstTime()
+
+    def getSubseries(self, von = None, bis = None):
+        if not von:
+            von = self.getMinTime()
+        if not bis:
+            bis = self.getMaxTime()
+        ts = TimeSeries()
+        for time in self.data:
+            if time < von or time > bis:
+                continue
+            ts[time] = self.data[time]
+        return ts
+
+    def getFilteredSeries(self, funct):
+        ts = TimeSeries()
+        for time in self.data:
+            if funct(time, self.data[time]):
+                ts[time] = self.data[time]
+        return ts
+
+
+if __name__ == '__main__':
+
+    # TimeSeries ist ein dict mit zusaetzlichen Methoden
+    ts = TimeSeries('%d.%m.%Y')
+    ts['14.10.1986'] = 0
+    ts['15.10.1986'] = 1
+    ts['16.10.1986'] = 2
+    ts['17.10.1986'] = 3
+    print ts.getSpan()
+    lw = ts.getLastPoint()
+    print "Letzter Wert ist {0} am {1}".format(lw[0], lw[1])
+    ss = ts.getFilteredSeries(lambda t, v: v >= 1 )
+    print ss
+
+    # Iterieren funktioniert wie gewohnt
+    for el in ts:
+        print el
+
+    # Beim Einfuegen von Daten wird auf das richtige Format geachtet
+    try:
+        ts[4] = 2
+    except Exception as e:
+        print repr(e)
+
+    # Map and reduce funktioniert wie gewohnt
+    print reduce(lambda summe, key: summe + ts[key], ts, 0)
+
+\end{lstlisting}
+
+
+\subsubsection{Named tuples}
+Named tuples take the best of simple classes (accessing fields by names) and tuples (accessing fields by index, immutable, iterable). They are wonderful in combination with infix custom operators for use as geometric objects.
+
+\begin{lstlisting}[language=python]
+>>> Point = namedtuple('Point', ['x', 'y'])
+>>> p = Point(11, y=22)     # instantiate with positional or keyword arguments
+>>> p[0] + p[1]             # indexable like the plain tuple (11, 22)
+33
+>>> x, y = p                # unpack like a regular tuple
+>>> x, y
+(11, 22)
+>>> p.x + p.y               # fields also accessible by name
+33
+>>> p                       # readable __repr__ with a name=value style
+Point(x=11, y=22)
+\end{lstlisting}
+
+
+\subsection{Plotting}
+
+Matplotlib is a matlab inspired library for plotting. 
+
+\begin{lstlisting}[language=python]
+import matplotlib.pyplot as plt
+plt.plot([1,2,3,4])
+plt.ylabel('some numbers')
+plt.show()
+\end{lstlisting}
+
+There are two important plotting functions: \inlinecode{plot} and \inlinecode{scatter}. Plot expects you to pass in all values as an array, scatter allows you to add each point one by one. 
+
+\begin{lstlisting}[language=python]
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+for point in line:
+    ax.scatter(point.x, point.y, point.z)
+plt.show()
+\end{lstlisting}
+
+\begin{lstlisting}[language=python]
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot(xarray, yarray)
+plt.show()
+\end{lstlisting}
+
+Also, often we want to plot heatmaps: 
+\begin{lstlisting}[language=python]
+data = np.random.random((100, 100))
+plt.imshow(data, cmap='hot', interpolation='nearest')
+plt.show()
+\end{lstlisting}
+
+\subsection{SymPy}
+
+Sympy is fairly good at doing symbolic calculations. 
+You can put restrictions to the type of a variable in the Symbol class. 
+
+\begin{lstlisting}[language=python]
+from sympy import Symbol, sin, cos
+
+x = Symbol('x')
+y = Symbol('y')
+
+diff(sin(x), x) # --> cos(x)
+cos(x).series(x, 0, 10)  # --> 1 - x^2/2 + x^4/24 - ...
+sin(x+y).expand(trig=True) # --> sin(x)cos(y) + sin(y)cos(x)
+\end{lstlisting}
+
+\begin{lstlisting}[language=python]
+from sympy import Matrix
+
+M = Matrix([[1,0],[0,1]])
+\end{lstlisting}
+
+\begin{lstlisting}[language=python]
+from sympy.solvers import solve
+
+solve(x**2 -1, x) # --> [-1, 1]
+solve([x+y-5, x-y+1], [x,y]) # --> {x:2,y:3}
+\end{lstlisting}
+
+\begin{lstlisting}[language=python]
+integrate( t * exp(t), t)
+>>> 
+integrate( t * exp(t), (t, 0, oo))
+\end{lstlisting}
+
+\begin{lstlisting}[language=python]
+>>> from sympy import Symbol, exp, I
+>>> x = Symbol("x")
+>>> exp(I*x).expand()
+ I*x
+e
+>>> exp(I*x).expand(complex=True)
+   -im(x)               -im(x)
+I*e      *sin(re(x)) + e      *cos(re(x))
+>>> x = Symbol("x", real=True)
+>>> exp(I*x).expand(complex=True)
+I*sin(x) + cos(x)
+\end{lstlisting}
+
+For many comon integrals sympy already has a predefined function: 
+
+\begin{lstlisting}[language=python]
+>>> from sympy import fourier_transform, exp
+>>> from sympy.abc import t, k
+>>> fourier_transform(exp(-t**2), t, k)
+sqrt(pi)*exp(-pi**2*k**2)
+>>> fourier_transform(exp(-t**2), t, k, noconds=False)
+(sqrt(pi)*exp(-pi**2*k**2), True)
+\end{lstlisting}
+
+The same holds for statistics: many common distributions are already given: 
+
+\begin{lstlisting}[language=python]
+>>> from sympy.stats import Poisson, density, E, variance, cdf
+>>> from sympy import Symbol, simplify
+>>> rate = Symbol("lambda", positive=True)
+>>> z = Symbol("z")
+>>> X = Poisson("x", rate)
+>>> density(X)(z)
+lambda**z*exp(-lambda)/factorial(z)
+>>> E(X)
+lambda
+>>> simplify(variance(X))
+lambda
+>>> cdf(X)(2)
+lambda**2*exp(-lambda)/2 + lambda*exp(-lambda) + exp(-lambda
+\end{lstlisting}
+
+
+You can even use standard python function  definitions in sympy:
+
+\begin{lstlisting}[language=python]
+def myf(x):
+    return x**2 + 1
+    
+x = Symbol("x")
+
+diff(myf(x), x)
+
+>> 2*x
+\end{lstlisting}
+
+\subsection{Numpy and Scipy}
+Scypy has, amongst others, a bunch of useful statistical methods: 
+\begin{lstlisting}[language=python]
+from scipy.stats import poisson
+
+def pois(lmbd, n):
+    return poisson.pmf(n, lmbd)
+
+def Pois(lmbd, n):
+    return poisson.cdf(n, lmbd)
+
+def poisCond(lmbd, n, n0):
+    if n < n0:
+        return 0
+    else:
+        return (pois(lmbd, n)) / (1 - Pois(lmbd, n0-1))
+
+def expct(lmbd):
+    ex = 0
+    for i in range(samplesize):
+        ex += i * pois(lmbd, i)
+    return ex
+
+def expctCond(lmbd, n0):
+    ex = 0
+    for i in range(samplesize):
+        ex += i * poisCond(lmbd, i, n0)
+    return ex
+\end{lstlisting}
+
+\subsection{Piping and currying}
+\begin{lstlisting}[language=python]
+from infix import or_infix
+
+@or_infix
+def pipe(val, func):
+    return func(val)
+
+def add2(x):
+    return x + 2
+
+print 3 |pipe| add2 |pipe| (lambda x:x**2)
+\end{lstlisting}
+
+\begin{lstlisting}[language=python]
+import inspect
+
+def curry(func, *args, **kwargs):
+
+    '''
+    This decorator make your functions and methods curried.
+    Usage:
+    >>> adder = curry(lambda (x, y): (x + y))
+    >>> adder(2, 3)
+    5
+    >>> adder(2)(3)
+    5
+    >>> adder(y = 3)(2)
+    5
+    '''
+
+    assert inspect.getargspec(func)[1] == None, 'Currying can\'t work with *args syntax'
+    assert inspect.getargspec(func)[2] == None, 'Currying can\'t work with *kwargs syntax'
+    assert inspect.getargspec(func)[3] == None, 'Currying can\'t work with default arguments'
+
+    if (len(args) + len(kwargs)) >= func.__code__.co_argcount:
+
+        return func(*args, **kwargs)
+
+return (lambda *x, **y: curry(func, *(args + x), **dict(kwargs, **y)))
+\end{lstlisting}
+
+\subsection{Generators}
+
+Generators create lists that are not kept in memory, but only evaluated on demand. This is useful for performance if we need to work with very large lists. We can potentially define even infinite lists. 
+
+\begin{lstlisting}[language=python]
+# As function. Note the 'yield' instead of a 'return'
+def evens(n):
+    for i in range(n):
+        if i%2 == 0:
+            yield i
+            
+# As a list comprehension. Note the () istead of []
+evens = (i for i in range(n) if i%2 == 0)
+\end{lstlisting}
+
+Both these methods don't return \inlinecode{[1, 2, 4, ..., n**2]}, but \inlinecode{<generator_n>}, which will be evaluated when neccessary.
+
+
+\subsection{Oslash: advanced functional programming}
+
+Very often, we don't know if an actual value or null is passed into or returned from a function. Functional programming languages manage this problem by wrapping those values in a maybe-monad. More generally, very often operations are nondeterministic: a function migth return nothing or multiple results at once. Then, it makes sense to wrap these possible outcomes in a monad. 
+
+
+One important thing to note is this: monads are not the essence of functional programming, but a means of dealing with uncertain operation-results. It will make sense to unwrap monads as soon as you can.
+
+
+Here we will show functors, applicative functors (which are just beefed up functors) and finally monads (which are just beefed up applicatives). 
+
+\begin{itemize}
+    \item A functor is a data type that implements the Functor abstract base class. You apply a function to a wrapped value using map or \% 
+    \item An applicative is a data type that implements the Applicative abstract base class. You apply a wrapped function to a wrapped value using * or lift
+    \item A monad is a data type that implements the Monad abstract base class.  You apply a function that returns a wrapped value, to a wrapped value using | or bind
+\end{itemize}
+
+A Maybe implements all three, so it is a functor, an applicative, and a monad.
+
+There are several common monads, like for example: 
+
+\begin{itemize}
+    \item maybe : if a value might be null
+    \item list : if a value might be 0, 1 or more values
+    \item io
+    \item reader
+    \item writer
+    \item state
+    \item identity : there is no reason to use this - only useful for theory.
+\end{itemize}
+
+\paragraph{Wrapped values}
+
+\paragraph{Functors} Unfortunately, you cannot just stick a wrapped integer to a function that accepts an integer: 
+\begin{lstlisting}[language=python]
+def add3(x):
+    return x + 3
+
+val = Just(2)
+
+add3(val) 
+>> Error!
+\end{lstlisting}
+
+This is what functors are for. 
+\begin{lstlisting}[language=python]
+def add3(x):
+    return x + 3
+
+val = Just(2)
+
+val.map(add3)
+>> Just 5
+\end{lstlisting}
+
+This works because the \inlinecode{Just} wrapper implements the abstract \inlinecode{Functor} baseclass, which forces it to define a \inlinecode{map(self, func)} method. 
+
+
+\paragraph{Applicatives} It was a little weird that we had to write the value before the function in \inlinecode{val.map(add3)}. But we can also wrap functions in a wrapper. If the wrapper implements the \inlinecode{Applicative} class, we can instead write:
+
+\begin{lstlisting}[language=python]
+add3Wrapped = Just(lambda: x: x+3)
+val = Just(2)
+
+add3Wrapped.lift(val)
+>> Just 5
+\end{lstlisting}
+
+
+\subsection{Multimedia: Pygame}
+
+In general when we want to do  a bigger multimedia-app, pygame is a save choice. It's python's equivalent of the Processing framework for Java. 
+
+\begin{lstlisting}[language=python]
+import sys, pygame
+
+pygame.init()
+
+
+size = width, height = 320, 240
+speed = [2, 2]
+black = 0, 0, 0
+
+screen = pygame.display.set_mode(size)
+
+ball = pygame.image.load("ball.gif")
+ballrect = ball.get_rect()
+
+
+while True: 
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: 
+            sys.exit()
+
+    ballrect = ballrect.move(speed)
+    if ballrect.left < 0 or ballrect.right > width:
+        speed[0] = -speed[0]
+    if ballrect.top < 0 or ballrect.bottom > height:
+        speed[1] = -speed[1]
+
+    screen.fill(black)
+    screen.blit(ball, ballrect)
+    pygame.display.flip()
+
+\end{lstlisting}
+
+
+screen aka. surface: \inlinecode{pygame.display.set_mode()}.
+
+\inlinecode{display.flip()} will update the contents of the entire display. \inlinecode{display.update()} allows to update a portion of the screen, instead of the entire area of the screen. Passing no arguments, it updates the entire display. 
+To tell PyGame which portions of the screen it should update (i.e. draw on your monitor) you can pass a single pygame.Rect object, or a sequence of them to the display.update() function. A Rect in PyGame stores a width and a height as well as a x- and y-coordinate for the position.
+
+PyGame's built-in dawning functions and the \inlinecode{.blit()} method for instance return a Rect, so you can simply pass it to the \inlinecode{display.update()} function in order to update only the "new" drawn area.
+
+Due to the fact that \inlinecode{display.update()} only updates certain portions of the whole screen in comparison to \inlinecode{display.flip(), display.update()} is faster in most cases.
+
+
+\subsection{Regex}
+
+
+
+\subsection{Packages}
+There are two ways of importing other scripts. The first is to just add the script location to the include path and then load the script like this: 
+
+\begin{lstlisting}[language=python]
+import sys
+sys.path.append('dependencies/pybuilder')
+from buildtool import *
+\end{lstlisting}
+
+This, however, has a few disadvantages. ......................
+
+So it may be better to instead turn your project into a package. A package is merely a directory that contains the scripts together with a (potentially empty) file named \verb __init__.py . With this, you can go like this:
+\begin{lstlisting}[language=python]
+import sys
+sys.path.append('dependencies')
+import pybuilder.buildtool as bt
+
+help(bt.execute)
+\end{lstlisting}
+
+The init-file may however also contain some additional information. 

@@ -1,0 +1,207 @@
+\section{Zabbix}
+
+
+\subsection{Basic concepts}
+
+Zabbix uses a quite simple, hierarchical structure for its monitoring. On the base level, there are applications, which are - obviously - the applications we want to monitor. 
+There are several aspects of monitoring - we might want to monitor the cpu-performance of the application, or the number of users logged in, etc. These aspects are called items, and zabbix regularly collects data about an application's items. But This data is not yet evaluated - this is what triggers are for. Triggers are rules that are applied on the collected data that yield a boolean - true or false - which stands for "fire" or "don't fire". Finally, the fact that a certain trigger fires still doesn't mean that a zabbix-admin is going to get notified. This is what actions are for. 
+
+\begin{itemize}
+    \item application: e.g. system (doesn't need to be a real app-name, just for grouping) (\inlinecode{/configuration/templates})
+    \item item: e.g. monitor cpu (some agent sends info to server) (\inlinecode{/configuration/templates})
+    \item trigger: e.g. cpu-load too high (server evaluates info) (\inlinecode{/configuration/templates})
+    \item action: e.g. send notification (server reacts on evaluation)\footnote{When an items information is evaluated by a trigger, a zabbix-internal \emph{event} is created. It is this event, not the evaluation itself, that zabbix reacts on by issuing an action.} (\inlinecode{/configuration/actions} and \inlinecode{/administration/media_types})
+\end{itemize}
+
+Obviously, all applications need to be deployed somewhere - on hosts or, more likely, host groups. While zabbix does allow you to associate applications directly with hosts or host groups, it is good practice to instead create a \emph{template} per application, which then gets associated to one or more host groups. This leads to better decoupling\footnote{Unfortunately, zabbix offers no easy way to associate a template with all hosts in a group. See this site for some background: http://www.zabbixbook.com/2016/09/22/added-a-template-to-group-nothing-happened/. In general, as of zabbix 2.4, zabbix treats host groups with very little regard ...}. 
+
+\subsection{Trigger scripting}
+Zabbix uses a simple scripting language to let you define triggers. They always follow the same pattern: 
+\begin{lstlisting}
+{<templatename>:<itemcall>.<statisticsfunction>} <comparator> {<variable>}
+{<hostname>:<itemcall>.<statisticsfunction>} <comparator> {<variable>}
+\end{lstlisting}
+
+For example: 
+\begin{lstlisting}
+{Template App MySQL:mysql.replication.last(0)}=0
+\end{lstlisting}
+
+Here, the templatename is \inlinecode{Template App MySQL}, the item is called by \inlinecode{mysql.replication}, and we extract a statistic out of the history of itemcalls with \inlinecode{last(0)}.
+
+Itemcalls are also called \emph{keys}.
+
+\subsubsection{Delayed warning}
+Often, you might only want to issue an action when a trigger has been fireing constantly for a while. For this reason, all items allow triggers to evaluate some statistic like min(timespan), max(timespan) etc. Look at these examples: 
+\begin{lstlisting}
+{Template ICMP Ping:icmppingsec.avg(5m)}>0.9
+{Template ICMP Ping:icmppingloss.min(10m)}>20
+{Template ICMP Ping:icmpping.max(#5)}=0
+\end{lstlisting}
+
+
+\subsubsection{Hysteresis}
+Sometimes the conditions for starting an alert and releasing the alert may differ. Maybe you want to do something like this: Start a warning when value is at, say, 5, and call off the alert when value is at, say, 3. 
+
+Zabbix supports a {TRIGGER.VALUE} macro, which returns the current trigger status as an integer (0 – ok, 1 – problem) and can be used directly in trigger expressions.
+
+ Consider this example: 
+ \begin{lstlisting}
+ ({TRIGGER.VALUE}=0 & {Oracle DB1:system.cpu.load.last()} > 2)
+|
+({TRIGGER.VALUE}=1 & {Oracle DB1:system.cpu.load.last()} > 1)
+ \end{lstlisting}
+ 
+ The \inlinecode{\{Oracle DB1:system.cpu.load.last()\} > 2} part defines when a problem starts, while the second part of the expression: \inlinecode{\{Oracle DB1:system.cpu.load.last()\} > 1} defines the condition to stay in the problem state.
+
+The problem definition is much smarter now. We have a problem if CPU load is more than 2, while recovery happens only if the CPU load goes below 1.
+
+\subsubsection{Variables}
+Zabbix - quite unfortunately - calls variables "macros". They are defined on the template-level under \inlinecode{/configuration/templates/<templatename>/macros}. In a trigger, they may be called like for example this: 
+\begin{lstlisting}
+{Template App SSH Service:ssh.run[Discspace].last()}>{$FESTPLATTE_FAST_VOLL}
+\end{lstlisting}
+
+
+\subsection{Actions}
+Actions are how we react on trigger-evaluations. Usually, we react on them by
+\begin{itemize}
+    \item sending an email to a group
+    \item executing a script 
+    \item escalation
+\end{itemize}
+
+\subsubsection{Executing a script on action}
+
+\subsubsection{Escalation}
+Escalations are the steps you can find under \inlinecode{/configuration/actions/<actionname>/operations}.
+Step 1 is executed immediately. Find the documentation here: https://www.zabbix.com/documentation/2.4/manual/config/notifications/action/escalations
+
+\paragraph{Delayed warning revisited} Sometimes you might want to have a trigger fire immediately but only start an action when the trigger continues to be active for a while. This way, the dashbord will show the trigger to be fireing, while your team is not bothered with a mail until it is clear that the issue is serious. 
+
+
+\subsection{Groups}
+
+It is bad practice to define any item for only a single host, or to define any action for only a single user. Instead, we assign things based on the following groups:
+
+\begin{itemize}
+    \item template: groups of applications/items/triggers (database-agentchecks, database-sshchecks, webserver-externalchecks, ...)
+    \item usergroups: groups of users (admins, drupalusers, hnd, ...)
+    \item hostgroups: groups of hosts (linux-internal, linux-external, webservers, ...)
+\end{itemize}
+
+Of these three, templates are a little complicated in that we group items not only by the sort of software that they are meant to monitor (which is their intended use), but also by the means of executing the monitoring  (which is a side effect forced upon us by zabbix's structure).
+
+
+\subsection{Adding templates to all hosts in a host-group}
+Unfortunately, zabbix offers no easy way to associate a template with all hosts in a group. See this site for some background: http://www.zabbixbook.com/2016/09/22/added-a-template-to-group-nothing-happened/
+In essence, to add a template to all hosts in a group, select the template in \inlinecode{configuration/templates}  and add it \emph{not only to the group in the groups box}, but \emph{also to the hosts of that group in the hosts box}.
+Also unfortunately, when removing a host from a group, the items from the groups templates \emph{still remain on the host}. See this link for more: https://www.zabbix.com/forum/showthread.php?t=22706 . As a consequence, when moving a host out of a group, we have to manually unlink all superfluous items from that host. For this, got to the host page, then to templates, and \inlinecode{unlink an clear} all no longer needed templates. 
+
+\subsection{Means of executing zabbix items}
+
+There are four ways in which we can collect data from remote hosts. We can use zabbix-agents, external checks, ssh checks and snmp checks.
+
+\subsubsection{Agents}
+The first and most mature way to have zabbix monitor remote systems is by using agents. Zabbix-server communicates with agents over its own json-based protocol on top of TCP/IP.
+
+\paragraph{Running commants in the agent manually}
+\begin{lstlisting}
+zabbix_agentd -t "proc.num[mysqld]"
+\end{lstlisting}
+ You can even start these commands from remote: 
+ \begin{lstlisting}
+ zabbix_get -s 10.112.77.5 -p 10050 -h "system.cpu.load[all,avg1]"
+ \end{lstlisting}
+
+\paragraph{Defining own items}
+You can usually select items from a predefined list, like \inlinecode{proc.num[apache2].last(0) = 0}.
+But you can also define your own items that will be executed by zabbix-agents.
+
+For this, in \inlinecode{zabbix_agend.conf} add: 
+
+\begin{lstlisting}
+UserParameter = michaelsShizzl.mysqlstatus, service mysql status | grep -c "running"
+\end{lstlisting}
+
+
+\subsubsection{External checks}
+If we cannot use zabbix agents, 
+
+\subsubsection{Ssh-checks}
+If we cannot use zabbix agents, 
+
+
+
+\subsection{Debugging}
+Logs can be found under \inlinecode{/var/log/zabbix}. The log-level can be changed at runtime by 
+\begin{lstlisting}
+zabbix_server --runtime-control log_level_increase=poller
+\end{lstlisting}
+
+
+
+\subsection{Webmonitoring and web-triggers}
+Monitoring websites differs from the usual zabbix-structure of application/item/trigger/action, in that now we use application/scenario/trigger/action.
+
+To create a scenario, go to \inlinecode{/configuration/templates/web/create_scenario}. To create a trigger that reacts on a webscenario, go to \inlinecode{/configuration/templates/triggers} and select a webscenario-item to work with.
+
+
+
+\subsection{Monitoring triggers: quis custodiet ipsos custodes?}
+Sometimes, items may fail to deliver data. This may be because the zabbix-agent was switched off, because ssh needs too long to handshake, or for any of myriads of other reasons. We want to avoid them failing silently, however. If the job that monitors a hosts disc-usage doesn't work anymore, we need to be aware of this failure, otherwise the host might die without us ever knowing. 
+
+To do this, under \inlinecode{configuration/actions} select \inlinecode{internal} and enable the actions shown.
+
+These all react to zabbix-internal events, not to explicitly defined triggers. That means you cannot mess with the trigger-scripting for the "not-supported" event, because such a trigger doesn't exist. There is currently a thread open to create an "item became unsupported" trigger here: https://support.zabbix.com/browse/ZBX-7494
+
+
+
+\subsection{Maintenence: temporarily taking a server out of surveillance}
+Under \inlinecode{configuration/maintenence} you can define periods of time under which a server should not be monitored. 
+
+
+
+
+\subsection{Zabbix API}
+Zabbix exposes a rest-api for us to call. If we want to access that api from a script, we can use some library that translates our commands to rest-requests. 
+
+\begin{lstlisting}[language=python]
+#! /usr/bin/python
+
+import pprint
+from pyzabbix import ZabbixAPI
+
+z = ZabbixAPI('http://10.112.77.5/zabbix/')
+z.login("admin", "zabbix")
+
+groups = z.hostgroup.get(output="extend")
+
+gids = []
+for group in groups:
+    gids.append(group["groupid"])
+
+result = z.configuration.export(options= {"groups": gids}, format="xml")
+
+pp = pprint.PrettyPrinter(depth=6)
+pp.pprint(result)
+\end{lstlisting}
+
+This is equivalent to calling a post with the json: 
+
+\begin{lstlisting}[language=java]
+{
+    "jsonrpc": "2.0",
+    "method": "configuration.export",
+    "params": {
+        "options": {
+            "hosts": [
+                "10161"
+            ]
+        },
+        "format": "xml"
+    },
+    "auth": "038e1d7b1735c6a5436ee9eae095879e",
+    "id": 1
+}
+\end{lstlisting}

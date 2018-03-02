@@ -1,0 +1,255 @@
+\documentclass{book}
+\usepackage[utf8]{inputenc}
+\usepackage{mdframed} % For the subproof
+\usepackage{amsthm} % For theorems and proofs
+\usepackage{amsmath} % For custom functions, matrices, 
+\usepackage{amsfonts} % For Reals
+\usepackage{listings} % For code
+\usepackage{graphicx} % for including images
+\usepackage{hyperref} % for making ref's links
+\usepackage{marginnote} % weil footnotes oft im weg sind
+\usepackage{float} % to be able to fix table position
+\usepackage{fancyvrb} % for verbatim in footnotes
+\usepackage{titlesec} % for pagebreak after every section
+\usepackage[margin=0.8in]{geometry} % for manually changing margin size
+\usepackage{hyperref} % for including links
+\usepackage{booktabs} % For tables
+\usepackage{multirow}
+\usepackage{qtree} % for treestructures
+\usepackage{gensymb} % for degree-symbol
+\usepackage[table,xcdraw]{xcolor}
+\usepackage[toc,page]{appendix}
+\usepackage{titlesec} % for numbers on subsubsection
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\VerbatimFootnotes % for verbatim in footnotes (from fancyvrb}
+
+% For the subproof
+\newmdenv[linecolor=black
+          ,topline=false
+          ,bottomline=false
+          ,rightline=false
+          ,leftline=true
+          ,leftmargin=0.1cm
+          ,linewidth=0.02cm
+          ,skipabove=0.05cm
+          ,innerbottommargin=0.05cm
+          ,skipbelow=0.05cm
+          ]{subproof}
+          
+\graphicspath{ {images/} }
+          
+% For the theorem environment
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+
+% Meine custom Funktionsnamen
+\DeclareMathOperator{\rops}{rops}
+\DeclareMathOperator{\cops}{cops}
+\DeclareMathOperator{\indeg}{indeg}
+\DeclareMathOperator{\outdeg}{outdeg}
+\DeclareMathOperator{\degr}{deg}
+\DeclareMathOperator{\paths}{paths}
+\DeclareMathOperator{\probFunct}{Pr}
+
+% Meine custom macros
+%logic
+\newcommand{\then}{\to}
+\newcommand{\thereis}{\exists}
+\renewcommand{\iff}{\leftrightarrow}
+%\newcommand{\lnot}{\neg} %already exists
+%sets
+\newcommand{\intersection}{\cap}
+\newcommand{\union}{\cup}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\naturals}{\mathbb{N}}
+%prop
+\newcommand{\samplespace}{\ensuremath{\Omega} }
+%linalg
+\newcommand{\nullspace}[1]{\ensuremath{\mathcal{N}(#1)}}
+\newcommand{\collspace}[1]{\ensuremath{\mathcal{C}(#1)}}
+\newcommand{\solspace}[1]{\ensuremath{\mathcal{S}(#1)}}
+%algebraic geometry
+\newcommand{\innerprod}{\ensuremath{\cdot}}
+\newcommand{\innerprodbr}[2]{\ensuremath{< #1 , #2 >}}
+\newcommand{\outerprod}{\ensuremath{\wedge}}
+\newcommand{\orth}{\ensuremath{\perp}}
+%analysis
+\newcommand{\diff}[1]{\ensuremath{\mathop{d#1}}}
+\newcommand{\partDiff}[2]{\ensuremath{ \frac{ \mathop{d#1} }{ \mathop{d#2} } }}
+%hyperreals
+\newcommand{\subs}[2]{\ensuremath{#1_{#2}}}
+\newcommand{\std}[1]{\subs{#1}{std}}
+\newcommand{\nstd}[1]{\subs{#1}{nstd}}
+\newcommand{\pnstd}[1]{\subs{#1}{(nstd)}} %potentially nonstandard
+%\newcommand{\int}[1]{\subs{#1}{int}}
+\newcommand{\ext}[1]{\subs{#1}{ext}}
+\newcommand{\pext}[1]{\subs{#1}{(ext)}} % potentially external
+%programming
+\newcommand{\BigTheta}[1]{\ensuremath{\Theta(#1)}}
+\newcommand{\BigOh}[1]{\ensuremath{O(#1)}}
+%proofs
+\newcommand{\subprf}[3]{
+    {\setlength{\parindent}{0cm}
+        #1
+        Proof that #2
+        \begin{subproof}
+            #3
+        \end{subproof}
+        Thus #2 \newline
+    }
+}
+\newcommand{\induction}[5]{
+    \subprf{By induction.  Let $P(i)$ be #1 }{$P(1)$ and $P(i) \to P(i+1)$ hold true.}{
+        \subprf{Base case: #2 }{$P(1)$ holds true.}{
+            #3
+        }
+        \\
+        \subprf{Induction step: #4 }{$P(i) \to P(i+1)$ holds true.}{
+            #5
+        }
+    }
+}
+\newcommand{\contradiction}[2]{
+    \subprf{Suppose that #1}{this assumption leads to a contradiction.}{
+        #2
+    }
+}
+
+\newcommand{\invariant}[4]{
+    
+    \textbf{$Q(i)$ :} #1 
+    \begin{subproof}
+        \begin{subproof}
+            \textbf{Initial state $Q(0)$ :} #2 
+        \end{subproof}
+        \begin{subproof}
+            \textbf{Transition $Q(i) \then Q(i+1)$ :} #3 
+        \end{subproof}
+        \begin{subproof}
+            \textbf{Final state $Q(n)$ :} #4 
+        \end{subproof}
+    \end{subproof}
+}
+
+\newcommand{\myarray}[1]{
+    \ensuremath{
+        \begin{bmatrix}
+            #1 \\
+        \end{bmatrix}
+    }
+}
+
+
+
+
+
+% Code style
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=false,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
+
+\lstset{escapechar=°,style=customc}
+
+%inlinecode
+\newcommand{\inlinecode}[1]{\lstinline|#1|}
+
+
+% for pagebreak after every section
+%\newcommand{\sectionbreak}{\clearpage}
+\let\stdsection\section
+\renewcommand\section{\clearpage\stdsection}
+%\renewcommand\section{\cleardoublepage\stdsection}
+
+
+\title{Science}
+\author{Michael Langbein}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\chapter{Math}
+
+\input{math/logic}
+\input{math/set_theory}
+\input{math/combinatorics}
+\input{math/algebra_general}
+\input{math/algebra_linear}
+%\input{math/algebra_geometric}
+\input{math/fourier_and_laplace}
+%\input{math/grouptheory}
+\input{math/graphics}
+\input{math/probability}
+\input{math/statistics}
+\input{math/graph_theory}
+\input{math/computation}
+\input{math/dyn_programming}
+\input{math/calculus}
+%\input{math/differential_equations}
+\input{math/number_theory}
+
+\chapter{Algorithms and data-structures}
+\input{algorithms/algorithms}
+\input{algorithms/data_structures}
+
+\chapter{General computer theory}
+\input{compsci/hardware}
+\input{compsci/networking}
+\input{compsci/security}
+\input{compsci/virtualisation}
+
+
+\chapter{Programming languages}
+\input{programming/c}
+\input{programming/cpp}
+\input{programming/java}
+\input{programming/python}
+\input{programming/clojure}
+\input{programming/php}
+\input{programming/javascript}
+\input{programming/git}
+\input{programming/strategies}
+
+\chapter{Applications}
+\input{applications/where_to_meet}
+\input{applications/effective_wind}
+\input{applications/touch_instrument}
+\input{applications/cylinder}
+\input{applications/fourier_football}
+\input{applications/task_time}
+\input{applications/scheduling}
+\input{applications/webcam_giant}
+
+
+%\chapter{Fun Stuff}
+%\input{funstuff/fun_stuff}
+
+
+\begin{appendices}
+\input{appendices/spring}
+\input{appendices/springBoot}
+\input{appendices/android}
+\input{appendices/react}
+\input{appendices/jekyll}
+\end{appendices}
+
+
+
+\end{document}

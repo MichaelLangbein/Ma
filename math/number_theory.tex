@@ -1,0 +1,38 @@
+\section{Number theory}
+
+\subsection{Divisability}
+
+\begin{definition}
+    Divisability: $a|b \iff \thereis k: ak = b$
+\end{definition}
+
+\begin{theorem}
+    $ a|b \land b|c \then a|c  $
+\end{theorem}
+
+\begin{proof}
+    \subprf{}{$a|b \land b|c \then a|c$}{
+        \subprf{Suppose $ \thereis x_0 : ax_0 = b \land \thereis x_1 : bx_1 = c $}{$\thereis x_2 : ax_2 = c$}{
+            Try $ x_2 = x_0 x_1 $ \\
+            Then $ a x_2 = a x_0 x_1 = b x_1 = c $
+        }
+    }
+\end{proof}
+
+\begin{theorem}
+    If a divides both b and c, then a divides any linear combination of b and c as well.  $ a|b \land a|c \then \forall v, w: a| (vb + wc)  $
+\end{theorem}
+
+\begin{proof}
+    \subprf{}{$ a|b \land a|c \then \forall v, w: a| (vb + wc)  $}{
+        \subprf{Suppose $ a|b \land a|c$}{$\forall v, w: a | (vb + wc)  $}{
+            \subprf{Let $v_0, w_0$}{$ \thereis x : ax = (v_0 b + w_0 c) $}{
+                Try $ x = v_0 x_0 + w_0 x_1 $
+            }
+        }
+    }
+\end{proof}
+
+\begin{definition}
+    Modulus: $ a\%d = r \iff d|(a-r) \land 0 \leq r \leq d $
+\end{definition}

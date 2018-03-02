@@ -1,0 +1,27 @@
+\section{Dynamic Programming}
+
+Dynamic programming tries to solve problems by expressing the problem recursively: The sollution for some parameter-set $sol(para)$ equals a function of sollutions of other parameter-sets, like for example: 
+$$ sol(para) = sol(para') + x$$
+or
+$$ sol(para) = sol(para') + sol(para'')$$
+or most generally:
+$$ sol(para) = f(sol(para'), sol(para''), ...)$$
+
+For performance, subsolutions are stored in a lookup-table. Without the lookup-table, dynamic programming would be called "divide and conquer".
+
+
+\subsection{A strategy for finding the recursion}
+
+Dynamic programming tries to solve problems by breaking them apart into subproblems. But how do we find those subproblems?
+
+The sollution $S$ we are looking for should be obtained by some function $sol$.
+$$ S = sol(para) $$
+
+Try to find a way to split $S$ into a large part $S'$ and a small part $s$ \marginnote{In more advanced problems we might instead want to partition $S$ into several new sets $S'$ and $S''$}.
+$$ S = S' + \{ s \} $$
+
+The large part itself must be the result of $sol$ for some other set of parameters $para'$.
+$$ S' = sol(para') $$
+
+
+\subsection{Dynamic programming for hidden Markov-models (Viterbi algorithm)}

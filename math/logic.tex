@@ -1,0 +1,39 @@
+\section{Logic}
+
+\subsection{Algebra}
+
+$\land$ and $\lor$ are distributive: 
+
+$$ (A \land B) \lor C \equiv (A \lor C) \land (B \lor C)$$
+
+$$ (A \lor B) \land C \equiv (A \land C) \lor (B \land C) $$
+
+This is easiest seen by drawing a Venn-diagram. 
+
+\subsection{Quantifiers}
+
+$$ \thereis ! x: Q(x) \equiv ( \thereis x: Q(x) ) \land ( \forall x,y: Q(x) \land Q(y) \then y = x ) $$
+
+\subsection{Inference}
+
+Simple if statements: 
+
+$$ A \then B \equiv \lnot A \lor B $$
+
+$$ \lnot (A \then B) \equiv A \land \lnot B$$
+
+
+Applying this to function-statements yields: 
+
+$$ \lnot ( \forall x: A(x) \then B(x) ) \equiv \thereis x: A(x) \land B(x)$$ 
+
+If-and-only-if statements: 
+
+$$ A \iff B \equiv (A \then B) \land (B \then A) \equiv (A \land B) \lor (\lnot A \land \lnot B)$$
+
+$$ \lnot (A \iff B) \equiv (A \land \lnot B) \lor (B \land \lnot A) \equiv (\lnot A \then B) \land (A \then \lnot B) \equiv A \iff \lnot B$$
+
+Applying this to function-statements yields: 
+
+$$ \lnot (\forall x : A(x) \iff B(x)) \equiv \thereis x : ( \lnot A(x) \then B(x) ) \land ( A(x) \then \lnot B(x) ) $$
+

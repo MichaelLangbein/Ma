@@ -1,0 +1,131 @@
+\section{Vue}
+
+We will handle most graphics with vue.js.
+
+\subsection{Basic setup}
+
+\begin{lstlisting}
+[language=html,title=index.html]
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+
+  <!-- navigation bar -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <a class="navbar-brand"><i class="glyphicon glyphicon-bullhorn"></i> Vue Events Bulletin Board</a>
+    </div>
+  </nav>
+
+  <!-- main body of our application -->
+  <div class="container" id="events">
+
+    <!-- add an event form -->
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3>Add an Event</h3>
+        </div>
+        <div class="panel-body">
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- show the events -->
+    <div class="col-sm-6">
+      <div class="list-group">
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="node_modules/vue/dist/vue.js"></script>
+  <script src="node_modules/vue-resource/dist/vue-resource.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+\end{lstlisting}
+
+\begin{lstlisting}[title=app.js]
+
+new Vue({
+  // We want to target the div with an id of 'events'
+  el: '#events',
+
+  // Here we can register any values or collections that hold data
+  // for the application
+  data: {},
+
+  // Anything within the ready function will run when the application loads
+  ready: function() {},
+
+  // Methods we want to use in our application are registered here
+  methods: {}
+});
+
+\end{lstlisting}
+
+
+\subsection{Components}
+
+Vue lets you create custom html-elements.
+For this, create a html-file *.vue with main-element <template></template>. Then, add a script to the *vue file lile such: 
+
+\begin{lstlisting}[title=main.js]
+import Vue from 'vue'
+import App from './App'
+
+new Vue({
+  el: '#app',
+  template: '<App/>',
+  components: { App }
+})
+\end{lstlisting}
+
+\begin{lstlisting}[language=html,title=App.vue]
+<template>
+  <div id="app">
+    <todo-list></todo-list>
+  </div>
+</template>
+
+<script>
+import TodoList from './components/TodoList'
+export default {
+  components: {
+    TodoList
+  }
+}
+</script>
+\end{lstlisting}
+
+\begin{lstlisting}[language=html,title=TodoList.vue]
+<template>
+    <div>
+      <ul>
+        <li> Todo A </li>
+        <li> Todo B </li>
+        <li> Todo C </li>
+      </ul>
+    </div>
+  </template>
+
+  <script type="text/javascript">
+    export default {}
+  </script>
+  <style>
+  </style>
+
+\end{lstlisting}

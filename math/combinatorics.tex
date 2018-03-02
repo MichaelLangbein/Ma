@@ -1,0 +1,87 @@
+\section{Combinatorics}
+
+\subsection{Sums and asymptotics}
+
+We begin with a few trivial results. Closed form on the right. The methods we develop for sums will also work for products, since any product can be converted into a sum by taking its logarithm.
+
+$$ \sum_{n=0}^N n = \frac{N(N+1)}{2} $$
+
+$$ \sum_{n=0}^N x^n = \frac{1-x^{N+1}}{1-x} $$
+
+We might get to these results with the perturbation method:
+
+\begin{itemize}
+    \item $ 1 + x + x^2 ... + x^N = S $
+    \item $ -x -x^2 ... -x^{N+1} = -xS $
+    \item $ 1 - x^{N+1} = S -xS $
+\end{itemize}
+
+It is very important to note that this method only works for calculating \textit{finite} partial sums. Nothing guarantees us that such a method would work as well for infinite sums. In fact, we can disprove this.
+
+\begin{theorem}
+    A example where using the perturbation method on infinite series leads to a contradiction would be ...
+\end{theorem}
+
+
+However, we are always allowed to calculate a partial sum by some variant of the perturbation method and then taking the limit of $n \to \infty$.
+
+\subsection{Products of sums and comvolutions}
+
+Let $S_A = \sum_n a_n$ and $S_B = \sum_m b_n$. To calculate $S_A S_B$ we sum all elements in the following table: 
+
+\begin{table}[H]
+\centering
+\caption{Multiplication of sums}
+\begin{tabular}{lllll}
+     & $a_0$      & $a_1$      & $a_2$      & $a_3$ \\
+$b_0$ & $a_0 b_0$ & $a_1 b_0$ & $a_2 b_0$ & ...  \\
+$b_1$ & $a_0 b_1$ & $a_1 b_1$ & ...       &      \\
+$b_2$ & $a_0 b_2$ & ...       &           &      \\
+$b_3$ & ...       &           &           &     
+\end{tabular}
+\end{table}
+
+Note that the diagonal from ll to ur in this table is a convolution. 
+
+\subsection{Cardinality}
+
+
+\subsection{Counting}
+
+The \emph{combination}, aka. the \emph{binominal coefficient}, for drawing $k$ items out of $n$ items,  is defined as: 
+$$ \binom{n}{k} = \frac{ n! }{ k!(n-k)! }$$
+
+Selecting n indistinguishable items out of m groups.
+
+Selecting n distinguishable items out of m groups.
+
+
+\subsection{Generating functions}
+
+In the previous section we have found a bunch of formulas for getting the possible selections in different simple situations. But what if we need to combine a few simple selection-scenarios into one complicated scenario? \marginnote{There is another scenario where generating functions come in very handy: finding a closed form for a recursive formula.}
+
+Imagine you need to buy n items. There are two kinds of items: apples and bananas. Apples always come in packs of six, and bananas have two different sub-kinds. How many ways are there then to get n items?
+
+This is where we use generating functions. 
+
+Let $A = (a_0, a_1, ...)$ be a sequence where $a_n$ represents the number of ways to select from group $\mathcal{A}$. Then the generating function $G_A$ would be defined as: 
+
+$$ G_A (x) = a_0 + a_1 x + a_2 x^2 + ... = \sum_n a_n x^n $$
+
+For any sequence we can define a generating function. Now, to get the desired result, we first transform several sequences into their generating functions, find their closed forms, multiply them, and transform the result of the multiplication back into a sequence. 
+
+In detail: 
+
+\begin{itemize}
+    \item From $(a_0, a_1, ...)$ create $G_A(x)$ and find its closed form.
+    \item From $(b_0, b_1, ...)$ create $G_B(x)$ and find its closed form.
+    \item Get $G_C = G_A G_B$
+    \item Get $(c_0, c_1, ...)$ from $G_C$
+\end{itemize}
+
+This works because of the following theorem:
+
+\begin{theorem}[Convolutions with generating functions]
+    Let $A = (a_0, a_1, ...)$ be a sequence where $a_n$ represents the number of ways to select from group $\mathcal{A}$. Let $B = (b_0, b_1, ...)$ be a sequence where $b_n$ represents the number of ways to select from group $\mathcal{B}$. Let $\mathcal{A} \cap \mathcal{B} = \emptyset$. Then $c_n$ is the number of ways to select n items from $\mathcal{A} \cup \mathcal{B}$. It can be obtained by getting the $n$-th coefficient of $G_C = G_A G_B$
+\end{theorem}
+

@@ -1,0 +1,362 @@
+\section{General algorithm theory}
+
+\subsection{Invariant principle}
+
+The invariant principle is not much more than using induction to prove that some statement holds over all iterations $n$ from $0$ to $n_0$.
+
+
+\subsection{Well ordering}
+
+The well ordering principle is a fundamental theorem in discrete mathematics. 
+
+$$ \forall S \subset \naturals^+: S \neq \emptyset : \thereis x_0 \in S: \forall x \in S: x_0 \leq x $$
+
+We usually use it in existance proofs, by contradiction. However, there is a nice little template for proofs using the well ordering principle.
+
+To prove that $P(n)$ holds true for $\forall n \in \naturals$:
+
+\begin{itemize}
+    \item Define the set $C$ of counterexamples to $P$ being true. That is: 
+    $$ C = \{ n \in \naturals | \lnot P(n) \}$$
+    
+    \item For a proof by contradiction, assume $C$ is nonempty.
+    
+    \item By the well ordering principle, there will be a smallest element $n_0 \in C$
+    
+    \item Reach a contradiction (often by showing how to use $n_0$ to find another member of $n_1 \in C$ that is even smaller than $n_0$)
+\end{itemize}
+
+
+\subsection{Programm verification according to Floyd}
+
+\begin{itemize}
+    \item Partial correctness:
+    \item termination:
+\end{itemize}
+
+
+\subsubsection{ Proving 'partial correctness' with invariant principle }
+
+
+
+\subsubsection{ Proving 'termination' with well ordering principle }
+
+
+\subsection{Notation}
+
+An algorithm that takes $f(n)$ cycles is said to take \BigTheta{g(n)} time, iff: 
+
+$$ f \in \BigTheta{g(n)} $$ 
+where 
+$$ \BigTheta{g(n)} = \{ f(n) | \thereis c_1, c_2, n_0 : \forall n \geq n_0:  0 \leq c_1 g(n) \leq f(n) \leq c_2 g(n) \} $$
+
+Simmilarly, the set \BigOh{g(n)} is defined as: 
+$$ \BigOh{g(n)} = \{ f(n) | \thereis c_2, n_0 : \forall n \geq n_0:  0 \leq  f(n) \leq c_2 g(n) \} $$
+
+That is, \BigOh{} only has an upper bound, but no lower bound.
+
+\subsection{Order of basic operations}
+
+In the integer ram model of computation, addition, multiplication, remainder and bitwise operations all take O(1).
+
+
+\subsection{Remembering the state in loops}
+Sometimes, operations have to be repeatedly executed in a loop. These operations may take \BigOh{g} time by themselves, but only \BigOh{1} time if the result of the previous execution is already known. 
+
+In such a case it makes sense to keep track of the previous result. StateMachines are a natural vehicle to store such information. 
+
+Lets assume for now that modulo was not constant time. Then we could do the infamous FizzBuzz problem like this in linear time: 
+
+\begin{lstlisting}[language=python]
+class SM:
+    def __init__(self, nr):
+        self.nr = nr
+        self.nToGo = nr
+
+    def feed(self):
+        self.nToGo -= 1
+        if self.nToGo < 0:
+            self.nToGo = self.nr - 1
+
+    def isMult(self):
+        return self.nToGo == 0
+
+
+
+threeM = SM(3)
+fiveM = SM(5)
+for i in range(1, 16):
+    threeM.feed()
+    fiveM.feed()
+    if threeM.isMult() and fiveM.isMult():
+        print("{} --> FizzBuzz".format(i))
+    elif threeM.isMult():
+        print("{} --> Fizz".format(i))
+    elif fiveM.isMult():
+        print("{} --> Buzz".format(i))
+    else:
+        print(i)
+\end{lstlisting}
+
+\subsection{Dynamic programming}
+A natural extension to the idea above here is dynamic programming. There we also make use of the fact that some instructions can be simplified if we remember the result of the previous instruction.
+
+
+\subsection{Solving recurrences}
+Sometimes we dont have to do a recursive sollution at all. Many recursive problems can be reshaped into a explicit form (the so called closed form). Think of the Fibonacci-sequence: 
+
+$$ fib(n) = fib(n-1) + fib(n-2) = \frac{(1 + \sqrt{5})^n - (1 - \sqrt{5})^n }{2^n \sqrt{5}} $$
+
+This section will examplify some methods for finding the closed form expression.
+
+\subsubsection{Solving linear recurrences}
+
+A homogeneous linear recurrence is one of the following form: 
+
+$$ f(n) = a_1 f(n-1) + a_2 f(n-2) + ... + a_d f(n-d)$$
+
+We can solve it as follows: 
+
+\begin{enumerate}
+    \item Assume $f(n) = x^n$. We now try to find an expression for $x$.
+    \item Divide both sides in the hlr by $x^{n-d}$, leaving a (hyper-)quadratic equation. 
+    \item Every root of the quadratic equation is a \textbf{homogeneous sollution}. Also, if a root $r$ occures $v$ times, $r^n, nr^{n-1}, n^2r^n ..., n^{v-1}r^n$ are also sollutions.
+    \item Also, every linear combination of the above is also a sollution. So, a sollution might in general have a form like $a r_1^n + b r_2^n + ...$.
+    \item Finally, choose $a, b, ...$ such that they fulfill the boundary conditions (in Fibonacci those would be $f(0) = f(1) = 1$). This is the \textbf{concrete sollution}.
+\end{enumerate}
+
+We can extend the above schema to also solve (nonhomogeneous) linear recurrences: 
+$$ f(n) = a_1 f(n-1) + a_2 f(n-2) + ... + a_d f(n-d) + g(n)$$
+
+\begin{enumerate}
+    \item Ignore $g(n)$, find the homogeneous sollution from step 4 above.
+    \item Find a \textbf{particular sollution} to the equation including $g(n)$.
+    \item homogeneous solltution + particular sollution = \textbf{general sollution}
+    \item Now for the general sollution, again plug in the boundary conditions as in step 5 above.
+\end{enumerate}
+
+
+\section{Important algorithms}
+
+\subsection{Merge-sort}
+
+The function merge takes two already sorted lists and merges them into one sorted list.
+
+\begin{lstlisting}[language=python]
+def merge(a, b):
+    c = []
+    ia = ib = ic = 0
+    while len(c) < len(a) + len(b):
+        if a[ia] <= b[ib]:
+            c[ic] = a[ia]
+            ia++
+        else:
+            c[ic] = b[ib]
+            ib++
+        ic++
+    return c
+\end{lstlisting}
+
+\invariant{statement}{sometext}{sometext}{sometext}
+
+
+\subsection{Matrix inverse}
+Gauss Jordan
+
+\subsection{Polynomals}
+
+In this section, we will deal with the polynomal $P_A(x) = 1x^3 + 2x^2 + 3x + 4$.
+
+\subsubsection{Coefficient-representation of polynomals}
+The most common representation of this polynomal is its coefficient representation $[4, 3, 2, 1]$. This representation is very convenient for fast evaluation at any $x$ using Horner's method: 
+
+\begin{lstlisting}[language=c]
+#include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+
+/**
+ * Coefficient representation of polynomals
+ */
+
+typedef struct PolynomalC {
+  int length;
+  int* coefficients;
+} PolynomalC;
+
+PolynomalC* polyc_create(int l, int* coeffs) {
+  PolynomalC* p = malloc(sizeof(PolynomalC));
+  p->length = l;
+  p->coefficients = malloc(l*sizeof(int));
+  for(int i = 0; i<l; i++){
+    p->coefficients[i] = coeffs[i];
+  }
+  return p;
+}
+
+void polyc_delete(PolynomalC* p) {
+  free(p->coefficients);
+  free(p);
+}
+
+int polyc_evalAt(PolynomalC* p, int x) {
+  int sum = 0;
+  for(int i = p->length; i > 0; i--){
+    sum = sum * x + p->coefficients[i-1];
+  }
+  return sum;
+}
+
+PolynomalC* polyc_add(PolynomalC* p1, PolynomalC* p2) {
+  int l1 = p1->length;
+  int l2 = p2->length;
+  int l = max(l1, l2);
+  int coeffs[l];
+  for(int i = 0; i < l; i++){
+    int v = 0;
+    if(i < l1) v += p1->coefficients[i];
+    if(i < l2) v += p2->coefficients[i];
+    coeffs[i] = v;
+  }
+  PolynomalC* p3 = polyc_create(l, coeffs);
+  return p3;
+}
+
+int main(void) {
+  
+  int coeffs1[4] = {4, 3, 2, 1};
+  PolynomalC* p1 = polyc_create(4, coeffs1);
+  
+  int coeffs2[3] = {1, 2, 3};
+  PolynomalC* p2 = polyc_create(3, coeffs2);
+  
+  PolynomalC* p3 = polyc_add(p1, p2);
+  
+  int r = polyc_evalAt(p3, 2);
+  printf("Result: %d\n", r);
+  
+  polyc_delete(p1);
+  polyc_delete(p2);
+  polyc_delete(p3);
+  
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Point-value-representation of polynomals}
+Another way of representing this polynomal is the point-value representation $[(0,4), (1, 10), (2, 26), (3,58)]$. This representation is very convenient for fast evaluation of polynomal multiplication (assuming both polys are evaluated at exactly the same points): 
+
+\begin{lstlisting}[language=c]
+#include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+
+/**
+ * Point/Value representation of polynomals
+ */
+
+typedef struct PolynomalV {
+  int length;
+  int* points;
+  int* values;
+} PolynomalV;
+
+PolynomalV* polyv_create(int l, int* pts, int* vls) {
+  PolynomalV* p = malloc(sizeof(PolynomalV));
+  p->length = l;
+  p->points = malloc(sizeof(int)*l);
+  p->values = malloc(sizeof(int)*l);
+  for(int i = 0; i < l; i++) {
+    p->points[i] = pts[i];
+    p->values[i] = vls[i];
+  }
+  return p;
+}
+
+void polyv_delete(PolynomalV* p) {
+  free(p->points);
+  free(p->values);
+  free(p);
+}
+
+PolynomalV* polyv_mult(PolynomalV* p1, PolynomalV* p2) {
+  int l = p1->length;
+  int vals[l];
+  for(int i = 0; i < l; i++) {
+    vals[i] = p1->values[i] * p2->values[i];
+  }
+  PolynomalV* p = polyv_create(l, p1->points, vals);
+  return p;
+}
+
+int main(void) {
+  
+  int points[4] = {0, 1, 2, 3};
+  
+  int vals1[4] = {4, 10, 26, 58};  // [4, 3, 2, 1]
+  PolynomalV* p1 = polyv_create(4, points, vals1);
+  
+  int vals2[4] = {1, 10, 49, 142}; // [1, 2, 3, 4]
+  PolynomalV* p2 = polyv_create(3, points, vals2);
+  
+  PolynomalV* p3 = polyv_mult(p1, p2);
+  
+  polyv_delete(p1);
+  polyv_delete(p2);
+  polyv_delete(p3);
+  
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Naive transformation from coefficient to point-value and vice-versa}
+\begin{lstlisting}[language=c]
+
+// O(n^2)
+ PolynomalV* poly_coeffToPv(PolynomalC* pc, int* points){
+   int l = pc->length;
+   int vals[l];
+   for(int i = 0; i < l; i++) { // n operations
+     vals[i] = polyc_evalAt(pc, points[i]); // O(n)
+   }
+   PolynomalV* pv = polyv_create(l, points, vals);
+   return pv;
+ }
+
+// O(n^3)
+PolynomalC* poly_PvToCoeff(PolynomalV* p){
+  int l = p->length;
+  int points[l] = p->points;
+  int values[l] = p->values;
+  int** data = [[1, x1, x1^2, ...]
+                [1, x2, x2^2, ...]
+                [1, x3, x3^2, ...]];
+  Matrix* m = mtrx_create(l, l, data);
+  Matrix* mi = mtrx_inverse(m);   // Gauss Jordan: O(n^3)
+  int coeffs[l] = mtrx_mult(mi, values);
+  PolynomalC* pc = polyc_create(l, coeffs);
+  return pc;
+}
+
+
+int main(void) {
+  
+  int coeffs[4] = {4, 3, 2, 1};
+  PolynomalC* pc = polyc_create(4, coeffs);
+  int points[4] = {0, 1, 2, 3};
+  PolynomalV* pv = poly_coeffToPv(pc, points);
+  PolynomalC* px = poly_PvToCoeff(pv);
+  
+  polyc_delete(pc);
+  polyv_delete(pv);
+  polyc_delete(px);
+  
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Fast transformation}
+Up to now we have used the points $0, 1, 2, 3$ for our evaluation. However, there is no reason why we should have chosen these specific points - any other points of evaluation are just as good. It turns out that if we use the 4 roots of 1 as points of evaluation, we can cut down on computation costs.
+
+In general, the $k$th root of 1 is $e^{2 \pi i \frac{k}{n} }$. So let's do the evaluation at $(1^{1/4})_1, (1^{1/4})_2, (1^{1/4})_3, (1^{1/4})_4 = 1, i, -1, -i$.
+

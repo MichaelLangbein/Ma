@@ -1,0 +1,44 @@
+\section{Hardware}
+
+\subsection{Memory}
+
+
+Data is moved from ram to the processor by the memory controller. 
+
+
+Each cell in memory holds 8 bits. 
+
+\subsubsection{How data is stored}
+
+\begin{itemize}
+    \item  \inlinecode{tiny int}: use just one bite - making 256 possible values. 
+   \item  \inlinecode{int}: uses 4 bites (32 bits)
+   \item  \inlinecode{long int}: uses 8 bites (64 bits)
+   \item  \inlinecode{signed int}: reverse the leftmost bit
+   \item  \inlinecode{fractions}: store two numbers: the numerator and the denominator. 
+   \item  \inlinecode{float}: also store two numbers: the number without the point and the position of the point
+\end{itemize}
+
+
+Fun fact: java tends to silently cause integer overflows. When it has to compute an addition of two big ints, say 255 + 1 (1111 1111 + 0000 0001), it does the right computation (1 0000 0000) but throws away the leftmost binary because that won't fit into memory, causing the result to be stored as 0000 0000. 
+
+\begin{lstlisting}[language=java]
+System.out.println(Integer.MAX_VALUE);   
+Integer a = 2147483647;
+Integer b = 1;
+Integer c = a + b;
+System.out.println(c);
+\end{lstlisting}
+
+
+Words and Pages:
+
+
+
+\subsection{Processors}
+
+Processors have a cache where they store copies of stuff they recently read form ram. This cache is even faster than reading from ram itself. Because programs tend to put their stuff in sequential order in the ram, the memory controller not only feeds the processors cache the contends of the requested adresses, but also a few of the nearby ones. 
+
+32 versus 64 bit.
+
+

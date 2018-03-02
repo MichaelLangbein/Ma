@@ -1,0 +1,309 @@
+\section{Clojure}
+
+As a functional language, clojure is pretty opinionated about what the \verb right-way-of-doing-things   is. Languages like php or cpp leave you very much freedom in chosing how to code something - but also leave you with a confusing abundance of non-orthogonal language-features. Clojure is a lot more restrictive in that way.  
+
+\subsection{Basics}
+
+
+\subsection{Setup}
+
+\begin{lstlisting}
+lein new app ersteApp
+lein run
+lein uberjar
+\end{lstlisting}
+
+
+\subsection{emacs}
+\begin{itemize}
+    \item \inlinecode{M-x cider-jack-in} start repl session
+    \item \inlinecode{M-x cider-quit} kills repl
+    
+    \item \inlinecode{C-c M-e} evaluate line before cursor
+    \item \inlinecode{C-c C-k} evaluate the whole buffer
+    \item \inlinecode{C-j} repl new line
+    
+    \item \inlinecode{M->} prompts you for a var, a function (defn) or symbol name (def) and moves the cursor to its definition
+    \item \inlinecode{C-c C-d C-d} show docs for function under cursor
+    \item \inlinecode{C-c C-d C-a}	Apropros search; find arbitrary text across function names and documentation
+
+\end{itemize}
+
+\subsubsection{Syntax and datatypes}
+
+\paragraph{datatypes}
+There are only four basic datatypes: lists, vectors, maps, and sets.
+
+\begin{itemize}
+    \item keywords: \inlinecode{:mykey}
+    \item symbols: \inlinecode{'mysym}
+    \item sequences and collections: 
+        \begin{itemize}
+            \item lists: \inlinecode{(list :a :b :c :d)} or using a litteral: \inlinecode{'(:a :b :c :d)} (quoted so the list won't be evaluated as a function expression)
+            \item vectors: values indexed by contiguous integers. \inlinecode{(vector a b c d e f)} or using a litteral \inlinecode{[a b c d e f]}
+            \item maps: \inlinecode{(hash-map :key1 1, :key2 2)} or using a litteral \inlinecode{\{:key1 1, :key2 2\}}. Has no particular ordering.
+            \item sets: collections of unique values. \inlinecode{(hash-set :a :b :c :d)} or using a litteral: \inlinecode{#\{:a :b :c :d\}}. Has no particular ordering. 
+        \end{itemize}
+\end{itemize}
+
+\paragraph{Basic functions} Functions can be declared with a name (\inlinecode{defn}) or anonymously (\inlinecode{fn}). 
+
+\begin{lstlisting}[language=lisp]
+(defn vadd [v1 v2]
+    (map + v1 v2))
+    
+(defn sprd [s v]
+    (map 
+        (fn [x] (* x s)) 
+        v))
+    
+(vadd [1 2 3] [2 3 4])
+(sprd 3 [1 2 3])
+\end{lstlisting}
+
+If \inlinecode{fn} is too verbose of a command for you, there is an even shorter syntax for anonymous functions: 
+\begin{lstlisting}[language=lisp]
+(#(* 15 %) 4) // -> 60
+\end{lstlisting}
+Here, \inlinecode{#(...)} is a macro that says: "get me an anonymous function", and \inlinecode{\%} stands for an argument. Even anonymous functions may take multiple arguments:
+\begin{lstlisting}[language=lisp]
+(#(+ %1 %2 %3) 4 5 6) // -> 15
+\end{lstlisting}
+
+
+\paragraph{values} In general, we declare values using the \inlinecode{def} statement:
+\begin{lstlisting}[language=lisp]
+(def x 5)
+(+ 3 x)
+\end{lstlisting}
+However, sometimes we just want to pass a value anonymously. Here, the \inlinecode{let} macro defines a value for use just within the next expression:
+\begin{lstlisting}[language=lisp]
+(let [x 5] (+ 3 x))
+\end{lstlisting}
+
+\paragraph{function-arguments} There are two ways of handlig function arguments.
+
+\begin{lstlisting}[language=lisp]
+    ; On one hand, there is variable arity function arguments
+    (defn xchop
+        ([name type](str "i will " type " " name " like i dont even care"))
+        ([name](xchop name "karate-kick")))
+    (xchop "santa" "seduce")
+    
+    ; On the other hand, we have destructuring, 
+    ; which assigns names to values from given lists, maps, sets or vectors
+    (defn printLocation 
+        [{lat :lat lng :lng}] ;giving lat the value behind :lat
+        (println (str "treasure location x: " lng))
+        (println (str "treasure location x: " lat)))
+    (printLocation {:lat 14.11 :lng 10.12})
+    
+    (def dalmatians ["pongo" "perdita" "puppy1" "puppy2"])
+    (let [[mainchar & rest] dalmatians] rest)
+\end{lstlisting}
+
+\paragraph{Looping and Recursing} There are basically two ways of doing loops.
+
+\begin{lstlisting}[language=lisp]
+; simple recursion. uses up one stack for each recursive call
+(defn isEven? [n]
+  (if (= n 0)
+    true
+    (not (isEven? (dec n)))))
+
+; efficient recursion. just one stack-call. effectively a loop.
+(defn isEvenBig? [n]
+  (loop [n n carry true]  ; giving initial values to n and carry here 
+    (if (= n 0)
+      carry
+      (recur (dec n) (not carry)))))
+      ; adjusting values of n and carry for next iteration
+\end{lstlisting}
+
+
+\paragraph{control structures} We have the good old if/else and switch statements: 
+\begin{lstlisting}[language=lisp]
+(defn bouncer [money]
+  (if (>= money 50) 
+      (println "Dude, you're rich!")
+      (println "No way you're getting in here.")))
+(bouncer 61)
+
+(defn bouncer [money]
+  (cond 
+        (< money 50) (println "Pff. You're poor.")
+        (< money 100) (println "Ok, you'll get in.")
+        :else (println "Whew! First class!")))
+      
+(bouncer 110)
+
+(defn explain-defcon-level [exercise-term]
+     (case exercise-term
+           :fade-out          :you-and-what-army
+           :double-take       :call-me-when-its-important
+           :round-house       :o-rly
+           :fast-pace         :thats-pretty-bad
+           :cocked-pistol     :sirens
+           :say-what?))
+\end{lstlisting}
+
+\paragraph{Function functions}
+apply
+partial
+\begin{lstlisting}[language=lisp]
+(reduce (fn [carry el] (* carry el)) [1 2 3 4]) // -> 24
+(reduce (fn [carry el] (* carry el)) 100 [1 2 3 4]) // -> 2400
+\end{lstlisting}
+
+
+We can apply what we've learned so far to create a simple game-of-live clone: 
+\begin{lstlisting}[language=lisp]
+(defn randomVec [n]
+  (vec (take n (repeatedly #(rand-int 2)))))
+
+(defn sum [list]
+  (reduce (fn [carry el] (+ carry el)) 0 list))
+
+(defn lastIndexOf [list] 
+  (- (count list) 1))
+
+(defn indices [row]
+  (range (count row)))
+
+(defn neighborhoodAt [pos row] 
+  (let [lst (lastIndexOf row)]
+       (let [left (if (> pos 0)   (- pos 1) lst )
+             rigt (if (< pos lst) (+ pos 1) 0   )]
+                [(row left) (row pos) (row rigt)] )))
+
+(defn getNeighborhoods [row] 
+  (map (fn [indx] (neighborhoodAt indx row)) (indices row)))
+
+(defn rule [nbh]
+  (if (> (sum nbh) 1) 1 0))
+
+(defn applyRule [row]
+  (vec (map rule (getNeighborhoods row))))
+
+(defn run [row n]
+  (if (> n 0) 
+      (do
+        (println n  ": " row)
+        (run (applyRule row) (- n 1)))))
+
+(run (randomVec 20) 20)
+\end{lstlisting}
+
+
+\paragraph{Piping an item through multiple operations}
+Kind of unfortunately, this is called \emph{threading} the item through the operations. In ideomatic clojure, we could write this: 
+
+\begin{lstlisting}[language=lisp]
+(defn transform [person]
+   (update (assoc person :hair-color :gray) :age inc))
+
+(transform {:name "Socrates", :age 39})
+;; => {:name "Socrates", :age 40, :hair-color :gray}
+\end{lstlisting}
+
+However, the syntax is not very pretty. It is not immediately evident that first the \inlinecode{assoc} and then the \inlinecode{update} function is applied to the person item. Much nicer is to use the \inlinecode{->} macro:
+
+\begin{lstlisting}[language=lisp]
+(defn transform* [person]
+   (-> person
+      (assoc :hair-color :gray)
+      (update :age inc)))
+\end{lstlisting}
+
+This macro takes the \inlinecode{person} and adds it as the first argument to all the following function calls. Similarly, the \inlinecode{->>} macro takes the \inlinecode{person} and adds it as the \emph{last} argument. 
+
+
+\paragraph{Some convenience syntax} Maps can be used as a function for lookup.
+\begin{lstlisting}[language=lisp]
+(def jobs {:daniel "programmer" :michael "bad programmer"})
+(:daniel jobs) // -> "programmer"
+(jobs :michael) // -> "bad programmer"
+\end{lstlisting}
+
+\subsection{Macros}
+
+\begin{lstlisting}[language=lisp]
+(defmacro infix
+  "Use this macro when you pine for the notation of your childhood"
+  [infixed]
+  (list (second infixed) (first infixed) (last infixed)))
+
+(infix (1 + 1))
+; => 2
+
+(macroexpand '(infix (1 + 1)))
+; => (+ 1 1)
+\end{lstlisting}
+
+One key difference between functions and macros is that function arguments are fully evaluated before they’re passed to the function, whereas macros receive arguments as unevaluated data. You can see this in the example. If you tried evaluating (1 + 1) on its own, you would get an exception. However, because you’re making a macro call, the unevaluated list (1 + 1) is passed to infix.
+
+You can also use argument destructuring in macro definitions, just like you can with functions:
+\begin{lstlisting}[language=lisp]
+(defmacro infix-2
+  [[operand1 op operand2]]
+  (list op operand1 operand2))
+\end{lstlisting}
+
+
+\subsection{Abstractions}
+
+In Clojure, an abstraction is a collection of operations, and data types implement abstractions. For example, the \inlinecode{seq} abstraction consists of operations like \inlinecode{first} and \inlinecode{rest}, and the \inlinecode{vector} data type is an implementation of that abstraction; it responds to all of the \inlinecode{seq} operations. A specific vector like \inlinecode{[:seltzer :water]} is an instance of that data type.
+
+\begin{itemize}
+    \item seqences: Allow iteration through all elements starting by the first. There are actually thow types of sequences: seqs and lazy seqs. 
+        \begin{itemize}
+            \item: allows for: map, reduce, filter, sort, \textbf{first, rest, cons}, concat, take, drop, apply, partial
+            \item implemented by: lists, vectors, maps, sets
+        \end{itemize}
+    \item collection: 
+        \begin{itemize}
+            \item allows for: count, empty?, every?, into, conj
+            \item implemented by: lists, vectors, maps, sets
+        \end{itemize}
+\end{itemize}
+
+\paragraph{Implementing existing abstractions and creating your own: Multimethods, protocols and records}
+This is roughly equivalent to creating a new class and a new interface, respectively. 
+
+
+\subsection{Core.spec : some type-safety for nested data-structures}
+
+
+\subsection{Efficiency : reducers and transducers}
+
+
+\subsection{Promises, futures, threads and csp: concurrency and parallelism}
+
+\paragraph{Strings, keywords and symbols}
+
+
+\subsection{Atoms, refs and agents: implementing state}
+
+
+
+\begin{itemize}
+    \item Vars are for thread local isolated identities with a shared default value. Vars are all things you define with \inlinecode{let} or \inlinecode{def}.
+    \item Refs are for coordinated synchronous access to "Many Identities".
+    \item Atoms are for uncoordinated synchronous access to a single Identity.
+    \item Agents are for uncoordinated asynchronous access to a single Identity.
+\end{itemize}
+
+Where: 
+
+\begin{itemize}
+    \item Coordinated access is used when two Identities need to be changes together, the classic example being moving money from one bank account to another, it needs to either move completely or not at all.
+    \item Uncoordinated access is used when only one Identity needs to update, this is a very common case.
+    \item Uncoordinated access is used when only one Identity needs to update, this is a very common case.
+    \item Uncoordinated access is used when only one Identity needs to update, this is a very common case.
+    \item Asynchronous access is "fire and forget" and let the Identity reach its new state in its own time.
+\end{itemize}
+
+
+\paragraph{ref}'s are 
+
+

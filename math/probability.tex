@@ -1,0 +1,62 @@
+\section{Probability}
+
+\subsection{Basics}
+
+\subsubsection{Probability space}
+
+Probability works on some basic entites:
+\begin{itemize}
+    \item \samplespace is a nonempty set called the samplespace. 
+    \item $\omega \in \samplespace$ is called an outcome
+    \item $E \subseteq \samplespace$ is called an event
+\end{itemize}
+
+
+\begin{definition}[Probability]
+    Probability is a measure on \samplespace. It is a total function $ \probFunct: \samplespace \to \reals $ such that:
+    \begin{itemize}
+        \item $ \forall \omega \in \samplespace : \probFunct[\omega] \geq 0 $
+        \item $ \sum_{\omega \in \samplespace} \probFunct[\omega] = 1 $
+    \end{itemize}
+\end{definition}
+
+A probability measure together with a samplespace is called a probability space. 
+
+
+We define the probability of an event as: 
+$$ \probFunct[E] = \sum_{\omega \in E} \probFunct[\omega] $$
+
+\begin{definition}[Random variable]
+    A random variable is a function mapping a $\omega$ from \samplespace  to the reals. 
+    $$ X(\omega) : \samplespace \then \reals $$
+\end{definition}
+Note that a random variable strictly takes a single $\omega$ as argument, not a set of outcomes. 
+
+We then calculate the probability that a random variable $X$ has a certain value $x$ as such: 
+
+$$ \probFunct[X=x] = \sum_{X^{-1}(x)} \probFunct[\omega]$$
+
+\begin{definition}[Expectation]
+    The expectation of a random variable is defined as 
+    $$ E[X] = \sum_\samplespace X(\omega)P(\omega)$$ 
+\end{definition}
+
+\subsubsection{Uncountable sets and infinitessimals}
+
+Conventional probability restricts \samplespace 's to only include sigma-algebras, that is, sets of which every subset is guaranteed to be measureable. This is neccessary because it turns out that some uncountable sets do indeed have subsets that you cannot assign a probability to. However, we can sidestep this difficulty by restricting ourselves only to countable sets. If we need continuity, we can include infinitessimals in that set.
+
+\subsection{Probability distributions}
+
+A probability distribution is a function from the domain of a random variable to its probability - in other words, a probability distribution yields the probability that a random variable will take on a certain value. 
+
+There is an abundance of ready made probability distributions to chose from, covering virtually all important situations. But care must be taken when deciding which distribution to apply to a certain problem. 
+
+\paragraph{The Bernoulli family} based on modelling a series of coin-tosses.
+\begin{itemize}
+    \item Bernoulli: heads or tails?
+    \item Binominal: k heads in n trials
+    \item Poisson: k heads in $\infty$ trials. 
+\end{itemize}
+A remarkable feature of the Poisson-distribution is that it has only a parameter for the mean, but always the same variance.
+
+\paragraph{The geometric family} based on repeating an experiment until it succeeds. 

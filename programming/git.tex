@@ -1,0 +1,109 @@
+\section{Git}
+
+\subsection{Lingo}
+\begin{itemize}
+
+    \item origin: default name for your remote repository
+    
+    \item head: \emph{your} last \emph{commit} on the current branch. Does not yet include non-commited changes. 
+        \begin{itemize}
+            \item When you switch branches with \inlinecode{git checkout}, the HEAD revision changes to point to the tip of the new
+            branch.
+            \item When you do a \inlinecode{git pull}, your working directory may contain new stuff, which your head is lagging behind. To see the difference between the working dir and your last commit, do \inlinecode{git diff HEAD}
+        \end{itemize}
+        
+    \item index: The index is a single, large, binary file in <baseOfRepo>/.git/index, which lists all files in the current branch, their sha1 checksums, time stamps and the file name
+    
+\end{itemize}
+
+\subsection{Branches}
+
+\paragraph{Creating a new branch} Don't forget to also specify the branches name when you push:
+
+\begin{lstlisting}
+git branch schwebstoff_tabellen
+git branch
+git checkout schwebstoff_tabellen
+
+# ... doing stuff ...
+
+git push -u origin schwebstoff_tabellen
+\end{lstlisting}
+
+\paragraph{Checking out an existing branch} Just first clone the whole repo and then switch to the branch: 
+
+\begin{lstlisting}
+git clone http://hnd-jens.rz-sued.bayern.de:8181/applikation/includes.git
+git branch -a // also shows remote branches
+git fetch origin schwebstoff_tabellen
+git checkout schwebstoff_tabellen
+\end{lstlisting}
+
+
+\paragraph{Merging a branch back into master} On the dev-branch, we first suck in all the changes that might have occured on the master while we were not looking. Once those changes have been properly integrated, we switch to the master and suck in the dev-branch.
+
+\begin{lstlisting}
+// Step 0: safety measure: first get all new stuff from the master into your dev branch
+git merge master 
+
+// Step 1: Go to master and insert all your dev stuff 
+checkout master
+git merge schwebstoff_tabellen
+
+// Step 2: cleanup
+git branch -d shwebstoff_tabellen  // don't need this branch any more
+
+// Step 3: push
+git push -u origin master
+\end{lstlisting}
+
+
+\paragraph{Merging remote changes on master into local master} It can happen that somebody else has been messing with the master before you had a chance to commit your own changes. You will notice this by seeing your \inlinecode{git push} fail. In that case, try to first merge the remote changes into your local copy before pushing again. 
+\begin{lstlisting}
+git commit // first saving our latest changes
+git fetch  // geting remote stuff in remote-tracking-branches. Doesn't change our files yet
+git diff master origin/master // compares what you have in master vs. what happend to master remotely
+git merge remotes/origin/master
+\end{lstlisting}
+This will try to merge the upstream changes into yours. If it fails, the conflicting file will contain annotations like these: 
+\begin{lstlisting}
+<<<<<<< HEAD
+print("159 just edited this file")
+=======
+print("133 just edited this file")
+>>>>>>> master
+\end{lstlisting}
+As you can guess, \inlinecode{<<<<<HEAD} is your code, \inlinecode{===} is a separator, and \inlinecode{>>>> master} is the end of the other guys code. 
+Use a texteditor to resolve all conflicts. Eclipse actually has a graphical interpreter for the conflict-tags. Once the resolving is completed, a \inlinecode{git push} and \inlinecode{git commit} will complete the merge.
+\begin{lstlisting}
+git status // shows that there is still a conflict
+git add .
+git status // shows that conflict is resolved, but merging still in progress
+git commit -m "phew! managed to resolve the conflict!"
+git push origin master
+\end{lstlisting}
+
+
+\paragraph{Comparing branches} Diff can compare any commited branches: 
+\begin{lstlisting}
+// How is your branch different from the master?
+git diff master..schwebstoff_tabellen
+// What have you changed since your last commit?
+git diff HEAD
+\end{lstlisting}
+
+\paragraph{Reverting} is best explained in this post: \inlinecode{https://stackoverflow.com/questions/4114095/how-to-revert-git-repository-to-a-previous-commit}
+
+
+
+\subsection{Creating your own repository}
+Basically, any git folder can be used as a repository. But you still need to do some work to expose that folder over the web. The easiest way to work is certainly over gitlab. For alternative means if you don't have a hoster, this site lists a few of the possibilities: \inlinecode{http://www.jedi.be/blog/2009/05/06/8-ways-to-share-your-git-repository/}.
+
+
+
+\subsection{Storing credentials}
+It is tedious to always have to type your name and password again. Here's how to avoid that: 
+\begin{lstlisting}
+git config [--global] user.name "Mona Lisa"
+git config [--global] credential.helper "cache --timeout=3600"
+\end{lstlisting}

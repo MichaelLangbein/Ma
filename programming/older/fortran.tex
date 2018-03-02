@@ -1,0 +1,43 @@
+\section{Fortran}
+
+Fortran can be even faster than c, because it can make use of the very strict rules of the language in its compiler. 
+
+
+\paragraph{The differences to c} are an easy way to get a first impression of how fortran works. 
+\begin{itemize}
+    \item Case-insensitive
+    \item Pointers always have a type. You're not allowed to cast pointers to void or any other type. 
+    \item Pointers are not integers. In case of an array, pointers contain information about the array-size. 
+    \item You can pass functions as arguments, but not in the form of a pointer. 
+    \item Variables are always passed by reference, never by value or by pointer (just like in java).
+    \item Functions are not by default allowed to be called recursively. 
+\end{itemize}
+
+\subsection{Basic syntax}
+\begin{lstlisting}[language=fortran]
+program HelloWorld
+  ! This is a comment
+  write (*,*) "Hello world."
+end program
+\end{lstlisting}
+The parameter \inlinecode{(*,*)} tells the compiler to print the output to the terminal stdout (first star) with default printing format (second star)
+
+Variables must be defined in the beginning of a program/subroutine/function. Typical variables are integer variables, floating point variables, boolean variables, character variables and strings. Using the operator "=", values can be assigned to variables. The following instructive example demonstrates the definition.
+\begin{lstlisting}[language=fortran]
+program DefineVariables
+
+  integer :: i      ! Integer variable
+  real :: d         ! Floating point value
+  logical :: b      ! Boolean variable
+  character :: c    ! Character
+
+  character(len=10) :: sstring  ! String of length 10
+
+  i = 0
+  d = 0.0
+  b = .false.       ! Logical has values ".true." or ".false."
+  sstring = "Hello"
+
+  write (*,*) i, " ", d, " ", b, " ", sstring
+end program
+\end{lstlisting}

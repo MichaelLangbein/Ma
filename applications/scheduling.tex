@@ -1,0 +1,18 @@
+\section{Scheduling}
+
+The proposed algorithm is simple: 
+
+\begin{enumerate}
+    \item Take the most urgent remaining task $T_i$.
+    \item Put it in the slot $[t_0, t_0 + expt(T_i)]$
+    \item If $t_0 + expt(T_i) > deadline(T_i)$, throw an exception
+    \item Set $t_0 = t_0 + expt(T_i)$ and $i = i+1$ and loop to step 1.
+\end{enumerate}
+
+Doublecheck: What if the task has scheduled subtasks?
+
+\subsection{Running time}
+
+\subsection{Partial correctness}
+
+\subsection{Termination}

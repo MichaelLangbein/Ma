@@ -1,0 +1,242 @@
+\section{Data-structures}
+
+\subsection{Stack}
+
+Stacks perform push and pop in O(1).
+However, they do search in O(n).
+
+\begin{lstlisting}[language=c]
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+
+typedef struct El {
+	char* key;
+	float val;
+} El;
+
+
+El* el_create(char* key, float val){
+	char* keyk = strdup(key);
+	El* el = malloc(sizeof(El));
+	el->key = keyk;
+	el->val = val;
+	return el;
+}
+
+
+void el_destroy(El* el){
+	free(el->key);
+	free(el);
+}
+
+
+typedef struct Stack {
+	El** data;
+	int size;
+	int top;
+} Stack;
+
+
+Stack* stack_create(int size){
+	Stack* stack = malloc(sizeof(Stack));
+	stack->data = malloc(sizeof(El*) * size);
+	stack->size = size;
+	stack->top = -1;
+	return stack;
+}
+
+void stack_push_el(El* el, Stack* stack){
+	stack->top += 1;
+	stack->data[stack->top] = el;
+}
+
+void stack_push(char* key, float val, Stack* stack){
+	El* el = el_create(key, val);
+	stack_push_el(el, stack);
+}
+
+El* stack_pop(Stack* stack){
+	stack->top -= 1;
+	return stack->data[stack->top + 1];
+}
+
+El* stack_peak(Stack* stack){
+	return stack->data[stack->top];
+}
+
+void stack_print(Stack* stack){
+	int i;
+	for(i = 0; i <= stack->top; i++){
+		printf("%s -> %d", stack->data[i]->key, stack->data[i]->val);
+	}
+}
+
+void stack_destroy(Stack* stack){
+	while(stack->top >= 0){
+		El* el = stack_pop(stack);
+		el_destroy(el);
+	}
+	free(stack->data);
+	free(stack);
+}
+
+
+int main(){
+
+	Stack* s = stack_create(10);
+	stack_push("eins", 1.1, s);
+	stack_push("zwei", 1.2, s);
+	stack_push("drei", 3.1, s);
+
+	stack_print(s);
+
+	stack_destroy(s);
+
+	return 0;
+
+}
+
+\end{lstlisting}
+
+\subsection{Linked lists}
+
+Linked lists have the advantage that they have no prefixed size. Addition and insertion at any point is O(1). On the other hand, searching takes O(n) in the worst case. 
+
+
+\subsection{Binary trees}
+
+Trees make sense when the keys have to be ordered in some sense. 
+
+\begin{lstlisting}[language=c]
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+
+typedef struct El {
+	int key;
+	float val;
+} El;
+
+
+El* el_create(int key, float val){
+	El* el = malloc(sizeof(El));
+	el->key = key;
+	el->val = val;
+	return el;
+}
+
+
+void el_destroy(El* el){
+	free(el);
+}
+
+typedef struct Node {
+	struct El* data;
+	struct Node* parent;
+	struct Node* left;
+	struct Node* right;
+} Node;
+
+
+Node* node_create(Node* parent, El* element){
+	Node* leaf = malloc(sizeof(Node));
+	leaf->parent = parent;
+	leaf->data = element;
+	return leaf;
+}
+
+void node_destroy(Node* node){
+	if(node->left != NULL){ node_destroy(node->left); }
+	if(node->right != NULL){ node_destroy(node->right); }
+	el_destroy(node->data);
+	free(node);
+}
+
+void node_elementInsert(Node* node, El* el){
+	if(el->key < node->data->key){
+		if(node->left){
+			node_elementInsert(node->left, el);
+		}else{
+			node->left = node_create(node, el);
+		}
+	}else{
+		if(node->right){
+			node_elementInsert(node->right, el);
+		}else{
+			node->right = node_create(node, el);
+		}
+	}
+}
+
+void node_dfsPrint(Node* node){
+	printf("%d -> %d \n", node->data->key, node->data->val);
+	if(node->left){
+		node_dfsPrint(node->left);
+	}
+	if(node->right){
+		node_dfsPrint(node->right);
+	}
+
+}
+
+typedef struct Tree {
+	Node* root;
+} Tree;
+
+
+Tree* tree_create(El* el){
+	Tree* tree = malloc(sizeof(Tree));
+	Node* root = node_create(NULL, el);
+	tree->root = root;
+	return tree;
+}
+
+void tree_destroy(Tree* tree){
+	node_destroy(tree->root);
+	free(tree);
+}
+
+void tree_elementInsert(Tree* tree, El* el){
+	node_elementInsert(tree->root, el);
+}
+
+void tree_dfsPrint(Tree* tree){
+	node_dfsPrint(tree->root);
+}
+
+
+int main(){
+
+	El* baseEl = el_create(20, 14);
+	El* el1 = el_create(1, 4);
+	El* el2 = el_create(25, 9);
+	El* el3 = el_create(2, 2);
+
+	Tree* tree = tree_create(baseEl);
+
+	tree_elementInsert(tree, el1);
+	tree_elementInsert(tree, el2);
+	tree_elementInsert(tree, el3);
+
+	tree_dfsPrint(tree);
+
+	tree_destroy(tree);
+	return 0;
+
+}
+
+\end{lstlisting}
+
+\subsection{Hash-tables}
+
+Hash tables are basically a array with a hash-function. The hash function is there to associate string-keys to the integer-array-indices. The array needs as many elements as the hash-function can create integer-keys. 
+
+Through the hash-function the hash-table has insertion- and lookup-times of expected O(1). However, when the array gets many elements. it might happen that the hash-function gives the same integer-key to several string-keys. To acommodate such a case, the array-elements are implemented as linked lists. This makes the worst-case loopup-time O(n/k).
+
+
+Why does one not simply use a perfect hash? Make a hash-function that generates a unique key for any string it's given. This would be known as a lookup-table. That works perfectly fine when we expect almost all possible string-keys to be really used. If however we  expect only a few of the possible strings to be used, the array would contain a lot of unused space.

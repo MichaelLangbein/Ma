@@ -1,0 +1,80 @@
+\section{Computation}
+
+\subsection{Finite state machines}
+
+A FSM takes a series of inputs (a \emph{sentence}), evaluates if the sentence is part of its language, and processes it by stepping through a few states to a final state. 
+
+The theory of FSM's does not really handle actions that are to be taken uppon transitions. In some implementations, uppon arriving at the final state, an (external) action is triggered based on that final state. In others, an action may be executed after any transition, not only after arriving at a final state.
+
+ It is important to note that the states of a FSM need not be one-dimensional. For example, in the die-hard problem, we model the system as a FDM where the state is a two-tupple; the first being the contents of a 3-liter jug, the second the content of a 5-liter jug. In such a situation it makes sense to draw the nodes of the transition function in a grid with the state-dimensions as the axes.
+
+\subsubsection{Definition}
+
+\begin{equation}
+M = \{ Q, q_0, F, \Sigma, \delta \}    
+\end{equation} 
+
+where $Q$ is the set of states, $F \subset Q$ is the set of final states, $\Sigma$ is the alphabet of possible inputs, and $\delta$ is:
+
+\begin{align}
+ \delta(q, \sigma) = q' \\
+ \delta : Q \cdot \Sigma \to Q \\
+ \Delta(\vec{\sigma}) = \delta( \delta( \delta( q_0, \sigma_0 ), \sigma_1 ), ... ) 
+\end{align}
+
+It should be noted that in reality state machines may differ from this definition in two ways:
+
+\begin{itemize}
+    \item For one, usually every state may be considered a legitimate final state.
+    \item Also usually a output function is added. There are two main designs for output-functions:
+    \begin{itemize}
+        \item Moore machine: an output is generated after every state transition. This is the most common design in hardware applications, and also used in my NID-backend.
+        \item Mealy machine: every state has its own behavior, which reacts on inputs. One of the possible reactions to an input may be to trigger a state change, but not neccessarily every input does cause a state change. This is the most common design in software-applications, especially where state-machines are used to model AI.
+    \end{itemize}
+\end{itemize}
+
+In both cases the output function is usually implemented as follows:
+A behavior is defined for each state. 
+The output function takes the input and the current state as arguments, fetches the correct behaviour based on the current state, and lets the behavior handle the input. In code:
+
+\begin{lstlisting}[language=Python]
+
+class FSM:
+    State s
+    
+    Output handleInput(Input i):
+        State ns = transitionFunction(s, i)
+        s = ns  # Might be just the same state
+        Output o = outputFunction(s, i)
+        
+    State transitionFunction(State s, Input i):
+        Behavior b = getTransBehavior(s)
+        return b.handleInput(i)
+    
+    Output outputFunction(State s, Input i):
+        Behavior b = getOutputBehavior(s)
+        return b.handleInput(i)
+
+
+\end{lstlisting}
+
+\subsubsection{Getting the language of a given machine M}
+
+\begin{equation}
+L(M) = \{  \vec{\sigma} | \Delta(\vec{\sigma}) \in F \}
+\end{equation}
+
+Since $\delta$ can be expressed as a graph, a version of theorem \ref{all_possible_paths} may be used to get $L(M)$.
+
+\subsubsection{Getting the simplest machine for a given language}
+
+\subsubsection{Buildung machines from simpler machines}
+
+\subsubsection{Induction using the invariant principle}
+Often we want to prove that a certain desireable property $P(q)$ holds for any step along any sentence that goes into a FSM. This is something we use for Turing machines as well, and in fact in many other applications, like MCMC. We can prove that $P$ holds at every step using the invariant principle. 
+
+
+\subsection{Turing machines}
+A Turing machine is only moderately more complex than a FSM. Instead of stepping through each input in the given sentence from left to right, the machine can also chose (based on its state) to move back again, or to erase or change a letter\footnote{We use "letter" and "input" as synonyms.}.
+
+However, there seems to be no such thing as a Turing-Machine-Design-Pattern. Instead, the TM is used solely as a model for computation. Contrary to the FSM the TM has no relevant practical implementation.

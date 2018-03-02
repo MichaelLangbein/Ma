@@ -1,0 +1,121 @@
+\section{Harddrive}
+
+
+Linux is almost always installed on \inlinecode{/dev/sda} and mounted on \inlinecode{/}.
+
+\paragraph{SCSI versus ATA} SCSI (small computer system interface) and ATA (advanced technology attachment) are two standards for connecting storage devices to a computer. They both are protocol-stacks just like the internet-protokol stack. Traditionally, ATA was cheaper while SCSI was more powerful, but that simple comparison is no longer valid. Both SCSI and ATA were originally parallel interfaces, though recent trends have moved towards Serial Attached SCSI (SAS) and Serial ATA (SATA) as these are much faster.
+
+
+\paragraph{File systems} Only NTFS, ext4 anf Fat32 are really important. NTFS versus ext4. EXT4 can support individual files up to 16 terabytes, and volumes up to one exabyte in size. But, one of the aspects of EXT4 which contributes to better performance, though, is that EXT4 can handle larger extents-a range of contiguous physical blocks of data. This allows it to work better with large files and reduce drive fragmentation. Other factors include the allocate-on-flush technique used by EXT4. By delaying allocation of data blocks until the data is ready to be written to disk, EXT4 improves performance and reduces fragmentation compared to file systems that allocate blocks earlier.
+Using checksums for drive journaling improves reliability and improves performance by avoiding waiting on the disk during the journaling process. When it comes to file checking, EXT4 is quicker because unallocated blocks of data are marked as such and are simply skipped during disk check operations.
+Fat32 is a really old microsoft format, but it has become industry standard such that external drives tend to use far32 when they need to make sure a disc can be read on any OS. 
+
+
+\paragraph{Partition tables} Really only msdos (standard also on linux, provides support for DOS-style MBR partition tables) and gpt (provides support for GUID partition tables - which contrary to msdos allows for more than 4 partitions at more than 2TB each) are relevant. When you \emph{format} a disc, what you really do is create a new partition table (quick option: really only new ptable, while data still intact, but unusable, slow option: also changes all of partition layout and all data is overwrittewn with zeros). 
+
+
+\subsection{Mounting a harddrive}
+
+Watch harddrive being registered as a /dev
+\inlinecode{dmesg -wH}
+\begin{lstlisting}
+[ 2113.695339] usb 3-6: USB disconnect, device number 6
+[ 2113.695878] sd 6:0:0:0: [sdb] Synchronizing SCSI cache
+[ 2113.695898] sd 6:0:0:0: [sdb] Synchronize Cache(10) failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
+[ 2125.807577] usb 3-6: new high-speed USB device number 7 using xhci_hcd
+[ 2125.937460] usb 3-6: New USB device found, idVendor=174c, idProduct=1153
+[ 2125.937464] usb 3-6: New USB device strings: Mfr=2, Product=3, SerialNumber=1
+[ 2125.937467] usb 3-6: Product: AS2115
+[ 2125.937468] usb 3-6: Manufacturer: ASMedia
+[ 2125.937470] usb 3-6: SerialNumber: 00000000000000000000
+[ 2125.938105] usb-storage 3-6:1.0: USB Mass Storage device detected
+[ 2125.938199] scsi host7: usb-storage 3-6:1.0
+[ 2126.936617] scsi 7:0:0:0: Direct-Access     ASMT     2115             0    PQ: 0 ANSI: 6
+[ 2126.937725] sd 7:0:0:0: Attached scsi generic sg2 type 0
+[ 2126.958759] sd 7:0:0:0: [sdb] 625142448 512-byte logical blocks: (320 GB/298 GiB)
+[ 2126.959151] sd 7:0:0:0: [sdb] Write Protect is off
+[ 2126.959155] sd 7:0:0:0: [sdb] Mode Sense: 43 00 00 00
+[ 2126.959526] sd 7:0:0:0: [sdb] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+[ 2126.974721] sd 7:0:0:0: [sdb] Attached SCSI disk
+\end{lstlisting}
+
+\inlinecode{udevadm monitor --udev}
+
+\inlinecode{lsblk} Lists all block devices
+
+
+Determine filesystem
+\inlinecode{lsusb}
+\begin{lstlisting}
+Bus 003 Device 006: ID 174c:1153 ASMedia Technology Inc. ASM2115 SATA 6Gb/s bridge
+\end{lstlisting}
+
+\inlinecode{fdisc -l /dev/sdb}
+\begin{lstlisting}
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+\end{lstlisting}
+
+\inlinecode{parted /dev/sda -l}
+\begin{lstlisting}
+Model: ATA HGST HTS725050A7 (scsi)
+Disk /dev/sda: 500GB
+Sector size (logical/physical): 512B/4096B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start   End    Size    Type      File system     Flags
+ 1      1049kB  496GB  496GB   primary   ext4            boot
+ 2      496GB   500GB  3994MB  extended
+ 5      496GB   500GB  3994MB  logical   linux-swap(v1)
+
+
+Error: /dev/sdb: unrecognised disk label
+Model: ASMT 2115 (scsi)                                                   
+Disk /dev/sdb: 320GB
+Sector size (logical/physical): 512B/512B
+Partition Table: unknown
+Disk Flags:
+\end{lstlisting}
+
+
+"discs" utility
+
+
+
+Do the mount 
+\inlinecode{mount -t ntfs /dev/sdb /mnt/phil}
+Make mount permanent: 
+\inlinecode{vim /etc/fstab}
+
+
+\subsection{Repairing a harddrive}
+
+\paragraph{Check harddrive hardware} Using "disks" tool: lick on options and do SMART analysis
+
+\paragraph{Make a backup image} Using "disks" tool
+
+\paragraph{Repair with fsck} Note: for NTFS filesystems it might be better to instead use Window's chkdsk.
+
+
+\paragraph{repair with testdisk and photorec}
+How PhotoRec works
+
+FAT, NTFS, ext2/ext3/ext4 file systems store files in data blocks (also called clusters under Windows). The cluster or block size remains at a constant number of sectors after being initialized during the formatting of the file system. In general, most operating systems try to store the data in a contiguous way so as to minimize data fragmentation. The seek time of mechanical drives is significant for writing and reading data to/from a hard disk, so that's why it's important to keep the fragmentation to a minimum level.
+
+When a file is deleted, the meta-information about this file (file name, date/time, size, location of the first data block/cluster, etc.) is lost; for example, in an ext3/ext4 file system, the names of deleted files are still present, but the location of the first data block is removed. This means the data is still present on the file system, but only until some or all of it is overwritten by new file data.
+
+To recover these lost files, PhotoRec first tries to find the data block (or cluster) size. If the file system is not corrupted, this value can be read from the superblock (ext2/ext3/ext4) or volume boot record (FAT, NTFS). Otherwise, PhotoRec reads the media, sector by sector, searching for the first ten files, from which it calculates the block/cluster size from their locations. Once this block size is known, PhotoRec reads the media block by block (or cluster by cluster). Each block is checked against a signature database which comes with the program and has grown in the type of files it can recover ever since PhotoRec's first version came out.
+
+For example, PhotoRec identifies a JPEG file when a block begins with:
+
+    0xff, 0xd8, 0xff, 0xe0
+    0xff, 0xd8, 0xff, 0xe1
+    or 0xff, 0xd8, 0xff, 0xfe
+
+If PhotoRec has already started to recover a file, it stops its recovery, checks the consistency of the file when possible and starts to save the new file (which it determined from the signature it found).
+
+If the data is not fragmented, the recovered file should be either identical to or larger than the original file in size. In some cases, PhotoRec can learn the original file size from the file header, so the recovered file is truncated to the correct size. If, however, the recovered file ends up being smaller than its header specifies, it is discarded. Some files, such as *.MP3 types, are data streams. In this case, PhotoRec parses the recovered data, then stops the recovery when the stream ends.
+
+When a file is recovered successfully, PhotoRec checks the previous data blocks to see if a file signature was found but the file wasn't able to be successfully recovered (that is, the file was too small), and it tries again. This way, some fragmented files can be successfully recovered. 

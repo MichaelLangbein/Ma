@@ -1,0 +1,38 @@
+\section{Jekyll}
+Jekyll is a ruby/markdown based static site builder.
+
+
+\subsection{Setup}
+
+We want to use github's user-account hosting with our jekyll site. For this reason, our site's project's name must equal our github-useraccount: 
+
+\begin{lstlisting}
+gem install jekyll bundler
+jekyll new MichaelLangbein.gitbub.io
+cd MichaelLangbein.gitbub.io
+git add --all
+git commit -m "Let's go!"
+git push
+\end{lstlisting}
+
+Now we have a github-repository named \verb MichaelLangbein.github.io  which github will recognize and automatically build and host. 
+
+
+
+\subsection{Blogging}
+\paragraph{To start blogging} just add files to your \verb _posts  directory.
+
+\paragraph{To add sites other than block entries} it is best to ...
+
+\paragraph{To add a navigation menu} you can ...
+
+
+
+\subsection{Layout}
+\paragraph{Themes} define the basic layout of your site. If you don't like all the details of your theme, you can always overwrite them by customizing your layout by adding a \verb _layouts  folder to your project. 
+Chosing a theme is as simple as editing your \verb _config.yml  file: 
+\begin{lstlisting}
+theme: jekyll-theme-cayman
+\end{lstlisting}
+
+\paragraph{Customizing layout} You use layouts when you want to have full control over all html. All the stuff you put in your \verb _layouts  folder automatically overwrites whichever theme you have chosen. There is a lot of good information \hyperlink{https://learn.cloudcannon.com/jekyll/introduction-to-jekyll-layouts/}{here}.

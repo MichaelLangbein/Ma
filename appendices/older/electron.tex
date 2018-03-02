@@ -1,0 +1,88 @@
+\section{Electron}
+
+Main process: the equivalent of a browser. Creates web pages. Has access to local file system via the node.js api.
+
+Here is some very basic implementation: 
+
+\begin{lstlisting}
+'use strict';
+
+/**
+The main script handles window creation and dispatching app-events to the modules,
+as well as receiving of messages from (and sending to) windows via ipc.
+Every window references a html file.
+Which in turn references a script containing the logic for that html-file
+(that script can access the document object, with its methods "querySelector" and "addEventListener")
+*/
+
+var {app, BrowserWindow} = require('electron');
+var url = require('url');
+var path = require('path');
+var ipcMain = require('electron').ipcMain;
+
+
+var mainWindow = null;
+
+app.on('ready', function () {
+  mainWindow = new BrowserWindow({
+    width: 600,
+    height: 400
+  });
+  mainWindow.loadURL(url.format({
+      pathname: path.join(__dirname, "/app/index.html"),
+      protocol: 'file:',
+      slashes: true
+    }));
+});
+
+ipcMain.on('windowKanal', function (event, nachricht) {
+  console.log(nachricht);
+});
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=html]
+<!DOCTYPE html>
+<html>
+  <body>
+
+    <h1>My First Heading</h1>
+
+    <p>My first paragraph.</p>
+
+     <button type="button" class="button">Click Me!</button>
+
+     <script src="index.js"></script>
+  </body>
+</html>
+
+\end{lstlisting}
+
+\begin{lstlisting}
+"use strict";
+
+var ipcRenderer = require('electron').ipcRenderer;
+
+var buttons = document.querySelectorAll(".button");
+
+for (var i = 0; i < buttons.length; i++) {
+    var button = buttons[i];
+    prepareButton(button);
+}
+
+
+function prepareButton (button) {
+  button.addEventListener('click', function () {
+    alert("Button clicked");
+    car nachricht = {
+      aktion: "close"
+    };
+    ipcRenderer.send('windowKanal', nachricht);
+  });
+}
+
+ipcRenderer.on('message', function (event) {
+  console.log(event);
+});
+\end{lstlisting}
+

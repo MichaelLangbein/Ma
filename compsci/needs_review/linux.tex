@@ -1,0 +1,31 @@
+\section{Linux}
+
+As much as I prefer linux over other os'es, most of the daily work with it is just memorizing some magic spells in arcane syntax and learning to type really fast. 
+
+\subsection{System}
+
+\begin{itemize}
+    \item \inlinecode{shutdown}
+    \item \inlinecode{reboot}
+\end{itemize}
+
+\subsection{Searching}
+
+\begin{itemize}
+    \item \inlinecode{grep -rn --include=\*.{php,inc} "some text" .}
+    \item \inlinecode{find . }
+\end{itemize}
+
+
+\subsection{startup}
+
+\subsubsection{SytemV}
+Old, sequential startup system. Runlevel based. 
+Scripts in \inlinecode{/etc/init.d/}
+
+\subsubsection{Upstart}
+Ubuntus attempt at replacing systemv. Dependency-tree based.  Will soon be given up for systemd. 
+Scripts in \inlinecode{/etc/init/}
+
+\subsubsection{Systemd}
+New, event based startup system. 

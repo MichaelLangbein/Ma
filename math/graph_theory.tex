@@ -1,0 +1,157 @@
+\section{Graph Theory}
+
+\subsection{General properties}
+
+\subsubsection{Degrees}
+
+\begin{theorem}
+    In a directed graph $\sum_{V_G} \indeg(v_n) = |E_G|$
+\end{theorem}
+
+\begin{proof}
+    \induction{$ \sum_{V_G} \indeg(v_n) = |E_G| $ \\}
+    {$\sum_{V_G} \indeg(v_n) = |E_G|$ where $E_G = \{(v_1, v_2)\}$ \\}
+    {This is tirvially true.}
+    {
+    \begin{itemize}
+        \item Let $\sum_{V_G} \indeg(v_n) = |E_G|$ 
+        \item Let $V_{G'} = V_G \cup \{v_{N+1}\}$
+        \item Let $E_{G'} = E_G \cup \{(x, y) \in V_G \times \{v_{N+1}\} \cup \{v_{N+1}\} \times V_G \}$
+    \end{itemize}
+    }
+    {
+     For the left side it holds that: 
+                $$ \sum_{V_{G'}} \indeg(v_n) = \sum_{V_G} \indeg(v_n) + \outdeg(v_{N+1}) + \indeg(v_{N+1}) $$
+                On the other hand on the right side it holds that: 
+                $$ |E_{G'}| = |E_G| + \outdeg(v_{N+1}) + \indeg(v_{N+1}) $$
+                So the equation reduces to $0=0$, which is true.
+    }
+\end{proof}
+
+
+\begin{lemma}
+    $\sum_{V_G} \indeg(v_n) = \sum_{V_G} \outdeg(v_n)$
+\end{lemma}
+
+\begin{lemma}
+    In an undirected graph we have $\sum_{V_G} \degr(v_n) = 2|E_G|$
+\end{lemma}
+
+\subsection{Walks and paths}
+
+\begin{definition}
+    A walk is any sequence of vertices that are connected by an edge.
+\end{definition}
+
+\begin{definition}
+    A path is a walk where no vertex appears twice.
+\end{definition}
+
+\begin{theorem}
+    The shortest walk between any two vertices in a graph is a path.
+\end{theorem}
+
+\begin{proof}
+    \subprf{By contradiction. Suppose that the vertex $x$ appears twice in the shortest walk.}{this is a contradiction.}{
+        Since $x$ appears twice, the proposed walk must be of the form $f-x-g-x-h$, where $g$ is a sequence of $0$ or more connected vertices. Then this walk can be shortened to $f-x-h$.
+    }
+\end{proof}
+
+\begin{theorem}
+    The longest path in a graph has length $ | V_G | - 1 $.
+\end{theorem}
+This is too trivial for a full-fledged proof: there are no repetitions in a path, so it can only have as many steps as it has vertices.
+
+
+\subsubsection{Relations and adjacency matrices}
+
+Let $R \circ Q$ be a composition of two relations. The number of paths of length exactly $n$ between two vertices $x$ and $y$, written as $\paths_n(x, z)$, can be expressed  as 
+ $$ \paths_n(x,z) = | \{ y | xRy \land yQz \} | = \sum_{y \in Y} xRy \cdot yQz$$
+
+
+If $R_{AM}$ and $Q_{AM}$ are the adjacency matrix representations of the above relations, then: 
+
+$$  R_{AM} \cdot Q_{AM} [n,m] = \sum_{y \in Y} R_{AM} [x_n, y] \cdot Q_{AM} [y, z_m] $$
+
+$$ = \sum_{y \in Y} xRy \cdot yQz = \paths_n(x,z) $$
+
+When $R=Q$, it follows easily that:
+
+\begin{theorem}
+    $R_{AM}^2 [n,m]$ is the number of paths  that go from $v_n$ to $v_m$ in exactly $2$ steps.
+\end{theorem}
+
+\begin{theorem} \label{all_possible_paths}
+    $R_{AM}$ explains whether or not two vertices $v$ and $u$ are connected. All possible paths are listed in $R^* = R_{AM} \cup R_{AM}^2 \cup R_{AM}^3 \cup ... \cup R_{AM}^{|V_G|-1}$.
+    We can find the length of the shortest path between two vertices $u$ and $v$ by
+\end{theorem}
+
+
+
+\subsection{Planar graphs}
+
+The following theorems all deal with planar, connected graphs, and build up to Eulers theorem.
+
+\begin{theorem}
+    Adding a edge to a planar, connected graph means adding one loop: $ \Delta N = 0 \land \Delta E = 1 \then \Delta L = 1$
+\end{theorem}
+
+\begin{theorem}
+    Adding x edges means adding x loops: $ \Delta N = 0 \land \Delta E = x \then \Delta L = x $
+\end{theorem}
+
+\begin{proof}
+    \subprf{}{$\Delta N = 0 \land \Delta E = x \then \Delta L = x$}{
+        By induction on $\Delta E$. \\
+        \subprf{Base case: $\Delta E = 1$}{$\Delta L = 1$}{
+            By theorem 11.
+        }
+        \subprf{Let $\Delta N = 0 \land \Delta E = x \then \Delta L = x$.\\}
+            {$\Delta N = 0 \land \Delta E = x+1 \then \Delta L = x+1$}{
+            Consider the graph from the induction hypothesis, then apply theorem 12.
+        }
+    }
+\end{proof}
+
+\begin{theorem}
+    When we add a new node to a graph and connect it to the graph using one or more edges, then the number of edges and loops behaves as such: $ \Delta N = 1 \then \Delta L = \Delta E - 1 $
+\end{theorem}
+
+\begin{proof}
+    \subprf{}{$\Delta N = 1 \then \Delta L = \Delta E - 1$}{
+        Let $ \Delta N = 1 $. \\
+        By induction on $ \Delta E $. \\
+        \subprf{Base case: $\Delta E = 1 $}{$ \Delta L = 0 $}{
+            Graphically trivial.
+        }
+        \subprf{Induction step: $\Delta L = \Delta E - 1$}{$\Delta L' = \Delta E' - 1$}{
+            $\Delta E ' = \Delta E + 1$ \\
+            Using theorem 12, that means:
+            $\Delta L' = \Delta L +1$ \\
+            Thus: 
+            $\Delta L + 1 = \Delta E + 1 - 1 $ \\
+            Which reduces to: 
+            $\Delta L = \Delta E - 1$, which is true by the induction hypothesis.
+        }
+    }
+\end{proof}
+
+\begin{theorem}
+    Eulers theorem: $N + L = E + 1$
+\end{theorem}
+
+\begin{proof}
+    \subprf{}{$N + L = E + 1$}{
+        By induction on $N$. \\
+        \subprf{Base case: $N=1$ or $N=2$}{$N + L = E + 1$}{
+            If $N=1$: $1 + 0 = 0 + 1$ \\
+            If $N=2$: $2 + 0 = 1 + 1$
+        }
+        \subprf{Induction step: Let $N + L = E + 1$.\\}{$N+1 + L' = E' + 1$}{
+            Using theorem 13: $\Delta L' = \Delta E - 1$ \\
+            Thus:
+            $N + 1 + L + \Delta L = E + \Delta E + 1$ \\
+            $N + L = E + 1$, which is true  by the induction hypothesis.
+        }
+    }
+\end{proof}
