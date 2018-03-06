@@ -4,7 +4,7 @@
 
 \subsubsection{Degrees}
 
-\begin{theorem}
+\begin{theorem} \label{sumIndegreesIsNrEdges}
     In a directed graph $\sum_{V_G} \indeg(v_n) = |E_G|$
 \end{theorem}
 
@@ -29,7 +29,7 @@
 \end{proof}
 
 
-\begin{lemma}
+\begin{lemma} \label{indegIsOutdeg}
     $\sum_{V_G} \indeg(v_n) = \sum_{V_G} \outdeg(v_n)$
 \end{lemma}
 
@@ -90,7 +90,7 @@ When $R=Q$, it follows easily that:
 
 \subsection{Planar graphs}
 
-The following theorems all deal with planar, connected graphs, and build up to Eulers theorem.
+The following theorems all deal with planar, connected graphs, and build up to Eulers theorem. Well use $N$ for the number of nodes, $E$ for the number of edges, and $L$ for the number of loops.
 
 \begin{theorem}
     Adding a edge to a planar, connected graph means adding one loop: $ \Delta N = 0 \land \Delta E = 1 \then \Delta L = 1$
@@ -154,4 +154,21 @@ The following theorems all deal with planar, connected graphs, and build up to E
             $N + L = E + 1$, which is true  by the induction hypothesis.
         }
     }
+\end{proof}
+
+
+Here is a fun little proof.
+
+\begin{proof} In a tree, the mean number of children ($mcc$) is always equal to $1 - 1/N$.
+    
+    \subprf{}{$mcc = 1 - \frac{1}{N}$}{
+        With what we have so far, this is almost trivial to prove. 
+        The mean child count can be written as 
+        $$ mcc = \frac{1}{N} \sum_N \outdeg{v_n} $$
+        Using theorem \ref{sumIndegreesIsNrEdges} and lemma \ref{indegIsOutdeg}, this becomes
+        $$ mcc = \frac{1}{N} E $$
+        Eulers formula in a tree becomes $N = E + 1$, since there are no loops in trees. Using this: 
+        $$ mcc = 1 - \frac{1}{N} $$
+    }
+
 \end{proof}

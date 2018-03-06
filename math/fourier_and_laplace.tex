@@ -1,10 +1,19 @@
 \section{Fourier and Laplace}
 
+\begin{figure}[H]
+  \caption{Time Base versus Fourier Base}
+  \centering
+    \includegraphics[width=0.95\textwidth]{images/fourier_base.jpg}
+\end{figure}
+
+
 \subsection{Discrete Fourier Analysis}
 
 We'll begin with the discrete case. For one, this case is the basis of the FFT. Also, the math is a lot easier in the discrete case. Let $N$ be the samplesize and $\delta$ be the samplefrequency (often equal to 44100 Hz or 48000 Hz). Let $V$ be the samplespace of signals of size $N$. This is a vectorspace, equipped with an inner product of the form $\innerprodbr{\vec{a}}{\vec{b}} = \frac{1}{N} \sum_{k=0}^{N-1} a_k (b_k)^*$, where $()^*$ is the complex complement.
 
 \subsubsection{The Fourier Base}
+
+
 
 
 We'll use the base $B = \{ \vec{w}_N^n | n \in [0, N-1]\}$. Here, $\vec{w}_N^n$ is the vector we get by evaluating $e^{i 2\pi \frac{n}{N} k}$ at the points $k=0, k=1, ..., k=N-1$. Thus if we call $w_N = e^{i 2 \pi \frac{1}{N}}$, then the vector $\vec{w}_N^n$ consists of the elements $w_N^{nk}$. Throughout this chapter, $k$ will be the index of time/the signalvector and $n$ will be the index of frequency/the basevectors.
@@ -72,7 +81,31 @@ sig = [2, 1, 1, 4]
 print amplitudes(sig)
 \end{lstlisting}
 
-But it turns out we can do better. 
+Notice that this is a matrix operation. 
+
+
+\subsection{As a matrix operation}
+
+\begin{proof}
+    The Fourier transform of $\vec{a} + \vec{b}$ equals the transform of $\vec{a}$ plus the transform of $\vec{b}$
+
+    Note that the Fourier transform can be rewritten in matrix form. 
+    
+    $$
+    <\vec{a}, \vec{f}_m>(m) = 
+    \begin{bmatrix} f_{1,1} & ... & f_{F,T} \\ ... & & ... \\ f_{F,1} & ... & f_{1,T}  \end{bmatrix} 
+    \begin{bmatrix} a_1 \\ a_2 \\ ... \\ a_T \end{bmatrix}  
+    = 
+    \begin{bmatrix} <\vec{a}, \vec{f}_1> \\ <\vec{a}, \vec{f}_2> \\ ...  \\ <\vec{a}, \vec{f}_F> \end{bmatrix} 
+    $$
+    
+    This means that the rules for matrix multiplication apply to the Fourier transformation, amongst which that matrix multiplication is distributive:
+    
+    $$ A (\vec{a} + \vec{b}) = A \vec{a} + A \vec{b} $$
+    
+    
+\end{proof}
+
 
 \subsection{Fast Fourier Transform}
 
