@@ -22,8 +22,21 @@ We will mention the following implementations: the vectorspace of coordinate fre
 The most common vectorspaces are certainly $\reals^n$ and functionspaces.
 The implementations of the above defined scalar product and vector addition are trivial.
 
+
+
+
+
+
+
 \paragraph{Subspaces of vectorspaces}
 A set $U$ is a subspace of a vectorspace $V$, iff $U \subset V$ and $U$ is a vectorspace.
+
+
+
+
+
+
+
 
 \paragraph{linear independence} 
 The elements in $A$, a subset of a vectorspace, are linearly independent iff $\forall \alpha_1, ...,\alpha_n: [( \sum \alpha_i \vec{a}_i = 0 ) \iff ( \alpha_1 = \alpha_2 = ... = 0 )]$. Note that this reduces automatically to $\forall \alpha_1, ...,\alpha_n: [\sum_i^n \alpha_i b_i = 0 \then (\alpha_1 = ... = \alpha_n = 0)]$, because the $\leftarrow$ case is always true. 
@@ -34,6 +47,12 @@ Consequently, linear dependence is defined as $B:ld \equiv \thereis \alpha_1, ..
 \begin{proof}
     Prove that iff $B:ld$, then one of the elements of $B$ is a linear combination of the others. 
 \end{proof}
+
+
+
+
+
+
 
 
 \paragraph{Bases}
@@ -55,6 +74,13 @@ For any three vectors chosen from $\reals^2$, at least one must be a linear comb
         }
     }
 \end{proof}
+
+
+
+
+
+
+
 
 
 
@@ -174,6 +200,24 @@ Booleans            &                  &               &                        
 
 \end{table}
 
+Here is one more example of an inner product. Consider the vector-space $L^2(\reals^2 \to \reals^3)$, that is, the space of square-integrable functions that take two input arguments $\vec{x}$ and return a 3-vector $\vec{y}$. How would you define an inner product to turn this into an inner-product-space? Well, the choice is up to you, but most often one choses: 
+
+$$ <f, g> := \int_{\reals^2} <f(\vec{x}), g(\vec{x})>_i \diff{\vec{x}} $$
+
+, where $ <\vec{a}, \vec{b}>_i$ is defined as $\sum_{i=0}^3 a_i b_i$. You can prove for yourself that this is indeed an inner product! 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \subsection{Excursion: More on orthogonality and preview of function decompositions}
 
@@ -251,49 +295,3 @@ This looks simple enough, but unfortunately, inverting a matrix is a \BigTheta{N
 \paragraph{Orthogonal complement}
 
 
-\subsection{Transformations}
-
-By accident, I created a transformation that results in a so called \hyperlink{https://en.wikipedia.org/wiki/Lissajous_curve}{Lissajous curve}.
-
-\begin{figure}
-  \caption{line to tr}
-  \centering
-    \includegraphics[width=0.8\textwidth]{images/transform.png}
-\end{figure}
-
-
-
-\begin{lstlisting}[language=python]
-import numpy as np
-from collections import namedtuple as nt
-from infix import or_infix
-from math import sin, cos, atan, tan, exp, log
-
-Point = nt("Point", "x,y,z")
-
-@or_infix
-def vplus(point1, point2):
-    x = point1.x + point2.x
-    y = point1.y + point2.y
-    z = point1.z + point2.z
-    return Point(x, y, z)
-
-@or_infix
-def sprod(s, point):
-    x = s * point.x
-    y = s * point.y
-    z = s * point.z
-    return Point(x, y, z)
-
-def Line(t):
-    return Point(0, 0, 0) |vplus| ( t |sprod| Point(1, 2, 1) )
-
-def transform(point):
-    x = cos(point.x + point.y)
-    y = sin(point.y + point.z)
-    z = cos(point.z + point.x)
-    return Point(x, y, z)
-
-line = [Line(t) for t in np.arange(0.0, 10.0, 0.05)]
-line2 = [transform(p) for p in line]
-\end{lstlisting}

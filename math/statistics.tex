@@ -10,3 +10,18 @@ Assume that reality can me modelled by a model like this one:
 $$ \vec{y} = \alpha \vec{x} + \vec{e} $$
 
 \subsection{Principal component analysis}
+
+
+\subsection{Tests}
+Often, statistical tests work \emph{the wrong way round}. You have your hypothesis, like "these groups are different". Then you state the opposite, the \emph{null-hypothesis}. Then you determine how likely your data is under the null-hypothesis - the \emph{p-value}. And than you hope that the p-value is very low.
+
+\paragraph{Students T-Test} compares two averages (means) and tells you if they are different from each other. The null hypothesis is that all samples come from the same distribution. That means that under $H_0$, the two means you obtained should be similar. So the interpretation goes like this: 
+\begin{itemize}
+    \item low p-value: the chance that your result would have happend under $H_0$ is low. It is very unlikely that the two means you have obtained actually come from the same distribution. 
+    \item high p-value: It is quite possible that both your groups come from the same distribution. 
+\end{itemize}
+Note that there are two experimental setups that can use t-tests:
+\begin{itemize}
+    \item unpaired: you have two groups, with no person in both groups. Example: Test one group with medication and another with placebo. 
+    \item paired: every person is first in the first and then in the second group. Example: test patients before and after treatment. 
+\end{itemize}

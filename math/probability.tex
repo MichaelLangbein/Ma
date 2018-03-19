@@ -41,9 +41,32 @@ $$ \probFunct[X=x] = \sum_{X^{-1}(x)} \probFunct[\omega]$$
     $$ E[X] = \sum_\samplespace X(\omega)P(\omega)$$ 
 \end{definition}
 
+\begin{definition}[Conditional Probability]
+    $$ \probFunct[A | B] = \frac{\probFunct[A \intersection B]}{\probFunct[B]}$$
+\end{definition}
+
+As a nice little exercise, we prove the formula for the conditional probability of the \emph{complement} of $B$.
+
+\begin{proof}
+    $$ \probFunct[A | \overline{B}] = $$
+\end{proof}
+
+
+
 \subsubsection{Uncountable sets and infinitessimals}
 
 Conventional probability restricts \samplespace 's to only include sigma-algebras, that is, sets of which every subset is guaranteed to be measureable. This is neccessary because it turns out that some uncountable sets do indeed have subsets that you cannot assign a probability to. However, we can sidestep this difficulty by restricting ourselves only to countable sets. If we need continuity, we can include infinitessimals in that set.
+
+ 
+ 
+ 
+ 
+ \subsubsection{Probabilistic fallacies}
+ \begin{itemize}
+     \item T-Test interpretation: If $\probFunct[A|B] = x$, then this does \emph{not} mean that $probFunct[A|\overline{B}] = 1 - x$.
+     \item Prosecutors fallacy aka. inverse fallacy: $P(A|B) \neq P(B|A)$
+ \end{itemize}
+ 
 
 \subsection{Probability distributions}
 

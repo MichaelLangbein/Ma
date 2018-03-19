@@ -299,6 +299,39 @@ plt.imshow(data, cmap='hot', interpolation='nearest')
 plt.show()
 \end{lstlisting}
 
+We can add multiple images to one single figure. 
+\begin{lstlisting}[language=python]
+fig = plt.figure()
+
+ax1 = fig.add_subplot(231, projection='3d')
+ax1.set_title("Original body")
+for point in signalCart:
+    ax1.scatter(point[0], point[1], point[2])
+
+ax2 = fig.add_subplot(232)
+ax2.set_title("Flattened")
+ax2.imshow(signal)
+
+ax3 = fig.add_subplot(233)
+ax3.set_title("Fourier Transform")
+ax3.imshow(log(abs(amps)))
+
+ax4 = fig.add_subplot(234, projection='3d')
+ax4.set_title("New body")
+for point in signalNewCart:
+    ax4.scatter(point[0], point[1], point[2])
+
+ax5 = fig.add_subplot(235)
+ax5.set_title("Flattened")
+ax5.imshow(abs(signalNew))
+
+ax6 = fig.add_subplot(236)
+ax6.set_title("Altered amplitudes")
+ax6.imshow(log(abs(ampsNew)))
+
+plt.show()
+\end{lstlisting}
+
 \subsection{SymPy}
 
 Sympy is fairly good at doing symbolic calculations. 
