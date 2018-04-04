@@ -130,3 +130,80 @@ ReactDOM.render(<PropsDisplayer name="Frarthur" town="Flundon" age={2} haunted={
 \end{lstlisting}
 
 You can, and often will, pass functions, like event-handlers, as props. 
+
+
+State is implemented by adding a variable named \inlinecode{state} to the Component-class. You can then alter the state by calling \inlinecode{setState}, which as a side-effect calls \inlinecode{render} again, such that your state-change is immediately reflected in the layout. 
+
+\begin{lstlisting}
+import React, { Component } from 'react';
+import logo from './logo.svg';
+import './App.css';
+
+const list = [
+  {
+    title: "React",
+    url: "https://facebook.github.io/react/",
+    author: "me",
+    num_comments: 3,
+    points: 4,
+    objectID: 0,
+  },
+  {
+    title: "Redux",
+    url: "https://github.com/reactjs/redux",
+    num_comments: 2,
+    author: "someone else",
+    points: 5,
+    objectID: 1,
+  }
+];
+
+class App extends Component {
+
+  constructor(props) {
+    super(props); // allways call super(props)
+    this.state = { // must be called state
+      list: list
+    };
+    // props and state are very similar; but state is private.
+    this.onDismiss = this.onDismiss.bind(this); // all your custom methods must first be registered (except if they are lifecycle hooks)
+  }
+
+  onDismiss(objId) {
+    const isNotId = item => item.objectID !== objId;
+    const shorterList = this.state.list.filter(isNotId);
+    this.setState({ list: shorterList }); // automatically calls render() again
+  }
+
+  render() {
+
+    var myName = "Michael";
+
+    return (
+      <div className="App">
+        <div className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h2>Hello there, {myName}!</h2>
+        </div>
+
+        {this.state.list.map( item => {
+          return (
+            <div key={item.objectID}>
+              <span><a href={item.url}>{item.title}</a></span>
+              <span>{item.author}</span>
+              <span>{item.num_comments}</span>
+              <span>{item.points}</span>
+              <span><button onClick={() => {this.onDismiss(item.objectID)}}>Dismiss</button></span>
+            </div>
+          );
+        })}
+
+      </div>
+    );
+  }
+
+}
+
+export default App;
+
+\end{lstlisting}

@@ -30,7 +30,7 @@ In the previous section on general algebra we dealt with vector spaces (subspace
 
 Here is a little exercise to get you warmed up. 
 
-\begin{proof}[If $\mtrx{A}\vec{x}$ is zero for any $\vec{x}$, then $\mtrx{A}$ must be the zero matrix.]\\
+\begin{proof}[If $\mtrx{A}\vec{x}$ is zero for any $\vec{x}$, then $\mtrx{A}$ must be the zero matrix.]
 
     \subprf{}{$\forall \vec{x} : \mtrx{A}\vec{x} = \vec{0} \then \mtrx{A} = \mtrx{0} $}{
         \subprf{Let $\vec{x}_0$ be chosen. Suppose $\mtrx{A}\vec{x}_0 = \vec{0}$.}{$\mtrx{A} = \mtrx{0} $}{
@@ -139,7 +139,27 @@ There are a bunch of properties to linear transformations that can be useful to 
     }
 \end{proof}
 
-\paragraph{A linear transformation can also be a change of basis} when the following conditions are fullfilled: 
+A whole bunch of other properties are now easily proved. Let $f$ and $g$ be linear transforms from $U$ to $V$. The following are also linear transforms: 
+\begin{itemize}
+    \item $\alpha f$
+    \item $f + g$
+    \item $f^{-1}$ ( if it exists )
+    \item $fg$ ( here $g: V \to W$ )
+\end{itemize}
+
+Let $f: U \to V$ be a linear transform. Then the following are equivalent: 
+\begin{itemize}
+    \item If $f(\vec{u}) = \vec{0}$, then $\vec{u} = \vec{0}$
+    \item $f$ is one-to-one
+    \item $f$ maps linearly independent vectors to linearly independent vectors. 
+\end{itemize}
+
+
+Prove that a transform can be split up into mulitple transforms on the basis vectors. 
+As an examle, consider the case of a rotation. A diagonal rotation can be reproduced by a rotation first around one, then around another axis. 
+
+
+\paragraph{A linear transformation can also be a change of basis} when it is on a vectorspace and invertible.
 
 
 \subsection{Systems of linear equations}

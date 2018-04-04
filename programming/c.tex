@@ -443,19 +443,29 @@ void encrypt(char * msg) {
 
 
 
-
-
-\subsubsection{Makefiles}
+\subsubsection{Building and Makefiles}
+The building of an executable consists of compuiling and linking. 
+\begin{itemize}
+    \item \textbf{Compiling your own code} The compiler generates an object file from your sourcecode. An object-file is a compiled piece of code together with some meta-information on what kind of functions and structures it containes. 
+    \item \textbf{Linking in libraries} After that, the include-directories are scanned for libraries that contain implementations of the header-files you included in your sourcecode. This phase is called linking. There are two ways you can link in external libraries.
+    \begin{itemize}
+        \item Static linking means that a copy of the library is added to the final executable at compile time. The executable can then be moved to another machine without worries, because all required libraries are placed inside the executable. Static libraries are usually written like this: \inlinecode{libXXX.a} and created with the \inlinecode{ar} program.
+        \item  Alternatively, libraries can be linked in a dynamic way: that means that the executable will search for an appropriate library once it needs to call its functions, that is, at run time.  Shared/dynamic libraries are written like \inlinecode{libYYY.so} and created with \inlinecode{gcc -fPIC -c YYY.c && gcc -shared -o libYYY.so YYY.o}
+        \item Both \inlinecode{.a} and \inlinecode{.so} libraries are included with the \inlinecode{-l} and \inlinecode{-L} commands. 
+    \end{itemize}
+\end{itemize}
 
 Makefiles are how we knot together different parts of a c programm. It's really easiest to look at a specific example:
 
 \begin{lstlisting}[language=bash]
+# Includes are header files without a concrete implementation.
 INCLUDES = -I/usr/include/mysql
+# Libraries are object files. -L adds a directory of libraries, -l adds a single library. 
 LIBS = -L/usr/lib/x86_64-linux-gnu -lmysqlclient -ljansson -pthread
 WARNINGS = -Wall -Wextra
 
 # Compilen
-#   -c: compile
+#   -c: compile (nur compile, nicht link!)
 #   -g: fuer debugger
 
 incl.o: incl.c incl.h
@@ -468,7 +478,7 @@ psql.o: psql.c jsn.h
 	gcc -g -c $(WARNINGS) $(INCLUDES) psql.c
 
 # Linken
-# 	-o: name der fertigen binary
+# 	-o: object-file: name der fertigen binary
 # 	-g: fuer debugger
 
 psql: psql.o jsn.o incl.o
@@ -479,14 +489,6 @@ clean:
 
 all: psql clean
 \end{lstlisting}
-
-Die compilation besteht aus drei Schritten.
-
-\begin{itemize}
-    \item Schritt 1: Preprocessor: auslesen der \#include directives, nachschlagen der included'ten*.h files in den -I dirs, alles zusammen in eine große Datei verbinden.
-    \item Schritt 2: Compiler: erzeugen der *.o object files
-    \item Schritt 3: Linker:  verbinden der object files.
-\end{itemize}
  
 \paragraph{Includes} sind header files.
 Option $-I$(dirname): hinzufügen dir zu Suchpfad für *.h files.
@@ -511,6 +513,29 @@ valgrind -v --leak-check=full --show-leak-kinds=all --log-file=val.log ./psql in
 
 \subsubsection{OpenMP}
 OpenMP is a set of macros used for control-flow for threads. Think of automatically distributing your for-loop over threads.
+
+
+
+
+
+
+
+
+
+
+\subsection{CMake and Autotools}
+While make does a good job at automating the build of c-programs, all the commands you type there are platform dependent. For that reason, larger projects use more sophisticated buildsystems. They don't require less configuration (in fact, they usually require \emph{more} work) but they make it easier to create a build that will work on any platform. Usually they work by first scanning your environment and then creating makefiles for you. 
+
+Working with these is not exactly pleasant. This section only contains a \emph{how-to} handle existing open-source projects that you have to get to compile somehow. 
+
+We begin with autotools. 
+\begin{itemize}
+    \item \inlinecode{./configure}
+    \item \inlinecode{make}
+    \item \inlinecode{make install}
+    \item Troubleshooting: most likely, some shared libraries will be missing. Find out which by calling \inlinecode{}
+\end{itemize}
+
 
 
 

@@ -178,7 +178,14 @@ Musical notes are special. Here, we don't want to get the full spectrum that FFT
 \subsubsection{Goertzel}
 Goertzel continues to work with the Fourier base. It differs from FFT in that only a few of the elements that FFT returns are actually evaluated. 
 \subsubsection{PCI}
-PCI discards of the Fourier base and instead uses the musical frequencies in the base. This results in a non-orthogonal base, but that won't hinder us. 
+PCI (pre-calculated inverse algorithm) discards of the Fourier base and instead uses the musical frequencies in the base. This results in a non-orthogonal base, but that won't hinder us. 
+\begin{equation}
+    \begin{split}
+        \vec{s} &= \sum_F a_f e^{-2 \pi i f t} \text{  , with F = \{440, 465, ...\}}  \\
+                &= \begin{bmatrix}  ... & & ... \\ & e^{- 2 \pi i f t} & \\ ... &  & ... \end{bmatrix} \vec{a} \\
+        \vec{a} &= \begin{bmatrix}  ... & & ... \\ & e^{- 2 \pi i f t} & \\ ... &  & ... \end{bmatrix}^{-1} \vec{s}
+    \end{split}
+\end{equation}
 
 \subsection{Continuous Fourier Analysis}
 
@@ -223,3 +230,27 @@ We can use Fourier to describe any functionspace - if we can prove that the Four
 https://psychedai.wordpress.com/2016/11/15/the-intuition-behind-bernsteins-proof-of-the-weierstrass-approximation-theorem/
 
 
+\subsubsection{Fourier transform on vector valued functions}
+As long as a vector-valued function can be decomposed over a set of basis-vectors (never mind what basis vectors exactly, this works with any basis), we can still use the normal, scalar Fourier transform on them. 
+\begin{equation}
+    \begin{split}
+        g &: A^N \to A^M \\
+        g(\vec{x}) &= \sum_m^M g_m(\vec{x}) \vec{e}_m \text{ ... decomposing the function over the output basis} \\
+        \fourier_g(\vec{u}) &= \sum_m^M \vec{e}_m \fourier_{g_m}(\vec{u})  \text{ ... Fourier transform over the input basis}
+    \end{split}
+\end{equation}
+
+Consider the example of a rgb-image.
+\begin{equation}
+    \begin{split}
+        c(x,y) &= \vec{e}_1 r(x,y) + \vec{e}_2 g(x,y) + \vec{e}_3 b(x,y) \\
+        \fourier_c\begin{bmatrix} f_x \\ f_y \end{bmatrix} 
+                        &= \int_X \int_Y c(x,y) e^{-2\pi i (f_xx + f_yy)} \diff{y} \diff{x} \\
+                        &= \int_X \int_Y \vec{e}_1 r(x,y) e^{-2\pi i (f_xx + f_yy)} \diff{y} \diff{x} + ... \\
+                        &= \vec{e}_1 \fourier_r\begin{bmatrix} f_x \\ f_y \end{bmatrix} + \vec{e}_2 \fourier_g\begin{bmatrix} f_x \\ f_y \end{bmatrix} + \vec{e}_3 \fourier_b\begin{bmatrix} f_x \\ f_y \end{bmatrix} 
+    \end{split}
+\end{equation}
+
+Note that the resulting fourier spectrum consist of complex 3d-vectors.
+
+Sometimes, however, you either have an input function that contains \emph{multivector} elements, or you want to apply a filter to the fourier spectrum based on mulitvectors. In that case, you can find an introduction to geometric-algebra Fourier transforms here: \inlinecode{https://pdfs.semanticscholar.org/41ce/67428ee60748a4142dee0eea28ed997855e6.pdf}

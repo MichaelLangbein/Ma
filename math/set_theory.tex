@@ -4,12 +4,12 @@
 
 A relation is injective if any $y$ belongs only to one $x$ - if at all.
 \begin{definition}
-    Injective: $\forall x_1, x_2 \in X: x_1 R y_0 \land x_2 R y_0 \rightarrow x_1 = x_2$
+    Injective (1-1): $\forall x_1, x_2 \in X: x_1 R y_0 \land x_2 R y_0 \rightarrow x_1 = x_2$
 \end{definition}
 
 A relation is surjective if any $y$ belongs to at least one $x$.
 \begin{definition}
-    Surjective: $\forall y \in Y: \exists x \in X: x R y$
+    Surjective (onto): $\forall y \in Y: \exists x \in X: x R y$
 \end{definition}
 
 Note that none of the above definitions means that there is a $y$ for any $x$. Under both definitions, there can be $X$'s that have none or more than one $y$. 
@@ -22,8 +22,8 @@ While these definitions are useful, it is sometimes easier to use the following 
 \begin{tabular}{@{}lll@{}}
 \toprule
                & out      & in         \\ \midrule
-$\leq$ 1       & function & injective  \\
-$\geq$ 1       & total    & surjective \\ \bottomrule
+$\leq$ 1       & function & injective (1-1) \\
+$\geq$ 1       & total    & surjective (onto) \\ \bottomrule
 \end{tabular}
 \end{table}
 

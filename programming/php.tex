@@ -47,7 +47,22 @@ Your URL would look either:
 
 
 
+\subsection{XDebug}
 
+\paragraph{The profiler} can be very helpful. Setup: 
+\begin{itemize}
+    \item Make sure xdebug is installed
+    \item append this to your apache-php.ini:
+        \begin{lstlisting}
+        xdebug.profiler_enable=0
+        xdebug.profiler_enable_trigger=1
+        xdebug.profiler_output_dir=/home/hnd/freeForAll/
+        \end{lstlisting}
+    \item append this to the url you want to profile: \inlinecode{&XDEBUG_PROFILE}.
+    \item To render the resulting \inlinecode{cachegrind.out} file: \inlinecode{git clone https://github.com/jokkedk/webgrind}.
+\end{itemize}
+
+Note that the resulting file can be over 500 MB big. 
 
 
 
@@ -55,6 +70,14 @@ Your URL would look either:
 
 
 \subsection{Apache}
+
+\subsection{Setting up tls}
+\begin{itemize}
+
+    \item Buy Certificate (or create a self-signed one for development). At the end you should end up with a certificate somwhere on your server, like \inlinecode{/home/hnd/tls/server.crt}.
+    
+    \item Configure Apache to resolve https-calls. 
+\end{itemize}
 
 \subsubsection{htaccess}
 
@@ -101,6 +124,8 @@ Additionally, all directives in the \verb php.ini  can be overwritten with
 \paragraph{apache}
 
 
+
+
 \subsection{Logging}
 When coding java, there is a strict, by-default differentiation between your app's output and your error-output. Your app is displayed as is (stdout), your errors in the console (stderr). Since php-apps are usually deployed on a server, you can only acces stdout via a browser and stderr via the servers logs. Php-devs tend to use \inlinecode{echo} calls in their code to display logging information inside the stdout. This is actually very bad practice! Avoid doing this! Good practice is to write logging information to the logs using \inlinecode{error_log("<pre>".print_r($werte,true)."</pre>", 3, "/home/hnd/freeForAll/php_custom_error.log");
 } and keeping the error logs open at all times. 
@@ -114,7 +139,7 @@ Here are the logs you should keep open:
 
 \paragraph{The configuration} of logs is handled in the \verb php.ini  with the following directives: 
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \caption{Php logging directives (recommendations are for production server)}
 \begin{tabular}{@{}llll@{}}
@@ -188,6 +213,8 @@ We build, test and distribute php-projects using Jenkins. For this, we make use 
 \paragraph{Autoload} the file \inlinecode{--bootstrap autoload.php} is a php file that contains any php-code that needs to be executed before the actual tests are run. Usually it consists merely of a bunch of \inlinecode{require} statements. These are used to load the testable files as well as their testfiles. 
 
 \paragraph{Fixtures: setUp() and tearDown()} ...
+
+
 
 
 

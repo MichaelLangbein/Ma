@@ -51,7 +51,9 @@ checkout master
 git merge schwebstoff_tabellen
 
 // Step 2: cleanup
+git branch --merged master // see all branches that have already been merged
 git branch -d shwebstoff_tabellen  // don't need this branch any more
+git push origin --delete schwebstoff_tabellen // also remove on remote
 
 // Step 3: push
 git push -u origin master

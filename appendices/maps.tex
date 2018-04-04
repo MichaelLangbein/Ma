@@ -1,0 +1,114 @@
+\section{Maps}
+
+A lot of this information comes from here: http://cite.opengeospatial.org/pub/cite/files/edu/wmts/text/operations.html
+
+
+\subsection{Server}
+A popular choice for serverside software is MapServer (C, CGI and PHP) or GeoServer (Java). Servers locally create GeoTiff files: high resolution images that are geo-referenced. They are then converted to png's and exposed via a HTTP-based API. We need to know about two important implementations. Both of them can be called via SOAP or GET-Parameters (KVP, for key-value-pairs, in geo-lingo). We'll only describe the GET-Parameters here. 
+
+\begin{itemize}
+    \item WMS: delivers custom made images for a given map-square. 
+    \begin{itemize}
+        \item Version 1.1.1
+            \begin{itemize}
+                \item GetCapabilites: \inlinecode{?service=wms&version=1.1.1&request=GetCapabilites}
+                \item GetMap \inlinecode{?service=wms&version=1.1.1&request=GetMap&src=EPSG:31468&format=image/png&BBOX=447,532,234,124&layers=l1,l2&widht=1000&height=1000}
+                \item GetFeatureInfo
+            \end{itemize}
+        \item Version 1.3
+            \begin{itemize}
+                \item BBOX: andere Achsenreihenfolge! Von vielen clients noch immer nicht richtig verarbeitet. 
+            \end{itemize}
+    \end{itemize}
+    
+    \item WMTS: has a pre-made pyramid of images. Clients pass an index for the pyramid instead of the coordinates of the selection. 
+    \begin{itemize}
+        \item Version 1.0.0.
+            \begin{itemize}
+                \item GetCapabilities \inlinecode{?service=wmts&version=1.0.0&request=GetCapabilites}
+                \item GetTile \inlinecode{?service=wmts&version=1.0.0&request=GetTile&layer=l1&format=image/png&TileMatrixSet=default28m&TileMatrix=1&TileRow=1&TileCol=1}
+                \item GetFeatureInfo
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+Usually, service providers expose \emph{multiple} urls for you to query, so that you can fetch images from several servers in parallel. 
+
+\subsection{Client}
+A popular javascript mapping library is openlayers. amongst other things, it facilitates the usage of wms and wmts. Note that openlayers has \emph{two} types of clients for wms: \inlinecode{ImageWms} and \inlinecode{TiledWMS}.
+
+\begin{lstlisting}
+require('ol/ol.css');
+var Proj         = require('ol/proj').default;
+var Extent       = require('ol/extent').default;
+var Map          = require('ol/map').default;
+var ImageLayer   = require('ol/layer/image').default;
+var TileLayer    = require('ol/layer/tile').default;
+var ImageWms     = require('ol/source/imagewms').default;
+var Wmts         = require('ol/source/wmts').default;
+var WmtsTileGrid = require('ol/tilegrid/wmts').default;
+var View         = require('ol/view').default;
+
+
+
+var projection = Proj.get('EPSG:3857');
+var projectionExtent = projection.getExtent();
+
+
+// Step 1: including a WMS
+
+var wmsLayer = new ImageLayer({
+    extent: projectionExtent,
+    source: new ImageWms({
+        url: "https://ahocevar.com/geoserver/wms",
+        params: {"LAYERS": "topp:states"}
+    }),
+});
+
+
+// Step 2: including a WMTS
+
+var size = Extent.getWidth(projectionExtent) / 256;
+var resolutions = new Array(14);
+var matrixIds = new Array(14);
+for (var z = 0; z < 14; ++z) {
+    resolutions[z] = size / Math.pow(2, z);
+    matrixIds[z] = z;
+}
+
+var wmtsLayer = new TileLayer({
+    source: new Wmts({
+        url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
+        layer: '0',
+        matrixSet: 'EPSG:3857',
+        style:'default',
+        tileGrid: new WmtsTileGrid({
+            origin: Extent.getTopLeft(projectionExtent),
+            resolutions: resolutions,
+            matrixIds: matrixIds
+        })
+    })
+});
+
+
+// Step 3: display
+
+var layers = [
+    wmsLayer,
+    wmtsLayer
+];
+
+
+var view = new View({
+    center: [0, 0],
+    zoom: 0
+});
+
+
+var map = new Map({
+  target: 'map',
+  layers: layers,
+  view: view
+});
+
+\end{lstlisting}

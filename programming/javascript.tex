@@ -83,10 +83,23 @@ var buz = (function ($) {
 Ultimately, this can be a little hard to read. There are tools like browserify, however, that let you write your sourcecode locally like you would in node, and then bundle all your requires together into one single script. 
 
 
-
-
-
-
+\subsection{Binding this}
+\inlinecode{this} refers to whoever calls a function.
+\begin{lstlisting}
+var me = {name: "Michael"};
+function printThis() { console.log(this);}
+me.pt = printThis;
+printThis(); // window
+me.pt(); // me
+\end{lstlisting}
+Because this can get confusing, javascript allows us to \inlinecode{bind} an object to a function to always be the value of \inlinecode{this}.
+\begin{lstlisting}
+var me = {name: "Michael"};
+function printThis() { console.log(this);}
+printThisBound = printThis.bind(me); // note that printThis is not changed in this process. 
+printThis();  // window
+printThisBound(); // me
+\end{lstlisting}
 
 
 

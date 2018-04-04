@@ -1,3 +1,80 @@
 \section{Geometric algebra}
 
 The geometric algebra is the algebra of multivectors. multivectors form a vectorspace, an inner product space and an algebra. 
+
+\subsection{Definition of the algebra}
+The geometric algeba has elements 
+$$A = scalar + vector + plane + volume + ... = (A)_0 + (A)_1 + (A)_2 + (A)_3 + ...$$
+
+It can be proven that such an algebra exists with the following gemoetric product: 
+\begin{itemize}
+    \item $AB \in \geometrics^n$
+    \item $A(B+C) = AB + BC$
+    \item $(A + B)C = AC + BC$
+    \item $(\alpha A)B = A(\alpha B) = \alpha (AB)$
+    \item $(AB)C = A(BC)$
+    \item $1A = A1 = A$
+\end{itemize}
+
+
+\subsection{Canonical basis}
+In $\geometrics^2$, this basis would consist of $1, e_1, e_2, e_1e_2$.
+
+A little slang is in order: 
+\begin{itemize}
+    \item a k-vector is a multivector consisting only of rank-j elemens. For example, a 2 vector in $\geometrics^3$ could be written as $a = \alpha e_1e_2 + \beta e_2e_3 + \gamma e_3e_1$
+\end{itemize}
+
+\subsection{Geometric product}
+Let's inspect the case of $\geometrics^1$.
+
+\begin{equation}
+    \begin{split}
+        A &= \alpha_0 + \alpha_1 e \\
+        B &= \beta_0 + \beta_1 e \\
+        AB &= (\alpha_0 + \alpha_1 e)(\beta_0 + \beta_1 e) \\
+          &= (\alpha_0 \beta_1 + \alpha_1 \beta_0) + (\alpha_1 \beta_0 + \alpha_0 \beta_1) e \\
+    \end{split}
+\end{equation}
+
+
+\subsubsection{Inner product}
+The inner product of a j-vector A and a k-vector B is:
+$$ A \innerprod B = (AB)_{\rank{B} - \rank{A}} $$
+
+\subsubsection{Outer product}
+The outer product of a j-vector A and a k-vector B is: 
+$$ A \outerprod B = (AB)_{\rank{A} + \rank{B}}$$
+
+\subsubsection{Norm and inverse}
+
+The reverse of a k-vector $A = a_1 a_2 ... a_k$ is $A^\dagger = a_k ... a_2 a_1$. This equals $A^\dagger = (-1)^{k(k-1)/2} A$. 
+
+The norm of a multivector is defined as 
+$$ A = \sum_J \alpha_J e_J \then |A| = \sum_J \alpha_J^2 $$
+If $A$ is a k-vector $A = a_1 a_2 ... a_k$, then the inverse of $A$ is 
+$$ A^{-1} = \frac{(-1)^{k(k-1)/2}}{|A|^2} A $$
+If $B$ isn't a k-vector, then it can be expressed as as sum of k-vectors. But be careful: the norm is not a linear function. So $|B| = |\sum_j A_j| \neq \sum_j |A_j|$
+
+
+\subsubsection{Parallel and orthogonal part}
+
+\subsection{Fourier decomposition of multivectors}
+Every multivector can be written in the form
+$$ A = \sum_J (e_J^{-1}A)_0 e_J$$
+This is easily proven. 
+\begin{equation}
+    \begin{split}
+        A &= \sum_J \alpha_J e_J \\
+        (A e_I)_0 &= \sum_J \alpha_J (e_J e_I)_0 \\
+                &= \alpha_I
+    \end{split}
+\end{equation}
+
+If a is a vector, this reduces to the normal 
+$$ a = \sum_j (a \innerprod e_j) e_j$$
+
+
+\subsection{Geometric calculus}
+
+

@@ -16,7 +16,9 @@
 \usepackage{booktabs} % For tables
 \usepackage{multirow}
 \usepackage{qtree} % for treestructures
+\usepackage{textcomp} % as a helper for gensymb
 \usepackage{gensymb} % for degree-symbol
+\usepackage{mathrsfs} % For Fourier-Symbol script.
 \usepackage[table,xcdraw]{xcolor}
 \usepackage[toc,page]{appendix}
 \usepackage{titlesec} % for numbers on subsubsection
@@ -66,6 +68,7 @@
 \newcommand{\union}{\cup}
 \newcommand{\reals}{\mathbb{R}}
 \newcommand{\naturals}{\mathbb{N}}
+\newcommand{\geometrics}{\mathbb{G}}
 %prop
 \newcommand{\samplespace}{\ensuremath{\Omega} }
 %linalg
@@ -78,9 +81,12 @@
 \newcommand{\innerprodbr}[2]{\ensuremath{< #1 , #2 >}}
 \newcommand{\outerprod}{\ensuremath{\wedge}}
 \newcommand{\orth}{\ensuremath{\perp}}
+\newcommand{\rank}[1]{\ensuremath{\text{rank}(#1)}}
 %analysis
 \newcommand{\diff}[1]{\ensuremath{\mathop{d#1}}}
 \newcommand{\partDiff}[2]{\ensuremath{ \frac{ \mathop{d#1} }{ \mathop{d#2} } }}
+% fourier 
+\newcommand{\fourier}{\ensuremath{\mathscr{F}}}
 %hyperreals
 \newcommand{\subs}[2]{\ensuremath{#1_{#2}}}
 \newcommand{\std}[1]{\subs{#1}{std}}
@@ -193,7 +199,7 @@
 \input{math/combinatorics}
 \input{math/algebra_general}
 \input{math/algebra_linear}
-%\input{math/algebra_geometric}
+\input{math/algebra_geometric}
 \input{math/fourier_and_laplace}
 %\input{math/grouptheory}
 \input{math/graphics}
@@ -249,6 +255,7 @@
 \input{appendices/android}
 \input{appendices/react}
 \input{appendices/jekyll}
+\input{appendices/maps}
 \end{appendices}
 
 
