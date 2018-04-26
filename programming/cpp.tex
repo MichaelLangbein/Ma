@@ -550,34 +550,120 @@ int main(){
 \end{lstlisting}
 You can avoid some of the above problem using barriers in your code (\inlinecode{std::mutex}) which will let you synchronize the way a group of threads share a resource.
 
-\subsection{SDL}
-
-Sdl is even simpler than openframeworks, but lacks some of of's more advanced features. However, to get started with simple programs, it seems ideal. 
-
-\subsubsection{setup}
 
 
-\subsection{OpenFrameworks}
 
-This is the C++ equivalent of processing. There are a few basics you need to be aware of. 
+\subsection{CMake}
+CMake input files are written in the “CMake Language” in source files named CMakeLists.txt or ending in a .cmake file name extension.
 
+CMake Language source files in a project are organized into:
 \begin{itemize}
-    \item Your \inlinecode{ofApp} extends \inlinecode{ofBasicApp} which exposes a bunch of virtual methods that you may or may not implement to hook into their functionality. 
-    \item \inlinecode{ofApp}'s are threaded, so you might need mutex'es to synchronise audio and video, for example. 
+    \item \emph{Directories} (CMakeLists.txt). When CMake processes a project source tree, the entry point is a source file called CMakeLists.txt in the top-level source directory. This file may contain the entire build specification or use the \inlinecode{add_subdirectory()} command to add subdirectories to the build. Each subdirectory added by the command must also contain a CMakeLists.txt file as the entry point to that directory. For each source directory whose CMakeLists.txt file is processed CMake generates a corresponding directory in the build tree to act as the default working and output directory.
+    \item \emph{Scripts} (script.cmake). An individual script.cmake source file may be processed in script mode by using the cmake(1) command-line tool with the -P option. Script mode simply runs the commands in the given CMake Language source file and does not generate a build system. It does not allow CMake commands that define build targets or actions.
+    \item \emph{Modules} (module.cmake). CMake Language code in either Directories or Scripts may use the include() command to load a module.cmake source file in the scope of the including context. See the cmake-modules(7) manual page for documentation of modules included with the CMake distribution. Project source trees may also provide their own modules and specify their location(s) in the \inlinecode{CMAKE_MODULE_PATH} variable.
+\end{itemize}
+
+\subsubsection{Variables}
+Variables are the basic unit of storage in the CMake Language. Their values are always of string type, though some commands may interpret the strings as values of other types. The \inlinecode{set()} and \inlinecode{unset()} commands explicitly set or unset a variable, but other commands have semantics that modify variables as well. Variable names are case-sensitive and may consist of almost any text, but we recommend sticking to names consisting only of alphanumeric characters plus \inlinecode{_} and \inlinecode{-}.
+
+Although all values in CMake are stored as strings, a string may be treated as a list in certain contexts, such as during evaluation of an Unquoted Argument. In such contexts, a string is divided into list elements by splitting on \inlinecode{;} characters not following an unequal number of \inlinecode{[} and \inlinecode{]} characters and not immediately preceded by a \inlinecode{\\}. The sequence \inlinecode{\\;} does not divide a value but is replaced by \inlinecode{;} in the resulting element.
+
+A list of elements is represented as a string by concatenating the elements separated by \inlinecode{;}. For example, the \inlinecode{set()} command stores multiple values into the destination variable as a list:
+\begin{lstlisting}
+set(srcs a.c b.c c.c) # sets "srcs" to "a.c;b.c;c.c"
+\end{lstlisting}
+Lists are meant for simple use cases such as a list of source files and should not be used for complex data processing tasks. Most commands that construct lists do not escape \inlinecode{;} characters in list elements, thus flattening nested lists:
+\begin{lstlisting}
+set(x a "b;c") # sets "x" to "a;b;c", not "a;b\;c"
+\end{lstlisting}
+
+
+A variable reference has the form \inlinecode{\$\{variable_name\}} and is evaluated inside a Quoted Argument or an Unquoted Argument. A variable reference is replaced by the value of the variable, or by the empty string if the variable is not set. Variable references can nest and are evaluated from the inside out, e.g. \inlinecode{\$\{outer_\$\{inner_variable\}_variable\}}.
+
+An environment variable reference has the form \inlinecode{\$ENV\{VAR\}} and is evaluated in the same contexts as a normal variable reference.
+
+\subsubsection{Logic}
+\begin{itemize}
+    \item Conditional Blocks: The \inlinecode{if()/elseif()/else()/endif()} commands delimit code blocks to be executed conditionally.
+    \item Loops: The \inlinecode{foreach()/endforeach()} and \inlinecode{while()/endwhile()} commands delimit code blocks to be executed in a loop. The \inlinecode{break()} command may be used inside such blocks to terminate the loop early.
+    \item Command Definitions: The \inlinecode{macro()/endmacro()}, and \inlinecode{function()/endfunction()} commands delimit code blocks to be recorded for later invocation as commands.
 \end{itemize}
 
 
-\subsubsection{of native fuctions}
-
-
-\paragraph{audioReceived}
-
-\paragraph{ofThread}
-
-\paragraph{ofMutex} This has all other threads wait with outputting anything until the action inside the lock is completed. 
-\begin{lstlisting}
-ofMutex soundMutex;
-soundMutex.lock();
-// do stuff here
-soundMutex.unlock();
+\subsubsection{Command arguments}
+\begin{itemize}
+    \item bracket argument:\begin{lstlisting}
+message([=[
+This is the first line in a bracket argument with bracket length 1.
+No \-escape sequences or ${variable} references are evaluated.
+This is always one argument even though it contains a ; character.
+The text does not end on a closing bracket of length 0 like ]].
+It does end in a closing bracket of length 1.
+]=])
 \end{lstlisting}
+
+    \item quoted argument:\begin{lstlisting}
+message("This is a quoted argument containing multiple lines.
+This is always one argument even though it contains a ; character.
+Both \\-escape sequences and ${variable} references are evaluated.
+The text does not end on an escaped double-quote like \".
+It does end in an unescaped double quote.
+")
+\end{lstlisting}
+
+    \item unquoted argument: \begin{lstlisting}
+foreach(arg
+    NoSpace
+    Escaped\ Space
+    This;Divides;Into;Five;Arguments
+    Escaped\;Semicolon
+    )
+  message("${arg}")
+endforeach()
+\end{lstlisting}
+\end{itemize}
+
+
+\subsubsection{Important predefined variables}
+There is a list of CMake’s global varibales. You should know them.
+\begin{itemize}
+    \item \inlinecode{CMAKE_BINARY_DIR}: if you are building in-source, this is the same as \inlinecode{CMAKE_SOURCE_DIR}, otherwise this is the top level directory of your build tree
+    \item \inlinecode{CMAKE_SOURCE_DIR}: this is the directory, from which cmake was started, i.e. the top level source directory
+    \item \inlinecode{EXECUTABLE_OUTPUT_PATH}: set this variable to specify a common place where CMake should put all executable files (instead of \inlinecode{CMAKE_CURRENT_BINARY_DIR}):
+    \begin{lstlisting}
+    SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+    \end{lstlisting}
+    \item \inlinecode{LIBRARY_OUTPUT_PATH}: set this variable to specify a common place where CMake should put all libraries (instead of \inlinecode{CMAKE_CURRENT_BINARY_DIR}):
+    \begin{lstlisting}
+    SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+    \end{lstlisting}
+    \item \inlinecode{PROJECT_NAME}: the name of the project set by \inlinecode{PROJECT()} command.
+    \item \inlinecode{PROJECT_SOURCE_DIR}: contains the full path to the root of your project source directory, i.e. to the nearest directory where CMakeLists.txt contains the \inlinecode{PROJECT()} command Now, you have to compile the test.cpp. The way to do this task is too simple. Add the following line into your CMakeLists.txt:
+    \begin{lstlisting}
+    add_executable(hello ${PROJECT_SOURCE_DIR}/test.cpp)
+    \end{lstlisting}
+\end{itemize}
+    
+
+
+
+        
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+

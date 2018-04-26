@@ -45,6 +45,20 @@ person.kind = 'person'
 console.log(zack.kind); //=> person
 \end{lstlisting}
 
+Javascript asserts that one usually doesn't need classes, since you most often only create one instance. If you do need to share things between two objects, add the shared things to a third object (the prototype) and give that prototype to the two objects. 
+
+\begin{lstlisting}
+var me = {name: "Michael"};
+var you = {name: "Eva"};
+var singer = { 
+    sing: function() { console.log("Me and you and a dog named " + this.name); } 
+};
+me.__proto__ = singer;
+you.__proto__ = singer;
+me.sing();
+you.sing();
+\end{lstlisting}
+
 \subsection{Constructor functions}
 
 Honestly, I dislike constructor functions. 
