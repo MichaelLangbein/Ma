@@ -1303,3 +1303,13 @@ For the discriminator to have access to the userRole key, you need to place it i
 MDC.put("userRole", "ADMIN");
 logger.info("Admin Action");
 \end{lstlisting}
+
+
+\section{Groovy}
+Python was built as a scripting language with c-interoperability. This lets it access the fast, native c libraries, but also forces it to a certain platform dependence. To use modules like numpy or heroku, the relevant c-so's (math and ssh, respectively) must be installed on the system. 
+Groovy was built as a scripting language with java-interoperability. Where python is a scripting-gateway into the native system, groovy is a scripting-gateway into java. This defines groovy's use-case: use groovy when you want to write a scripting-project that can be nicely packaged to be run anywhere where a jvm is installed - which is practically anywhere, including windows, a domain where python lacks somewhat. 
+
+\subsection{Building, running, and packaging}
+Contrary to java, it is quite viable to build and run groovy/gradle from the command line, which allows us to skip an ide. 
+
+\subsection{Groovy on grails}

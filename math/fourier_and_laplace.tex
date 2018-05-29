@@ -67,6 +67,7 @@ Using Horners method, this is a \BigTheta{n} operation. Executing it on all $n$ 
 import numpy as np
 
 def amplitudes(signal):
+    N = len(signal)
     amps = []
     for n in range(N):
         sm = 0
@@ -162,7 +163,7 @@ def fft(signal):
 
     amps = []
     for n in range(N/2):
-        wn = np.exp(1j * 2 * np.pi * n / N)
+        wn = np.exp(-1j * 2 * np.pi * n / N)
         an   = ampsE[n] + wn * ampsU[n]
         an2N = ampsE[n] - wn * ampsU[n]
         amps.insert(n,       an   )

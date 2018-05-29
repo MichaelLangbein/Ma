@@ -1,0 +1,37 @@
+\section{Sound}
+
+
+All sound-in (microphone, jack/cinch aka line-in) and sound-out (loudspeakers, headphones) cables lead to your soundcard, which has the sole task of transforming analog sound signals to digital \inlinecode{short[]} arrays. The whole routing is done via the ALSA System. 
+Because ALSA is a little complicated, linux has a layer on top of it. Two applications can be used as this top-layer: pulseaudio and jackd.  
+
+\subsection{Audio Standards}
+
+\paragraph{Raw audio} consists of \inlinecode{short[]} arrays containing raw amplitude data. 
+
+\paragraph{Midi} comes in two forms: JACK-Midi and ALSA-Midi.
+
+\subsection{Hardware}
+
+Use \inlinecode{aplay -l} to list all your sound cards. 
+
+\paragraph{PCH} is your actual soundcard. 
+
+\paragraph{HDMI} is combined audio/video transport. Mostly used by monitors, but also shows up in \inlinecode{aplay -l} because it can carry sound as well. 
+
+\subsection{Software}
+
+There are different systems that controll your soundcards. 
+
+
+\paragraph{ALSA} is linuxes standard sound routing mechanism. 
+
+\paragraph{Portaudio} is an alternative to alsa that can also run on windows and mac. 
+
+\paragraph{Jack} is a router that lets you plug one programs sound output into another programs sound input - or to the system's soundcard. 
+
+\subsection{JACK}
+Jack deserves its own section. 
+
+\paragraph{Frames per period * periods per buffer} yields your buffer size. Big buffer means low CPU load, but large latency. Small buffer means small latency, but high CPU load. If the CPU load approaches 100\%, you'll hear \emph{xruns} (which stands for buffer-Under- or Over-run), that is clicking and artifacts caused by your CPU not being able to process buffer-batches on time. Jack displays CPU usage under the term \emph{DSP load} in qjackclt.
+
+\paragraph{Realtime (RT)} mode requires your kernel to support realtime scheduling (called low-latency kernel). When that is given, jack will be given priority in memory and cpu over most other tasks. 

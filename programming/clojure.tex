@@ -81,6 +81,24 @@ However, sometimes we just want to pass a value anonymously. Here, the \inlineco
 (let [x 5] (+ 3 x))
 \end{lstlisting}
 
+We can also use \inlinecode{let} with functions: 
+\begin{lstlisting}[language=lisp]
+(defn sin [x] 
+  (Math/sin x))
+
+(defn buildVecFromFunc [func start to]
+  (vec (map func (range start to))))
+
+(defn linspace [start incr len]
+  (let [incrFunc (fn [pos] (+ start (* pos incr)))]
+       (buildVecFromFunc incrFunc 0 len)))
+
+(defn createWave [frequency sampleRate length]
+  (let [angularMoment   (/ sampleRate (* 2.0 Math/PI frequency))
+        timeArray       (linspace 0 angularMoment length)]
+       (map sin timeArray)))
+\end{lstlisting}
+
 \paragraph{function-arguments} There are two ways of handlig function arguments.
 
 \begin{lstlisting}[language=lisp]
@@ -217,6 +235,25 @@ However, the syntax is not very pretty. It is not immediately evident that first
 
 This macro takes the \inlinecode{person} and adds it as the first argument to all the following function calls. Similarly, the \inlinecode{->>} macro takes the \inlinecode{person} and adds it as the \emph{last} argument. 
 
+The \inlinecode{->} macro is often used in combination with the \inlinecode{update} function. 
+
+\begin{lstlisting}[language=lisp]
+(def person {
+  :name "Michael"
+  :age 31
+})
+
+(defn incrementAge [person]
+  (update person :age (fn [age] (+ 1 age))))
+
+(defn changeName [person newName] 
+  (update person :name (fn [name] newName)))
+
+(-> person
+  (incrementAge)
+  (changeName "Daniel"))
+
+\end{lstlisting}
 
 \paragraph{Some convenience syntax} Maps can be used as a function for lookup.
 \begin{lstlisting}[language=lisp]

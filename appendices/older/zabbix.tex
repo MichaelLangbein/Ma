@@ -35,8 +35,10 @@ Itemcalls are also called \emph{keys}.
 Often, you might only want to issue an action when a trigger has been fireing constantly for a while. For this reason, all items allow triggers to evaluate some statistic like min(timespan), max(timespan) etc. Look at these examples: 
 \begin{lstlisting}
 {Template ICMP Ping:icmppingsec.avg(5m)}>0.9
-{Template ICMP Ping:icmppingloss.min(10m)}>20
-{Template ICMP Ping:icmpping.max(#5)}=0
+{Template ICMP Ping:icmppingloss.min(10m)}>20   
+{Template ICMP Ping:icmpping.max(#5)}=0   // trigger fires if server couldn't be pinged a single time in 5 trials
+{Website Drupal:web.test.fail[Website Drupal].sum(#5)}>2 // trigger fires if webtest reported 2 errors in last 5 tests
+{gkd-dev:web.test.fail[Website Drupal].avg(3m)}>0.5 // trigger fires if during the last 3 min more than half the tests failed
 \end{lstlisting}
 
 
@@ -64,12 +66,15 @@ Zabbix - quite unfortunately - calls variables "macros". They are defined on the
 
 
 \subsection{Actions}
-Actions are how we react on trigger-evaluations. Usually, we react on them by
+Actions are how we react on trigger-evaluations (or on internal events). Usually, we react on them by
 \begin{itemize}
     \item sending an email to a group
     \item executing a script 
     \item escalation
 \end{itemize}
+
+\subsubsection{Notification on trigger or internal event}
+You will want to send a mail to your users when triggers fire or when items cannot be executed (for example due to connection problems). For the first, go to \inlinecode{/configuration/actions}, for the latter, click "Internal event" in the dropdown on the upper right. 
 
 \subsubsection{Executing a script on action}
 
