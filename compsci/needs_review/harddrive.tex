@@ -1,6 +1,33 @@
 \section{Harddrive}
 
 
+
+The following terms are common in file system discussions, so you should glance through the list and familiarize yourself with any you don't already know:
+
+Disk: A permanent storage medium of a certain size. A disk also has a sector or block size, which is the minimum unit that the disk can read or write. The traditional block size for disks has been 512 bytes, but it now approaches 4096 bytes for newer disks.
+
+Block: The smallest unit writable by a disk or ﬁle system. Everything a ﬁle system does is composed of operations done on blocks. A ﬁle system block is always the same size as or larger (in integer multiples) than the disk block size.
+
+Bitmap: not a picture, but a data structure that determines which blocks on a disk are free or used.
+
+Partition: A subset of all the blocks on a disk. A disk can have several partitions.
+
+Volume: The name given to a collection of blocks on some storage medium (i.e., a disk). That is, a volume may be all of the blocks on a single disk, some portion of the total number of blocks on a disk, or it may even span multiple disks and be all the blocks on several disks. The term “volume” is used to refer to a disk or partition that has been initialized with a ﬁle system.
+
+Superblock: The area of a volume where a ﬁle system stores its critical, volume-wide information. A superblock usually contains information such as how large a volume is, the name of a volume, and so on
+
+Metadata: A general term referring to information that is about something but not directly part of it. For example, the size of a ﬁle is very important information, but it is not part of the data that's stored in the file itself. So file metadata is data about a file, and not in a file.
+
+Journaling: A method of insuring the correctness of ﬁle system metadata even in the presence of power failures or unexpected reboots.
+
+I-node: The place where a ﬁle system stores all the necessary metadata about a ﬁle. The i-node also provides the connection to the contents of the ﬁle and any other data associated with the ﬁle. The term “i-node” (which we will use in this article) is historical and originated in Unix. An i-node is also known as a ﬁle control block (FCB) or ﬁle record.
+
+Attribute: A name (as a text string) and value associated with the name. The value may have a deﬁned type (string, integer, etc.), or it may just be arbitrary data. (1)
+
+
+
+
+
 Linux is almost always installed on \inlinecode{/dev/sda} and mounted on \inlinecode{/}.
 
 \paragraph{SCSI versus ATA} SCSI (small computer system interface) and ATA (advanced technology attachment) are two standards for connecting storage devices to a computer. They both are protocol-stacks just like the internet-protokol stack. Traditionally, ATA was cheaper while SCSI was more powerful, but that simple comparison is no longer valid. Both SCSI and ATA were originally parallel interfaces, though recent trends have moved towards Serial Attached SCSI (SAS) and Serial ATA (SATA) as these are much faster.

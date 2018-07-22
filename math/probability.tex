@@ -52,6 +52,25 @@ As a nice little exercise, we prove the formula for the conditional probability 
 \end{proof}
 
 
+As yet another exercise, here is the formula of the probability of a union of arbitrary events: 
+
+\begin{proof}
+    $$ \probFunct (\union A_i) = \sum_i \probFunct(A_i) 
+            - \sum_i \sum_{j>i} \probFunct(A_i \intersection A_j) 
+            + \sum_i \sum_{j>i} \sum_{k>j} \probFunct(A_i \intersection A_j \intersection A_k) 
+            - ...  $$
+    
+    This is proven by induction. 
+                
+    \subprf{Base case:}{$\probFunct(A_1 \union A_2) = \probFunct(A_1) + \probFunct(A_2) - \probFunct(A_1 \intersection A_2) $}{
+        This is tirivally true when looking at a Venn Diagramm. 
+    }
+    \subprf{Induction step. Suppose that... }{ }{
+    }
+    
+    
+\end{proof}
+
 
 \subsubsection{Uncountable sets and infinitessimals}
 
@@ -63,7 +82,7 @@ Conventional probability restricts \samplespace 's to only include sigma-algebra
  
  \subsubsection{Probabilistic fallacies}
  \begin{itemize}
-     \item T-Test interpretation: If $\probFunct[A|B] = x$, then this does \emph{not} mean that $probFunct[A|\overline{B}] = 1 - x$.
+     \item T-Test interpretation: If $\probFunct[A|B] = x$, then this does \emph{not} mean that $\probFunct[A|\overline{B}] = 1 - x$.
      \item Prosecutors fallacy aka. inverse fallacy: $P(A|B) \neq P(B|A)$
  \end{itemize}
  

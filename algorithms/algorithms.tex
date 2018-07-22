@@ -29,11 +29,20 @@ To prove that $P(n)$ holds true for $\forall n \in \naturals$:
 
 \subsection{Programm verification according to Floyd}
 
+If the following properties are given, then an algorithm is be correct. 
+
 \begin{itemize}
-    \item Partial correctness:
-    \item termination:
+    \item Partial correctness: if an answer is returned, it will be correct.
+    \item termination: The algorithm eventually reaches a halt - meaning that an answer is always returned eventually. 
 \end{itemize}
 
+There is a simple method of proving an algorithm correct (by Floyd ):
+\begin{itemize}
+    \item Proving 'partial correctness' with invariant principle: there is some loop invariant that basically says: 'At this iteration the state is a little better than before'. For example, in a sorting problem, at the i'th iteration the subarray \inlinecode{data[0:i]} might already be sorted. 
+    \item Proving 'termination' with well ordering principle
+\end{itemize}
+
+Note that there might be correct algorithms that don't have these properties. For example, some algorithms might eventually reach a desired state without ever having an ever-imporving loop invariant. Also, there are other ways to prove an algorithm correct than the Floyd-method. However, in many real-world examples, this is the easiest approach to formaly proving an algorithm correct. 
 
 \subsubsection{ Proving 'partial correctness' with invariant principle }
 

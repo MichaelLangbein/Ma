@@ -29,11 +29,15 @@
 
 Ethernet is barely a protocol. It works like morse: the sender writes the destination-mac on the frame and sends it out on the wire. On the wire, the frame is broadcasted to absolutely everyone, and every computer has to check for itself if the frame was meant for it or for someone else. 
 
-Because that is way too much work with several millions of computers in the world, we have hubs. Hubs are even simpler devices than switches: they connect tow nets of computers, and if a destination-mac is on the other net, they allow the frame to be broadcasted to all computers in both nets; otherwise they block the frame, which makes it only broadcast to its source-net.
+Because that is way too much work with several millions of computers in the world, we have switches. They connect two nets of computers, and if a destination-mac is on the other net, they allow the frame to be broadcast to all computers in both nets; otherwise they block the frame, which makes it only broadcast to its source-net. (Hubs are even simpler devices: they always broadcast to all nets, never even reading the destination-mac.)
 
 Because in the 70's hubs and switches didn't have very much memory, the payload of a frame is limited to 1500 bytes. As a consequence, IP's payload is 1480 bytes, and TCP's payload is 140 bytes.
 
+There are few problems that can arise witch switches, since they are such simple components. The one you should know about is a broadcast-storm (aka switching loop). This is where multiple switches keep broadcasting each other in search of a particular node. This can really only happen when there is a circle between switches. 
+
 When traversing through the net, routers change the destination-mac to that of the next router on the way to the destination-ip.
+
+\paragraph{Spanning tree protocol} is how ...
 
 \subsubsection{Layer 3 : Network}
 
@@ -97,6 +101,10 @@ If the REQUEST is not valid anymore the server will send a NACK indicating to th
 Sometimes you will see repeated DISCOVER / OFFER but never a REQUEST from the client. This happens when the client either doesn't receive the OFFER or doesn't like it for some reason. Perhaps a firewall is blocking it, they have a poor connection, or simply they're using a Windows computer.
 
 It's common for Windows Vista to never even start its DHCP process. It will just refuse to DISCOVER and complain that the connection is "limited or no connectivity".  You can try to diagnose the problem and tell it to reset the network card and/or get new IP information. If this fails to start it then I find adding a static IP and then setting it back to DHCP will get it going. You may even need to restart the DHCPC service. Its Vista.. where you expecting it to work as advertised?
+
+
+\paragraph{Routers} are the hardware components that ....
+
 
 \subsubsection{Layer 4 : Transport}
 
