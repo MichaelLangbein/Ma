@@ -3,8 +3,7 @@
 \subsection{General theory}
 
 \subsubsection{Memory allocation}
-By default, memory is allocated statically to the stack.
-By using malloc and free, you can instead allocate memory dynamically on the heap.
+By default, memory is allocated statically to the stack. By using \inlinecode{malloc} and \inlinecode{free}, you can instead allocate memory dynamically on the heap.
 
 \subsubsection{Threading}
 Threads are created by making a copy of the orignal process.
@@ -185,6 +184,32 @@ Consider this simple example:
         }
         return 0;
 } 
+\end{lstlisting}
+
+Especially when creating arrays, we need to be aware of a few things: 
+\begin{itemize}
+	\item ... what is the current content of the accessed memory?
+	\item ... is the accessed memory protected against overwriting by others?
+\end{itemize}
+
+\begin{lstlisting}[language=c]
+#include<stdio.h>
+#include <stdlib.h>  
+
+int main() {
+
+  const int size = 1000;
+  //double data[size] = {2.1,2.1,2.1, 2.1, 2.1};   //<-- puts in vals; fills rest with zeros. This mem won't be overwritten. 
+  //double data[size];      //<-- does not put in zeros - keeps whatever was in there before. This mem won't be overwritten.
+  //double* data = (double*) malloc(size * sizeof(double));              //<-- puts in zeros. This mem won't be overwritten.
+  //double* data;      //<-- does not put in zeros - keeps whatever was in there before. This mem can be overwritten by others! 
+  for(int i = 0; i < size; i++) {
+    double val = data[i];
+    printf("val at %i: %f \n", i, val);
+  }
+
+  return 0; 
+}
 \end{lstlisting}
 
 
