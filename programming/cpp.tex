@@ -129,9 +129,43 @@ From this basic example we can already note a few important points.
 \paragraph{Constructors} cpp knows \emph{three} ways of creating objects: 
 \begin{itemize}
     \item The default constructor \inlinecode{Robot b("Bender", 100);} is what you should usually make use of. 
-    \item Construction by assignment operator \inlinecode{Robot b = Robot("Bender", 100);} requires a functioning implementation of the assignment operator \inlinecode{Robot& operator=(const Robot& otherRobot)\{ ... return *this;\}}. If this isn't provided, the compiler generates one automatically. 
-    \item Construction by copying an existing instance \inlinecode{Robot b("Bender", 100); Robot v(b);} requires a functioning implementation of the copy constructor \inlinecode{Robot(const Robot& otherRobot)}. If this isn't provided, the compiler generates one automatically. 
+ 
+    \item Construction by copying an existing instance \inlinecode{Robot b("Bender", 100); Robot v = b;} requires a functioning implementation of the copy constructor \inlinecode{Robot(const Robot& otherRobot)}. If this isn't provided, the compiler generates one automatically. 
+    
+    \item Construction by assignment operator \inlinecode{Robot b("Bender", 100); Robot v("Vender", 90); v = b;} requires a functioning implementation of the assignment operator \inlinecode{Robot& operator=(const Robot& otherRobot)\{ ... return *this;\}}. If this isn't provided, the compiler generates one automatically. 
 \end{itemize}
+
+Here an example to clarify the difference between assignment and copy-constructor:
+
+\begin{lstlisting)[language=c++]
+#include<iostream>
+#include<stdio.h>
+ 
+using namespace std;
+ 
+class Test
+{
+public:
+   Test() {}
+   Test(const Test &t)
+   {
+      cout<<"Copy constructor called "<<endl;
+   }
+   Test& operator = (const Test &t)
+   {
+      cout<<"Assignment operator called "<<endl;
+   }
+};
+ 
+int main()
+{
+  Test t1, t2;
+  t2 = t1;
+  Test t3 = t1;
+  getchar();
+  return 0;
+}
+\end{lstlisting}
 
 \paragraph{Constructors as objects or as pointers} Objects can be constructed as objects or as pointers to objects. 
 
