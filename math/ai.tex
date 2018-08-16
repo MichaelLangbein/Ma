@@ -8,6 +8,39 @@
 
 There are two ways in which we can derive the backpropagation-algorithm. One is purely analytical, the other bayesian. We'll demonstrate both. 
 
+\paragraph{The analytical way of deriving the backpropagaion algorithm} consist of just a few steps. 
+A few definitions: 
+
+\begin{itemize}
+	\item A layers outputvector $\vec{y}_l$ is obtained by the activation function $\vec{y}_l = f(\vec{x}_l) $
+	\item The layers inputvector is obtained as a weighted sum of previous outputs: $\vec{x}_l = \mtrx{W}_l \vec{y}_{l-1} $
+	\item We strive to minimize the error-function $E = \frac{1}{2} \sum_s (\vec{y}_L - \vec{t})^2 $
+\end{itemize}
+
+Let's first consider only the top layer. 
+
+$$ \delta_L = \partDiff{E}{\vec{x}_L} = (\vec{t} - \vec{y}_L) \partDiff{\vec{y}_L}{\vec{x}_L} $$
+$$ = (\vec{t} - \vec{y}_L) f'(\vec{x}_L) $$
+
+That part was easy. But how do we obtain the same differential for \emph{any} layer $l$?
+
+$$ \delta_l = \partDiff{E}{\vec{x}_l} = \partDiff{E}{\vec{x}_{l+1}} \partDiff{\vec{x}_{l+1}}{\vec{x}_{l}} $$
+$$ = \delta_{l+1} \partDiff{ \mtrx{W}_{l+1} \vec{y}_{l}}{\vec{x}_{l}} $$
+$$ = \delta_{l+1} \mtrx{W}_{l+1} f'(\vec{x}_l) $$ 
+
+The smart part here was to not derive $ \partDiff{E}{\vec{x}_l} $ by going through $\vec{y}_L$, $\vec{x}_L$, $\mtrx{W}_L$, $\vec{y}_{L-1}$, $\vec{x}_{L-1}$, $\mtrx{W}_{L-1}$, ..., but by instead creating a recurrence relation by differentiating by $\vec{x}_{l+1}$.
+
+Finally, we can obtain the gradient at our weights as: 
+
+$$ \partDiff{E}{\mtrx{W}_l} = \partDiff{E}{\vec{x}_l} \partDiff{\vec{x}_l}{\mtrx{W}_l} $$
+$$ = \delta_l \vec{y}_{l-1} $$
+
+So we should change the weigths by: 
+
+$$ \Delta \mtrx{W}_l = - \alpha \partDiff{E}{\mtrx{W}_l} $$
+$$ = \delta_l \vec{y}_{l-1} $$
+
+
 \paragraph{Gaussian processes}
 
 The bayesian derivation of the backpropagation algorithm gives rise to the interesting idea that backprop-networks may be generalized into ...
