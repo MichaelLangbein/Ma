@@ -47,7 +47,12 @@ The bayesian derivation of the backpropagation algorithm gives rise to the inter
 
 \paragraph{Convolutional networks}
 
-These are the networks most commonly found employed as a deep-learning architecture. 
+These are the networks most commonly found employed as a deep-learning architecture. Really, they are just a simplified version of our backpropagation-networks (they are even trained using an only slightly altered algorithm). Instead of connecting every node from layer $l$ to every node of layer $l+1$, they impose some restrictions on the connection-matrix:
+\begin{itemize}
+	\item Nodes are connected in a pyramid scheme. A node on layer $l+1$ is connected to 9 nodes directly beneath it. Instead of a $n_l \times n_{l+1}$ connection matrix, we thus have several $9 \times 1$ matrices.
+	\item The connection-strengths of these  $9 \times 1$ matrices are all the same - so really there is only just one  $9 \times 1$ matrix. 
+\end{itemize}
+These restrictions are inspired by the physiology of the visual cortex. They have the nice effect that a network is trained much faster, since they massively reuce the ammount of weights that need to be learned. 
 
 \subsection{Computer vision}
 
