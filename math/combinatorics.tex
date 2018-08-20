@@ -69,6 +69,11 @@ Imagine you need to buy n items. There are two kinds of items: apples and banana
 
 This is where we use generating functions. 
 
+
+Algebraically, what's happening is that taking an ordinary generating function is a bijection between the vector space of sequences and the ring of formal power series. While in a vector space we have vector addition and scalar multiplication, in a ring we have element addition and element multiplication (and even division and differentiation!). So working in the powerseries-ring allows for ohter operations than working in the series-vectorspace. This is very simmilar to what we do when doing the Fourier-transform: we dive into a different domain where some operations are easier to do. However, Fourier is merely a change of basis, going from one vector space to another. Here, we move from a vector space to a ring - a whole different universe. 
+
+
+
 Let $A = (a_0, a_1, ...)$ be a sequence where $a_n$ represents the number of ways to select from group $\mathcal{A}$. Then the generating function $G_A$ would be defined as: 
 
 $$ G_A (x) = a_0 + a_1 x + a_2 x^2 + ... = \sum_n a_n x^n $$
