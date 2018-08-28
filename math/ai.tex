@@ -12,33 +12,47 @@ There are two ways in which we can derive the backpropagation-algorithm. One is 
 A few definitions: 
 
 \begin{itemize}
-	\item A layers outputvector $\vec{y}_l$ is obtained by the activation function $\vec{y}_l = f(\vec{x}_l) $
-	\item The layers inputvector is obtained as a weighted sum of previous outputs: $\vec{x}_l = \mtrx{W}_l \vec{y}_{l-1} $
-	\item We strive to minimize the error-function $E = \frac{1}{2} \sum_s (\vec{y}_L - \vec{t})^2 $
+	\item A layers outputvector $\vec{y}^l$ is obtained by the activation function $\vec{y}^l = f(\vec{x}^l) $
+	\item The layers inputvector is obtained as a weighted sum of previous outputs: $\vec{x}^l = \mtrx{W}^l \vec{y}^{l-1} $. We cn express a single $x_t^l = \sum_f W_{t,f}^l y_f^{l-1}$
+	\item We strive to minimize the error-function $e = \frac{1}{2} \sum_s \sum_t (\vec{y}^*_t - \vec{y}^L_t)^2 $
 \end{itemize}
 
 Let's first consider only the top layer. 
 
-$$ \delta_L = \partDiff{E}{\vec{x}_L} = (\vec{t} - \vec{y}_L) \partDiff{\vec{y}_L}{\vec{x}_L} $$
-$$ = (\vec{t} - \vec{y}_L) f'(\vec{x}_L) $$
+$$  \partDiff{e}{x_{t_0}^L} = \frac{1}{2} \sum_t \partDiff{}{x_{t_0}^L} (\vec{y}^*_t - \vec{y}^L_t)^2 $$
+$$ = (y_{t_0}^* - y_{t_0}^L) f'(x_{t_0}) $$
+
+Or, in vector form: 
+
+$$ \partDiff{e}{\vec{x}^L} = (\vec{y}^* - \vec{y}^L) \pointwise f'(\vec{x}^L)  $$
+
 
 That part was easy. But how do we obtain the same differential for \emph{any} layer $l$?
 
-$$ \delta_l = \partDiff{E}{\vec{x}_l} = \partDiff{E}{\vec{x}_{l+1}} \partDiff{\vec{x}_{l+1}}{\vec{x}_{l}} $$
-$$ = \delta_{l+1} \partDiff{ \mtrx{W}_{l+1} \vec{y}_{l}}{\vec{x}_{l}} $$
-$$ = \delta_{l+1} \mtrx{W}_{l+1} f'(\vec{x}_l) $$ 
+$$ \partDiff{e}{x_{f_0}^l} = \sum_t \partDiff{e}{x_t^{l+1}} \partDiff{x_t^{l+1}}{x_{f_0}^l}  $$
+$$                         = \sum_t \partDiff{e}{x_t^{l+1}} \partDiff{}{x_{f_0}^l} ( \sum_f W_{t,f}^{l+1} y_f^l ) $$
+$$                         = \sum_t \partDiff{e}{x_t^{l+1}} W_{t,f_0}^{l+1} f'(x_{f_0}^l)  $$
 
-The smart part here was to not derive $ \partDiff{E}{\vec{x}_l} $ by going through $\vec{y}_L$, $\vec{x}_L$, $\mtrx{W}_L$, $\vec{y}_{L-1}$, $\vec{x}_{L-1}$, $\mtrx{W}_{L-1}$, ..., but by instead creating a recurrence relation by differentiating by $\vec{x}_{l+1}$.
+Or, in vector form: 
+
+$$ \partDiff{e}{\vec{x}^l} = ( \mtrx{W}^{l+1}^T \partDiff{e}{\vec{x}^{l+1}} ) \pointwise f'(\vec{x}^l)  $$
+
+The smart part here was to not derive $ \partDiff{e}{\vec{x}^l} $ by going through $\vec{y}^L$, $\vec{x}^L$, $\mtrx{W}^L$, $\vec{y}^{L-1}$, $\vec{x}^{L-1}$, $\mtrx{W}^{L-1}$, ..., but by instead creating a recurrence relation by differentiating by $\vec{x}^{l+1}$.
 
 Finally, we can obtain the gradient at our weights as: 
 
-$$ \partDiff{E}{\mtrx{W}_l} = \partDiff{E}{\vec{x}_l} \partDiff{\vec{x}_l}{\mtrx{W}_l} $$
-$$ = \delta_l \vec{y}_{l-1} $$
+$$ \partDiff{e}{W_{t_0, f_0}^l} = \partDiff{e}{x_{t_0}^l} \partDiff{x_{t_0}^l}{W_{t_0, f_0}^l}   $$
+$$                              = \partDiff{e}{x_{t_0}^l} \partDiff{}{W_{t_0, f_0}^l} ( \sum_f W_{t_0, f}^l y_f^{l-1} ) $$
+$$                              = \partDiff{e}{x_{t_0}^l} y_{f_0}^{l-1} $$
+
+Or, in vector form: 
+
+$$ \partDiff{e}{\mtrx{W}^l} = \partDiff{e}{\vec{x}^l} \outer \vec{y}^{l-1} $$ 
 
 So we should change the weigths by: 
 
-$$ \Delta \mtrx{W}_l = - \alpha \partDiff{E}{\mtrx{W}_l} $$
-$$ = \delta_l \vec{y}_{l-1} $$
+$$ \Delta \mtrx{W}^l = - \alpha \partDiff{e}{\mtrx{W}^l} $$
+$$ = \partDiff{e}{\vec{x}^l} \vec{y}^{l-1} $$
 
 
 \paragraph{Gaussian processes}
