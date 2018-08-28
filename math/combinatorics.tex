@@ -53,8 +53,8 @@ $$ \binom{n}{k} = \frac{ n! }{ k!(n-k)! }$$
 
 \paragraph{Permutations} are the number of rearrangements. Permutations of unique items are relatively straightforeward, but things get a little involved when we deal with permutations of grouped items. 
 
-The number of unique permutations of a string consisting of $n_a$ \emps{a}'s, $n_b$ \emps{b}'s, $n_c$ \emps{c}'s, etc. is 
-$$ \fraq{( \sum n_i )!}{\prod (n_i !)} $$
+The number of unique permutations of a string consisting of $n_a$ \emph{a}'s, $n_b$ \emph{b}'s, $n_c$ \emph{c}'s, etc. is 
+$$ \frac{( \sum n_i )!}{\prod (n_i !)} $$
 Here, $( \sum n_i )! $ is the number of permutations if every letter in the string was unique, that is, if we could distinguish between two \emph{a}'s. We then reduce this number by the number of duplicates by dividing through $n_a !$, the number of rearrangements of \emph{a}'s.
 
 Note how the binomial coefficient is a special case of our string-permutation: it is the number of unique permutations in a string of length $n$ with only two letters in it. 
