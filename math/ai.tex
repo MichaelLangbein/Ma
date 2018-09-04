@@ -24,7 +24,7 @@ $$ = (y_{t_0}^* - y_{t_0}^L) f'(x_{t_0}) $$
 
 Or, in vector form: 
 
-$$ \partDiff{e}{\vec{x}^L} = (\vec{y}^* - \vec{y}^L) \pointwise f'(\vec{x}^L)  $$
+$$ \partDiff{e}{\vec{x}^L} = (\vec{y}^* - \vec{y}^L)^T \pointwise f'(\vec{x}^L)  $$
 
 
 That part was easy. But how do we obtain the same differential for \emph{any} layer $l$?
@@ -53,6 +53,24 @@ So we should change the weigths by:
 
 $$ \Delta \mtrx{W}^l = - \alpha \partDiff{e}{\mtrx{W}^l} $$
 $$ = \partDiff{e}{\vec{x}^l} \vec{y}^{l-1} $$
+
+
+It makes sense to reitterate the whole process in matrix-form. 
+
+First, we  get $\delta^L$:
+$$ \partDiff{e}{\vec{y}^L} = (\vec{y}^* - \vec{y}^L)^T := \delta^L $$ 
+
+Then we go through the highest layer:
+$$ \partDiff{e}{\vec{x}^L} = \delta^L \pointwise f'(\vec{x}^L)  $$
+$$ \partDiff{e}{\mtrx{W}^L} = \partDiff{e}{\vec{x}^L}^T \vec{y}^{L-1}^T $$
+$$ \delta^{L-1} = \partDiff{e}{\vec{x}^L} \mtrx{W}^L $$
+
+Then we pass $\delta^{L-1}$ to the next layer. 
+$$ \partDiff{e}{\vec{x}^l} = \delta^l \pointwise f'(\vec{x}^l)  $$
+$$ \partDiff{e}{\mtrx{W}^l} = \partDiff{e}{\vec{x}^l}^T \vec{y}^{l-1}^T $$
+$$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} \mtrx{W}^l $$
+
+
 
 
 \paragraph{Gaussian processes}

@@ -69,7 +69,7 @@ In fact, every function in javascript has a \inlinecode{prototype}  property, be
 \begin{lstlisting}
 var Robot = function () {
     this.sayHi = function () {
-        console.log("hi!");
+        console.log("Bleep bloop.");
     };
 };
 var r2d2 = new Robot();
@@ -77,6 +77,21 @@ var r2d2 = new Robot();
 Robot.__proto__ // => 'native code'
 Robot.prototype // => the prototype of r2d2
 \end{lstlisting}
+
+We can still use prototypical inheritance with the objects returned from a constructor function:
+
+\begin{lstlisting}
+var Fighter = {
+	fight: function () {
+		console.log("Boom!");
+	}
+};
+
+Robot.prototype.__proto__ = Fighter;
+
+r2d2.fight();
+\end{lstlisting}
+
 
 \subsection{Module Pattern}
 A module is created with a self-executing closure: 
