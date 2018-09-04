@@ -35,7 +35,7 @@ $$                         = \sum_t \partDiff{e}{x_t^{l+1}} W_{t,f_0}^{l+1} f'(x
 
 Or, in vector form: 
 
-$$ \partDiff{e}{\vec{x}^l} = ( \mtrx{W}^{l+1}^T \partDiff{e}{\vec{x}^{l+1}} ) \pointwise f'(\vec{x}^l)  $$
+$$ \partDiff{e}{\vec{x}^l} = ( \partDiff{e}{\vec{x}^{l+1}} \mtrx{W}^{l+1} ) \pointwise f'(\vec{x}^l)  $$
 
 The smart part here was to not derive $ \partDiff{e}{\vec{x}^l} $ by going through $\vec{y}^L$, $\vec{x}^L$, $\mtrx{W}^L$, $\vec{y}^{L-1}$, $\vec{x}^{L-1}$, $\mtrx{W}^{L-1}$, ..., but by instead creating a recurrence relation by differentiating by $\vec{x}^{l+1}$.
 
@@ -47,27 +47,27 @@ $$                              = \partDiff{e}{x_{t_0}^l} y_{f_0}^{l-1} $$
 
 Or, in vector form: 
 
-$$ \partDiff{e}{\mtrx{W}^l} = \partDiff{e}{\vec{x}^l} \outerp \vec{y}^{l-1} $$ 
+$$ \partDiff{e}{\mtrx{W}^l} = {\partDiff{e}{\vec{x}^l}}^T  {\vec{y}^{l-1}}^T $$ 
 
 So we should change the weigths by: 
 
 $$ \Delta \mtrx{W}^l = - \alpha \partDiff{e}{\mtrx{W}^l} $$
-$$ = \partDiff{e}{\vec{x}^l} \vec{y}^{l-1} $$
+$$ = - \alpha \partDiff{e}{\vec{x}^l} \vec{y}^{l-1} $$
 
 
-It makes sense to reitterate the whole process in matrix-form. 
+It makes sense to reiterate the whole process in matrix-form. 
 
 First, we  get $\delta^L$:
 $$ \partDiff{e}{\vec{y}^L} = (\vec{y}^* - \vec{y}^L)^T := \delta^L $$ 
 
 Then we go through the highest layer:
 $$ \partDiff{e}{\vec{x}^L} = \delta^L \pointwise f'(\vec{x}^L)  $$
-$$ \partDiff{e}{\mtrx{W}^L} = \partDiff{e}{\vec{x}^L}^T \vec{y}^{L-1}^T $$
+$$ \partDiff{e}{\mtrx{W}^L} = {\partDiff{e}{\vec{x}^L}}^T {\vec{y}^{L-1}}^T $$
 $$ \delta^{L-1} = \partDiff{e}{\vec{x}^L} \mtrx{W}^L $$
 
 Then we pass $\delta^{L-1}$ to the next layer. 
 $$ \partDiff{e}{\vec{x}^l} = \delta^l \pointwise f'(\vec{x}^l)  $$
-$$ \partDiff{e}{\mtrx{W}^l} = \partDiff{e}{\vec{x}^l}^T \vec{y}^{l-1}^T $$
+$$ \partDiff{e}{\mtrx{W}^l} = {\partDiff{e}{\vec{x}^l}}^T {\vec{y}^{l-1}}^T $$
 $$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} \mtrx{W}^l $$
 
 
@@ -87,6 +87,30 @@ These are the networks most commonly found employed in image-classification. Rea
 These restrictions are inspired by the physiology of the visual cortex. They have the nice effect that a network is trained much faster, since they massively reuce the ammount of weights that need to be learned. 
 
 In practice, such networks have a few convolutional layers to reduce the dimension of the input-images, followed by a few conventional, fully connected layers that learn some logic based on the reduced images. 
+
+We give the backpropagation-steps for convolutional layers and pooling layers. 
+
+In convolutional layers, the forward step goes: 
+
+$$ \vec{x}^l = \vec{y}^{l-1} \convol \vec{w}^l $$
+$$ \vec{y}^l = f(\vec{x}^l) $$
+
+Accordingly, the backwards step goes:
+
+$$ \partDiff{e}{\vec{x}^l} = \delta^l \pointwise f'(\vec{x}^l) $$
+$$ \partDiff{e}{\vec{w}^l} = \partDiff{e}{\vec{x}^l} \convol \vec{y}^{l-1} $$
+$$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} \convol \vec{w}^l $$
+
+In pooling layers, the forward step goes: 
+
+$$ x_t^l = \frac{1}{4} \sum_f y_{4t + f}^{l-1} $$
+$$ y_t^l = x_t^l $$
+
+And the  backwards step: 
+
+$$ \partDiff{e}{\vec{x}^l} = \partDiff{e}{\vec{y}^l} \partDiff{\vec{y}^l}{\vec{x}^l}  = \delta^l  $$
+$$ \partDiff{e}{\vec{w}^l} = 0 $$
+$$ \delta^{l-1} = \frac{1}{4} \partDiff{e}{\vec{x}^l}  $$
 
 \subsection{Computer vision}
 
