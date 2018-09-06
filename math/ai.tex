@@ -95,11 +95,32 @@ In convolutional layers, the forward step goes:
 $$ \vec{x}^l = \vec{y}^{l-1} \convol \vec{w}^l $$
 $$ \vec{y}^l = f(\vec{x}^l) $$
 
+Where the convolution is defined (in our simplified case) as:
+$$ (\vec{y} \convol \vec{w})_n = \sum_{m=-1}^1 \vec{y}_{n+m} \vec{w}_m $$
+
+Differentiating a convolution is unfamiliar, but not too hard: 
+$$ \partDiff{(\vec{y} \convol \vec{w})}{\vec{w}} = \myarray{
+	0   && y_0 && y_1 \\
+	y_0 && y_1 && y_2 \\
+	y_1 && y_2 && y_3 \\
+	... \\
+	y_{l-1} && y_l && 0 \\
+} := tr(\vec{y}) $$
+$$ \partDiff{(\vec{y} \convol \vec{w})}{\vec{y}} = \myarray{
+	w_0    && w_1    && 0   && ... \\
+	w_{-1} && w_0    && w_1 && ... \\
+	0      && w_{-1} && w_0 && ... \\
+	...    \\
+	0      && ...    && w_{-1} && w_0 \\
+} := br(\vec{w}) $$
+
+
+
 Accordingly, the backwards step goes:
 
 $$ \partDiff{e}{\vec{x}^l} = \delta^l \pointwise f'(\vec{x}^l) $$
-$$ \partDiff{e}{\vec{w}^l} = \partDiff{e}{\vec{x}^l} \convol \vec{y}^{l-1} $$
-$$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} \convol \vec{w}^l $$
+$$ \partDiff{e}{\vec{w}^l} = \partDiff{e}{\vec{x}^l} tr(\vec{y}) $$
+$$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} br(\vec{w}) $$
 
 In pooling layers, the forward step goes: 
 
