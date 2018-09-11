@@ -7,17 +7,16 @@ Assume an inner product space.
 
 Assume that reality can me modelled by a model like this one: 
 
-$$ \vec{y} = \mtrx{W} \vec{x} + \vec{e} $$
+$$ \vec{y} = \mtrx{X} \vec{w} + \vec{e} $$
 
 Not knowing $\vec{e}$, our best guess at the outcome would be 
 
-$$ \vec{\hat{y}} = \mtrx{W} \vec{x} $$
+$$ \vec{\hat{y}} = \mtrx{X} \vec{w} $$
 
-We can find \mtrx{W} by demanding that the slope of the error function be zero: 
+We can find the gradient of w by:
 
-$$ \partdiff{E}{\mtrx{W}} = -  (\vec{y} - \vec{\hat{y}}) \vec{x}^T = 0 $$
-$$ \vec{\hat{y}} \vec{x}^T = \vec{y} \vec{x}^T $$
-$$ \mtrx{W} = \vec{y} \vec{x} (\vec{x} \vec{x}^T)^{-1} $$
+$$ \partDiff{E}{\vec{w}} = -  (\vec{y} - \vec{\hat{y}}) \mtrx{X}  $$
+
 
 
 \subsection{Principal component analysis}

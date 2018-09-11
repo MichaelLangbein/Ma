@@ -119,8 +119,8 @@ $$ \partDiff{(\vec{y} \convol \vec{w})}{\vec{y}} = \myarray{
 Accordingly, the backwards step goes:
 
 $$ \partDiff{e}{\vec{x}^l} = \delta^l \pointwise f'(\vec{x}^l) $$
-$$ \partDiff{e}{\vec{w}^l} = \partDiff{e}{\vec{x}^l} tr(\vec{y}) $$
-$$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} br(\vec{w}) $$
+$$ \partDiff{e}{\vec{w}^l} = \partDiff{e}{\vec{x}^l} tr(\vec{y}) = (\sum_{n=1}^l e'_{x_n} y_{n+1}, \sum_{n=0}^l e'_{x_n} y_n, \sum_{n=0}^{l-1} e'_{x_n} y_{n+1}) $$
+$$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} br(\vec{w}) = \partDiff{e}{\vec{x}^l} \convol \vec{w} $$
 
 In pooling layers, the forward step goes: 
 
