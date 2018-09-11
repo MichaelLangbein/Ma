@@ -1,0 +1,50 @@
+\section{Tensorflow}
+
+\begin{lstlisting}[language=python]
+
+import tensorflow as tf
+import numpy as np
+
+N = 100
+w_true = 5
+b_true = 2
+noise = np.random.normal(scale=0.1, size=(N,1))
+y = w_true * x + b_true + noise
+x_np = np.random.rand(N,1)
+y_np = x_np * w_real + b_real + e
+
+
+with tf.name_scope("Platzhalter"):
+    x = tf.placeholder(tf.float32, (N, 1))
+    y = tf.placeholder(tf.float32, (N, 1))
+    
+with tf.name_scope("Gewichte"):
+    W = tf.Variable( tf.random_normal((1,1)) )
+    b = tf.Variable( tf.random_normal((1,)) )
+    
+with  tf.name_scope("Vorhersage"):
+    y_pred = tf.matmul(x, W) + b
+    
+with tf.name_scope("Verlust"):
+    l = tf.reduce_sum( (y - y_pred)**2 )
+    
+with tf.name_scope("Optimierung"):
+    train_op = tf.train.AdamOptimizer(.001).minimize(l)
+    
+with tf.name_scope("Zusammenfassungen"):
+    tf.summary.scalar("Verlust - zeitlicher Verlauf", l)
+    merged = tf.summary.merge_all()
+    
+n_steps = 1000
+train_writer = tf.summary.FileWriter("/tmp/lr-train", tf.get_default_graph())
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for i in range(n_steps):
+        feed_dict = {x:x_np, y:y_np}
+        _, loss, summary = sess.run([train_op, l, merged], feed_dict=feed_dict)
+        print("step {}, loss {}".format(i, loss))
+        train_writer.add_summary(summary, i)
+        
+
+\end{lstlisting}
