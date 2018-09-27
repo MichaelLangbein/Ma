@@ -526,29 +526,31 @@ Templates are like java generics.
 
 \subsubsection{Function template}
 
+For a function to accept a generic parameter, just prepend \inlinecode{template <class myType>} to the function definition. 
+
 \begin{lstlisting}[language=c++]
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-template <typename T>
-inline T const& Max (T const& a, T const& b) { 
-   return a < b ? b:a; 
+template <class myType>
+myType GetMax (myType a, myType b) {
+ return (a>b?a:b);
 }
 
 int main () {
    int i = 39;
    int j = 20;
-   cout << "Max(i, j): " << Max(i, j) << endl; 
+   cout << "Max(i, j): " << GetMax(i, j) << endl; 
 
    double f1 = 13.5; 
    double f2 = 20.7; 
-   cout << "Max(f1, f2): " << Max(f1, f2) << endl; 
+   cout << "Max(f1, f2): " << GetMax(f1, f2) << endl; 
 
    string s1 = "Hello"; 
    string s2 = "World"; 
-   cout << "Max(s1, s2): " << Max(s1, s2) << endl; 
+   cout << "Max(s1, s2): " << GetMax(s1, s2) << endl; 
 
    return 0;
 }
@@ -557,9 +559,69 @@ int main () {
 
 \subsubsection{Class template}
 
+Things work very simmilarly with classes: 
+
+\begin{lstlisting}[language=c++]
+#include <iostream>
+using namespace std;
+
+
+template <class T>
+class MyPair {
+  private:  
+    T values [2];
+  
+  public:
+    MyPair (T first, T second) {
+      values[0]=first; 
+      values[1]=second;
+    }
+    
+    T getMax() {
+    		return (values[0] > values[1] ? values[0] : values[1]);
+    }
+    
+};
+
+int main() {
+	MyPair<int> myobject(100, 75);
+  	cout << myobject.getMax();
+  	return 0;
+}
+
+\end{lstlisting}
+
+One last note on notation: if we had defined class and implementation in separate files, we'd have to write: 
+
+\begin{lstlisting}[language=c++]
+// ---- class definition ------
+
+template <class T>
+class MyPair {
+	private: 
+		T values[2];
+	public:
+		MyPair(T first, T second);
+		T getMax();
+};
+
+// ---- class implementation -----
+
+template <class T>
+MyPair<T>::MyPair(T first, T second) {
+	values[0] = first;
+	values[1] = second;
+}
+
+template <class T>
+MyPair<T>::getMax() {
+	return (values[0] < values[1] ? values[1] : values[0]);
+}
+
+\end{lstlisting}
 
 \subsection{Threading} 
-Comared to c's posix threads, c++ has somewhat simplified it's core threading library. 
+Compared to c's posix threads, c++ has somewhat simplified it's core threading library. 
 \begin{lstlisting}[language=c++]
 #include <iostream>
 #include <thread>
