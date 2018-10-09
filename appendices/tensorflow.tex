@@ -1,50 +1,56 @@
 \section{Tensorflow}
 
-\begin{lstlisting}[language=python]
+\subsection{Low-level API}
 
+Working with tf always entails a two-step process. First, define a graph, and second, execute it. 
+
+\begin{lstlisting}[language=python]
+import tensorflow as tf
+
+# Step 1: define a graph
+a = tf.Variable(initial_value=2)
+b = tf.Variable(initial_value=3)
+c = a * b
+
+# Step 2: execute graph
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    result = sess.run(c)
+    print(result)
+
+\end{lstlisting}
+
+\emph{Running} a tensor means evaluating it - in the case of \inlinecode{c}, that means calculating \inlinecode{a * b}.
+There are two things that can be run by a session: tensors (to be evaluated) and operations (to be executed). 
+
+Optimizers are a very common example of operations, so we show a very simple example of their usage.
+
+\begin{lstlisting}[language=python]
 import tensorflow as tf
 import numpy as np
 
-N = 100
-w_true = 5
-b_true = 2
-noise = np.random.normal(scale=0.1, size=(N,1))
-y = w_true * x + b_true + noise
-x_np = np.random.rand(N,1)
-y_np = x_np * w_real + b_real + e
+# Step 0: Data
+a = 0.2
+b = 5
+xs_training = np.random.random(100) * 100
+ys_training = a*xs_training + b + np.random.random(100)
+xs_validation = np.random.random(100) * 100
+ys_validation = a*xs_validation + b + np.random.random(100)
 
+# Step 1: define model
+a_tf = tf.Variable(0.3421)
+b_tf = tf.Variable(0.41)
+prediction_tf = a_tf * xs_training + b_tf
+loss_tf = tf.reduce_sum((ys_training - prediction_tf)**2)
+optimizer = tf.train.GradientDescentOptimizer(0.1)
+training_operation = optimizer.minimize(loss_tf, var_list=[a_tf, b_tf])
 
-with tf.name_scope("Platzhalter"):
-    x = tf.placeholder(tf.float32, (N, 1))
-    y = tf.placeholder(tf.float32, (N, 1))
-    
-with tf.name_scope("Gewichte"):
-    W = tf.Variable( tf.random_normal((1,1)) )
-    b = tf.Variable( tf.random_normal((1,)) )
-    
-with  tf.name_scope("Vorhersage"):
-    y_pred = tf.matmul(x, W) + b
-    
-with tf.name_scope("Verlust"):
-    l = tf.reduce_sum( (y - y_pred)**2 )
-    
-with tf.name_scope("Optimierung"):
-    train_op = tf.train.AdamOptimizer(.001).minimize(l)
-    
-with tf.name_scope("Zusammenfassungen"):
-    tf.summary.scalar("Verlust - zeitlicher Verlauf", l)
-    merged = tf.summary.merge_all()
-    
-n_steps = 1000
-train_writer = tf.summary.FileWriter("/tmp/lr-train", tf.get_default_graph())
-
+# Step 2: execute model
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    for i in range(n_steps):
-        feed_dict = {x:x_np, y:y_np}
-        _, loss, summary = sess.run([train_op, l, merged], feed_dict=feed_dict)
-        print("step {}, loss {}".format(i, loss))
-        train_writer.add_summary(summary, i)
-        
+    for i in range(10):
+        results = sess.run([training_operation, a_tf, b_tf])
+        print(results)
+
 
 \end{lstlisting}
