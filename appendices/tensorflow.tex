@@ -23,6 +23,14 @@ with tf.Session() as sess:
 \emph{Running} a tensor means evaluating it - in the case of \inlinecode{c}, that means calculating \inlinecode{a * b}.
 There are two things that can be run by a session: tensors (to be evaluated) and operations (to be executed). 
 
+Tf is declarative: \inlinecode{c = a*b} does not return the result of the multiplication of a and b, but a tensor that is still waiting to be evaluated. 
+This can make debuggung pretty hard, though. For debugging, we'd like tf to behave more imperatively, where every expression is immediately evaluated. 
+We can acchieve this by using an interactive session, where every tensor can be evaluated immediately by calling \inlinecode{eval()}:
+\begin{lstlisting}[language=python]
+    sess = tf.InteractiveSession()
+    c.eval()
+\end{lstlisting}
+
 Optimizers are a very common example of operations, so we show a very simple example of their usage.
 
 \begin{lstlisting}[language=python]
