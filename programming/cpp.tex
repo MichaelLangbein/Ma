@@ -512,7 +512,7 @@ We could'nt have used \inlinecode{weapon = w;}; that would have caused an error 
 Generally, we can proclaim the following rules:
 \begin{itemize}
     \item When you're given a reference, someone else will clean up the original. 
-    \item When you're given a unique pointer, you are now the sole owner of the smartpointer. If you move the pointer, it will go out of scope once you do; if you don't, it will go out of scope once your method ends. Passing a unique pointer to a method that doesn't move the pointer means destroying the object! To pass a unique pointer to a method without it being destroyed or moved, don't pass the unique pointer, pass a \inlinecode{unique_ptr<T> const &}.
+    \item When you're given a unique pointer, you are now the sole owner of the smartpointer. If you move the pointer, it will go out of scope once you execute that move; if you don't, it will go out of scope once your method ends. Passing a unique pointer to a method that doesn't move the pointer means destroying the object! To pass a unique pointer to a method without it being destroyed or moved, don't pass the unique pointer, pass a \inlinecode{unique_ptr<T> const &}.
     \item When you're given a shared pointer, ... . Shared pointers use reference counting just like the java garbage collector.  
 \end{itemize}
 There are a lot more useful tips \hyperlink{https://herbsutter.com/2013/06/05/gotw-91-solution-smart-pointer-parameters/}{here} and \hyperlink{https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function}{here}.
