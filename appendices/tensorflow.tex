@@ -8,7 +8,7 @@ Working with tf always entails a two-step process. First, define a graph, and se
 import tensorflow as tf
 
 # Step 1: define a graph
-a = tf.Variable(initial_value=2)
+a = tf.Variable(initial_value=2) # Tensors are immutable by default. We must wrap them in a Variable to allow them to change
 b = tf.Variable(initial_value=3)
 c = a * b
 
