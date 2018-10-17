@@ -13,7 +13,27 @@ For performance, subsolutions are stored in a lookup-table. Without the lookup-t
 Dynamic programming is a technique that solves some particular type of problem in polynomal time. Also, dp-sollutions can easily proven to be correct. But at first, we need to find out when dp-techniques apply. 
 
 \subsection{Overlapping subproblems (always) and optimal substructure (most)}
+\begin{itemize}
+	\item 
+	\item 
+\end{itemize}
 
+\subsection{Worked example: possible ways to sum coins}
+Imagine there was a currency with coins of value 1, 5 and 7. The task is to list all possible combinations of these basic coins to obtain a total value of $n$.
+
+Idea: 
+write the function as \inlinecode{combs(n)} 
+add 1 to each list in the results of \inlinecode{combs(n-1)},
+add 5 to each list in the results of \inlinecode{combs(n-5)}, 
+and add 7 to each list in the results of \inlinecode{combs(n-7)}
+
+Verify that this idea shows overlapping subproblems
+and that it shows optimal substructure
+
+Proof that algorithm delivers correct results
+
+
+counterexample: minimal number of coins
 
 
 \subsection{A strategy for finding the recursion}
