@@ -14,18 +14,50 @@ Dynamic programming is a technique that solves some particular type of problem i
 
 \subsection{Overlapping subproblems (always) and optimal substructure (most)}
 \begin{itemize}
-	\item 
-	\item 
+	\item Overlapping subproblems are those that make it worth to cache past results.
+	\item Optimal substructure means this: if you have the sollution to all parts of the problem, you get the sollution to the whole problem. Consider a graph of nodes $a, b, c, d$. To get from $a$ to $d$, consider the subproblems of getting from $a$ to $b$ and from $b$ to $d$. The shortest path from $a$ to $d$ is the shortest path from $a$ to $b$ plus the shortest from $b$ to $d$. Note that the opposite problem does not have optimal substructure: the longest path from $a$ to $d$ is in fact shorter than the longest paths from $a$ to $b$ plus the longest  from $b$ to $d$.
 \end{itemize}
 
 \subsection{Worked example: possible ways to sum coins}
 Imagine there was a currency with coins of value 1, 5 and 7. The task is to list all possible combinations of these basic coins to obtain a total value of $n$.
 
-Idea: 
-write the function as \inlinecode{combs(n)} 
-add 1 to each list in the results of \inlinecode{combs(n-1)},
+
+Here is an idea how this could be implemented: 
+Lets call our function \inlinecode{combs(n)}.
+Add 1 to each list in the results of \inlinecode{combs(n-1)},
 add 5 to each list in the results of \inlinecode{combs(n-5)}, 
-and add 7 to each list in the results of \inlinecode{combs(n-7)}
+and add 7 to each list in the results of \inlinecode{combs(n-7)}.
+
+
+\begin{lstlisting}[language=python]
+
+def combs(n):
+	if n < 1:
+		return []
+	if n == 1:
+		return [[1]]
+	if n == 5:
+		return [[1,1,1,1,1],[5]]
+	if n == 7:
+		return [[1,1,1,1,1,1,1],[5,1,1],[1,5,1],[1,1,5],[7]]
+
+	list1 = combs(n-1)
+	list5 = combs(n-5)
+	list7 = combs(n-7)
+
+	fullList = []
+	for c in list1:
+		fullList.append(c + [1])
+	for c in list5:
+		fullList.append(c + [5])
+	for c in list7: 
+		fullList.append(c + [7])
+
+	return fullList
+
+\end{lstlisting}
+
+Now just add some caching, and you have an efficient algorithm as well. 
 
 Verify that this idea shows overlapping subproblems
 and that it shows optimal substructure
