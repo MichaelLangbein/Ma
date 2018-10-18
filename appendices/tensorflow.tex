@@ -34,31 +34,47 @@ We can acchieve this by using an interactive session, where every tensor can be 
 Optimizers are a very common example of operations, so we show a very simple example of their usage.
 
 \begin{lstlisting}[language=python]
-import tensorflow as tf
-import numpy as np
-
-# Step 0: Data
-a = 0.2
-b = 5
-xs_training = np.random.random(100) * 100
-ys_training = a*xs_training + b + np.random.random(100)
-xs_validation = np.random.random(100) * 100
-ys_validation = a*xs_validation + b + np.random.random(100)
-
-# Step 1: define model
-a_tf = tf.Variable(0.3421)
-b_tf = tf.Variable(0.41)
-prediction_tf = a_tf * xs_training + b_tf
-loss_tf = tf.reduce_sum((ys_training - prediction_tf)**2)
-optimizer = tf.train.GradientDescentOptimizer(0.1)
-training_operation = optimizer.minimize(loss_tf, var_list=[a_tf, b_tf])
-
-# Step 2: execute model
-with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
-    for i in range(10):
-        results = sess.run([training_operation, a_tf, b_tf])
-        print(results)
-
+    import tensorflow as tf
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    
+    N = 100
+    a = 0.2
+    b = 5
+    xs_training = np.random.random(N) * 100
+    ys_training = a*xs_training + b + np.random.random(N)
+    xs_validation = np.random.random(N) * 100
+    ys_validation = a*xs_validation + b + np.random.random(N)
+    
+    
+    a_tf = tf.Variable(0.3421)
+    b_tf = tf.Variable(0.41)
+    xs_tf = tf.placeholder(tf.float32, shape=[N])
+    ys_tf = tf.placeholder(tf.float32, shape=[N])
+    model_tf = a_tf * xs_tf + b_tf
+    loss_tf = tf.reduce_sum((model_tf - ys_tf)**2)
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.1)
+    training_operation = optimizer.minimize(loss_tf, var_list=[a_tf, b_tf])
+    
+    
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+    
+        for i in range(1000):
+            sess.run(
+                training_operation, 
+                {xs_tf: xs_training, ys_tf: ys_training}
+            )
+    
+        prediction = sess.run(
+            model_tf, 
+            {xs_tf: xs_validation}
+        )
+    
+    
+    plt.scatter(xs_validation, prediction)
+    plt.scatter(xs_validation, ys_validation)
+    plt.show()
 
 \end{lstlisting}
