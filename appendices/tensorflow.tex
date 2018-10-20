@@ -127,3 +127,53 @@ print(result)
 
 
 \end{lstlisting}
+
+
+\subsection{Toppics}
+
+\subsubsection{LSTM}
+Lstm's can be tricky in that they need input in a very specific format.
+\begin{lstlisting}[language=python]
+    import numpy as np
+    import tensorflow as tf
+    import tensorflow.keras as k
+    
+    
+    
+    # 1. Data: sine-curve
+    nr_samples = 10
+    nr_timesteps = 4
+    nr_pixels = 1
+    inpt = np.zeros([nr_samples, nr_timesteps, nr_pixels])
+    outpt = np.zeros([nr_samples, nr_pixels])
+    for sample in range(nr_samples):
+        for timestep in range(nr_timesteps):
+            for pixel in range(nr_pixels):
+                inpt[sample, timestep, pixel] = (np.sin(timestep * 0.1 + sample) + 1.0) / 2.0
+        for pixel in range(nr_pixels):
+            outpt[sample, pixel] = (np.sin((nr_timesteps + 1) * 0.1 + sample) + 1.0) / 2.0
+        
+    
+    
+    # 2. Network: simple lstm
+    model = k.Sequential([
+        k.layers.LSTM(1) # 1 = output dimension. for every timeseries we pass in, we want the one next value
+    ])
+    
+    model.compile(
+        optimizer=tf.train.AdamOptimizer(learning_rate=0.1),
+        loss=tf.losses.mean_squared_error
+    )
+    
+    model.fit(x=inpt, y=outpt, epochs=500)
+    
+    model.predict(
+        np.array([[
+           [0.5       ],
+           [0.54991671],
+           [0.59933467],
+           [0.6477601 ]
+        ]])
+    )
+    
+\end{lstlisting}
