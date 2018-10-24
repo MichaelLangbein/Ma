@@ -1,0 +1,21 @@
+\section{Backpropagation for hydrological parameter estimation}
+
+Hydrological models consist of a network - a DAG - of landsurfaces, connected with flow paths. Each landsurface has one parameter $c$ (the flow-constant). 
+It seems like to find optimal values for the $c$'s, we could exploit the network-structure of a catchment and apply the backpropagation algorithm.
+
+\begin{itemize}
+	\item Just like neuronal nets, we want to minimize an error function.
+	\item Just like neuronal nets, we can do this by backpropagating the differential of a parameter. 
+	\item Unlike neural nets, we don't consider all possible connections between nodes - the elevation-map can take that burden from us.
+	\item Unlike neural nets, each node has state. This might complicate things - but in reality, when the net runs long enough, different initial states converge.
+\end{itemize}
+
+
+\subsection{Hydrological model}
+
+\subsection{Optimisation using tensorflow}
+
+
+
+\section{Hydrological models as Hidden Markov Models}
+Whereas the above section dealt primarily with parameter estimation, here we are going to handle state estimation. 
