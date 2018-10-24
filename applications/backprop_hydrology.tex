@@ -13,6 +13,85 @@ It seems like to find optimal values for the $c$'s, we could exploit the network
 
 \subsection{Hydrological model}
 
+
+\begin{lstlisting}[language=python]
+class Node:
+    def __init__(self, id, V0, c, a):
+        self.id = id
+        self.V = V0
+        self.c = c
+        self.a = a
+
+    def eval(N, qIns):
+        inpt = N*self.a + sum(qIns)
+        outpt = self.c * self.V
+        self.V += (inpt - outpt)
+        return outpt
+
+
+class Model:
+    def __init__(self, nodes, connections):
+        self.nodes = nodes              #{id: node}
+        self.connections = connections  #[(idFrom, idTo)]
+
+    def eval(Ns):    #Ns: {id: n}
+        lastNode = self.nodes[0]
+        qOut = evalNode(lastNode, Ns)
+        return qOut
+
+    def evalNode(self, node, Ns):
+        upstreamNeighbours = self.getUpstreamNeighbours(node)
+        qs = []
+        for neighbour in upstreamNeighbours:
+            qUpstream = self.evalNode(neighbour, Ns)
+            qs.append(qUpstream)
+        qOut = node.eval(Ns[node.id], qs)
+        return qOut
+
+    def getUpstreamNeighbours(self, node):
+        neighbours = []
+        for connection in self.connections:
+            if connection[1] == node.id:
+                neighbourId = connection[0]
+                neighbour = self.nodes[neighbourId]
+                neighbours.append(neighbour)
+        return neighbours
+
+    def gradients(self, sse):
+        pass
+
+    def updateParas(self, gradients):
+        pass
+
+    
+            
+def modelFactory(terrainMap):
+    nodes = None
+    connections = None
+    model = Model(nodes, connections)
+    return model
+
+def optimize(model, N_timeSeries, q_timeSeries):
+    errors = []
+    for t, Ns in enumerate(N_timeSeries):
+        qPred = model.eval(Ns)
+        qObs = q_timeSeries[t]
+        errors.append([qPred - qObs]**2)
+    sse = sum(errors)
+    grads = model.gradients(sse)
+    model.update(grads)
+
+
+
+
+terrainMap = None
+N_timeSeries = None
+q_timeSeries = None
+model = modelFactory(terrainMap)
+optimize(model, N_timeSeries, q_timeSeries)
+\end{lstlisting}
+
+
 \subsection{Optimisation using tensorflow}
 
 
