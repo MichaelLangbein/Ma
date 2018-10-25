@@ -1,0 +1,23 @@
+\section{Labeling radar-movies with likely summer-thunderstorms}
+
+Summer-thunderstorms are notoriously hard to predict. But we have an abundance of radar-data, together with decent records of actual precipitation.
+
+
+\begin{itemize}
+  \item Create labeled data
+    \begin{itemize}
+      \item When there is a thunderstorm about to come in the next three hours, label as "upcomming"
+      \item When there is a storm happening, label as "active"
+      \item When the storm is receding, label as "receding"
+      \item Otherwise, label as "clear"
+    \end{itemize}
+   \item Train a net to recognize the labels given a 10-hour radar-movie
+    \begin{itemize}
+      \item Lower layers: 3d-conv
+      \item Higher layers: dense
+    \end{itemize}
+   \item FInd out what the model has learned
+    \begin{itemize}
+      \item Are the conv-patterns interesting? Can they be used to find the outlines of a storm-cell?
+    \end{itemize}
+\end{itemize}
