@@ -131,6 +131,49 @@ print(result)
 
 \subsection{Toppics}
 
+\subsubsection{Convolutional nets}
+\begin{lstlisting}[language=python]
+    import tensorflow as tf
+    import tensorflow.keras as k
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import dummydata as dd
+    import utils as u
+    
+    
+    # 1. Data
+    imageWidth = imageHeight = 80
+    batchSize  = 10
+    timeSteps = 10
+    #dd.createDummyDataset(batchSize, timeSteps, imageWidth, imageHeight)
+    data_in, data_out = dd.loadDummyDataset()
+    
+    
+    
+    # 2. Net
+    model = k.Sequential([
+        k.layers.Conv3D(5, (2,2,2),     name="conv3d_1",    input_shape=(timeSteps, imageWidth, imageHeight, 1)),
+        k.layers.MaxPool3D(             name="maxpool_1"),
+        k.layers.Conv3D(5, (2,2,2),     name="conv3d_2"),
+        k.layers.MaxPool3D(             name="maxpool_2"),
+        k.layers.Flatten(),
+        k.layers.Dense(30,              name="dense_1"),
+        k.layers.Dense(10,              name="dense_2"),
+        k.layers.Dense(1,               name="dense_3")
+    ])
+    
+    model.compile(
+        optimizer=k.optimizers.Adam(),
+        loss=k.losses.mean_squared_error
+    )
+    
+    model.fit(x=data_in, y=data_out, batch_size=batchSize, epochs=10)
+    
+    model.predict(np.array([data_in[0]]))
+    
+\end{lstlisting}
+
+
 \subsubsection{LSTM}
 Lstm's can be tricky in that they need input in a very specific format.
 \begin{lstlisting}[language=python]
