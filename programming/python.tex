@@ -660,3 +660,29 @@ help(bt.execute)
 \end{lstlisting}
 
 The init-file may however also contain some additional information. 
+
+
+\subsection{Miniconda}
+Honestly, the python2/3 shism is going to kill you. And if that doesn't, then the multiple c-dependencies python has. There is really only one way around this, which is using miniconda as a venv manager.
+Miniconda first installs a root-environment for you under ~/miniconda. The packages in there will be included in any further venv you create. 
+You create a new venv with \inlinecode{source activate meinTestEnv}. Note that this does not create a folder at your current location. It does, however, create one under ~/miniconda/envs/meinTestEnv . This is where all your env-specific packages will be stored. A venv may even use a different python-version than your root-env.
+You can deactivate the venv again with \inlinecode{source deactivate}.
+
+\begin{itemize}
+    \item \inlinecode{conda env list}
+    \item \inlinecode{conda create --name meinEnv}
+    \item \inlinecode{source activate meinEnv}
+    \item \inlinecode{source deactivate}
+\end{itemize}
+
+Conda gets its packages from so-called channels - just like ubuntu-repositories. You can change the priority at which conda searches through channels, and add new ones. 
+
+\begin{itemize}
+    \item \inlinecode{conda config --get channels}
+    \item Search for packages here: \inlinecode{https://anaconda.org/anaconda/repo}
+    \item \inlinecode{conda config --append channels newchannel}
+    \item \inlinecode{conda list}
+    \item \inlinecode{conda search tensorflow}
+    \item \inlinecode{conda install tensorflow=1.0.1}
+    \item If you use pip while in a conda venv, the pip-package will also be installed in the venv. 
+\end{itemize}
