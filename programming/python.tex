@@ -459,6 +459,26 @@ def expctCond(lmbd, n0):
     return ex
 \end{lstlisting}
 
+
+\subsection{Gradual typing}
+Since python 3.6, gradual typing is possible with the mypy-checker. 
+Here is some examplecode:
+\begin{lstlisting}[language=python]
+class Person:
+    def __init__(self, name: str):
+        self.name = name
+
+
+def sayHi(person: Person) -> str:
+    return "Hello, {}".format(person.name)
+
+
+m = Person("Michael")
+print(sayHi(m))
+\end{lstlisting}
+
+However, the python-interpreter itself does, so far, not check types. Python does allow type-hints, but does not enforce them by itself. To check types ahead of type, use \inlinecode{mypy prog.py}.
+
 \subsection{Piping and currying}
 \begin{lstlisting}[language=python]
 from infix import or_infix
