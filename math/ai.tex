@@ -77,6 +77,18 @@ $$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} \mtrx{W}^l $$
 
 The bayesian derivation of the backpropagation algorithm gives rise to the interesting idea that backprop-networks may be generalized into ...
 
+
+\paragraph{Universial approximation}
+Let $f$ be a function mapping images to labels. $f$ stems from a vector space of functions $\mathscr{F}$. Let $B$ be a basis for $\mathscr{F}$, meaning that 
+$$ \forall f \in \mathscr{F}: \thereis \vec{\alpha}: \sum \alpha_n b_n = f $$
+So far, so simple. This holds for any basis of any vector space. Let's just propose that sigmoid functions do constitute a basis for these image-to-label functions. We cannot prove this, since we don't know what the image-to-label functions look like, but notice the potential: 
+$ \sum \alpha_n b_n $ is then just the output of one layer of a neural net!
+
+It turns out that sigmoid functions do indeed form a basis for any continuous function on $[0,1]^n$ \footnote{Note also that, while sigmoids do form a basis, they do not constitute an \emph{orthagonal} basis, meaning that we cannot obtain waights with the inner-product-trick. We couldn't have obtained them anyway, because for that trick we need the analytical form of $f$, which is generally not known to us.}.
+
+There is an important point that the universal approximation theorem does not cover, however. The UAT only deals with a single layer net. We know from practice, however, that a multilayer net can approximate functions with far less nodes than what a single-layer net would need. There is some strength to having multiple layers.
+
+
 \paragraph{Convolutional networks}
 
 These are the networks most commonly found employed in image-classification. Really, they are just a simplified version of our backpropagation-networks (they are even trained using an only slightly altered algorithm). Instead of connecting every node from layer $l$ to every node of layer $l+1$, they impose some restrictions on the connection-matrix:
