@@ -94,7 +94,12 @@ git diff master..schwebstoff_tabellen
 git diff HEAD
 \end{lstlisting}
 
-\paragraph{Reverting} is best explained in this post: \inlinecode{https://stackoverflow.com/questions/4114095/how-to-revert-git-repository-to-a-previous-commit}
+\paragraph{Reverting and resetting} is best explained in this post: \inlinecode{https://stackoverflow.com/questions/4114095/how-to-revert-git-repository-to-a-previous-commit}. Basically, we have these options: 
+
+\begin{itemize}
+    \item \inlinecode{git revert <lastGoodCommitHash>..HEAD} will execute the inverse of all the operations and commit them as a new commit. This way, the old history stays intact.
+    \item \inlinecode{git reset <lastGoodCommitHash>} will delete all the commits from \inlinecode{<firstBadCommitHash>..HEAD}. This way, you're rewriting history, which is really only good if you're working alone on a repo.
+\end{itemize}
 
 
 
