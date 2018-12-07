@@ -79,6 +79,27 @@ Optimizers are a very common example of operations, so we show a very simple exa
 
 \end{lstlisting}
 
+
+\subsection{Even lower level, and understsanding TF internals}
+
+Tensorflow is an automatic differentiation engine. That is not quite the same as a symbolic differentiation engine. The difference becomes appparent when you create a custom operation to add to TF. To do this, you need to: 
+
+\begin{itemize}
+    \item register a new operation in c++
+        \begin{itemize}
+            \item operation-name
+            \item inputs including their shapes
+        \end{itemize}
+    \item implement the operation in c++
+        \begin{itemize}
+            \item operation
+            \item gradient of operation for all inputs
+        \end{itemize}
+    \item create a python wrapper for the public python-tf-api (not really neccessary, because tf creates a default wrapper automatically)
+\end{itemize}
+
+So contrary to a symbolic engine, you have to explain to tf by hand how to calculate a gradient. 
+
 \subsection{High-level API}
 
 When using keras, you usually don't see the low-level api at all - no tensors, no sessions, no \inlinecode{run}.
