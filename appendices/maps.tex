@@ -2,9 +2,46 @@
 
 A lot of this information comes from here: http://cite.opengeospatial.org/pub/cite/files/edu/wmts/text/operations.html
 
+\subsection{Available software} 
+
+There are so many non-orthogonal tools out there that an overview can't do damage
+
+\begin{itemize}
+    \item Data-handling: There is a good tutorial here: \href{https://programminghistorian.org/en/lessons/mapping-with-python-leaflet}{https://programminghistorian.org/en/lessons/mapping-with-python-leaflet}
+        \begin{itemize}
+            \item GeoPandas: pandas is good at handling windows of csv-data. GeoPandas extends it with geographic datatypes and queries. 
+            \item geopy: lots of unseful APIs and transformations.
+        \end{itemize}
+    \item Data-storage in db
+        \begin{itemize}
+            \item Any PostgeSQL binding
+            \item Geodjango, for a Website-ORM.
+        \end{itemize}
+    \item Map-creation
+        \begin{itemize}
+            \item MapServer
+            \item GeoServer
+            \item Cartopy(python): Creates map-images from data
+        \end{itemize}
+    \item Serving data
+        \begin{itemize}
+            \item MapServer (c)
+            \item GeoServer (java)
+            \item FeatureServer (python): a WFS 
+        \end{itemize}
+    \item Displaying data
+        \begin{itemize}
+            \item Folium: Builds websites based on Leaflet.js, but with a python api.
+            \item Geodjango with django-leaflet
+            \item OpenLayers
+        \end{itemize}
+\end{itemize}
+
+
+
 
 \subsection{Server}
-A popular choice for serverside software is MapServer (C, CGI and PHP) or GeoServer (Java). Servers locally create GeoTiff files: high resolution images that are geo-referenced. They are then converted to png's and exposed via a HTTP-based API. We need to know about two important implementations. Both of them can be called via SOAP or GET-Parameters (KVP, for key-value-pairs, in geo-lingo). We'll only describe the GET-Parameters here. 
+A popular choice for serverside software is MapServer (C, CGI and PHP) or GeoServer (Java). Servers locally create GeoTiff files: high resolution images that are geo-referenced. They are then converted to png's and exposed via a HTTP-based API. We need to know about two important implementations. Both of them can be called via SOAP or REST-Parameters (KVP, for key-value-pairs, in geo-lingo). We'll only describe the GET-Parameters here. 
 
 \begin{itemize}
     \item WMS: delivers custom made images for a given map-square. 
@@ -30,6 +67,11 @@ A popular choice for serverside software is MapServer (C, CGI and PHP) or GeoSer
                 \item GetFeatureInfo
             \end{itemize}
     \end{itemize}
+
+    \item WFS: instead of images, a json-representation of features is passed to the client. 
+        \begin{itemize}
+            \item 
+        \end{itemize}
 \end{itemize}
 
 Usually, service providers expose \emph{multiple} urls for you to query, so that you can fetch images from several servers in parallel. 

@@ -1,0 +1,112 @@
+\section{Angular}
+
+\begin{itemize}
+    \item Module: lists all components (\inlinecode{declarations}) and all dependencies (\inlinecode{imports})
+    \item Component: Defines a custom html-Tag
+    \item Service: accesses a server
+\end{itemize}
+
+\subsection{Components}
+
+A component consists of a html-template and a ts-class. The template can access the classes properties and methods through directives.
+These directives are special syntax like \inlinecode{\{\}} or \inlinecode{*ngIf} that contain a string of ts-code that can be evaluated in the context of the class.
+
+\begin{itemize}
+    \item ts-file: has a method for every lifecycle-hook and a property for every bindable data.
+    \item html-file:
+            \begin{itemize}
+                \item interpolation: curly braces can read a classes properties. \inlinecode{<li>\{\{hero.name | uppercase\}\}</li>}
+                \item input-binding: round braces capture input-events. \inlinecode{(click)="onSelect(hero)"} Captures an input and directs to a method
+                \item value-binding: square braces write to a classes properties. \inlinecode{[hero]="chosenHero"} assigns an object to a property. 
+                \item two-way-binding: for reading \emph{and} writing properties. \inlinecode{[(ngModel)]="hero.name"}, requires \inlinecode{FormsModule}
+                \item loops: \inlinecode{*ngFor="let hero of heroes"}
+                \item conditionals: \inlinecode{*ngIf="!selected"}
+            \end{itemize}
+            Together, these might make a code section like this: \inlinecode{<li *ngFor="let hero of heroes" (click)="onSelect(hero)">\{\{hero.id\}\} -- \{\{hero.name\}\}</li>}
+\end{itemize}
+
+\subsubsection{Template directives: details}
+
+\paragraph{*ngFor}
+
+\paragraph{*ngIf} 
+
+\subsubsection{Subcomponents}
+
+Subcomponents can obtain the values of their properties from supercomponents. 
+
+A component-class can have properties annotated with \inlinecode{@Input}. That means that the value of this property will be given through the components html-tag. 
+For example, the component \inlinecode{Heroes} might have this tag in its template:
+
+\begin{lstlisting}[language=html]
+    <app-hero-detail [hero]="chosenHero"></app-hero-detail>
+\end{lstlisting}
+
+This \inlinecode{chosenHero} would be bound to the \inlinecode{hero} property in the \inlinecode{HeroDetail} component.
+
+\begin{lstlisting}[language=java]
+export class HeroDetailComponent implements OnInit {
+
+  @Input()
+  hero: Hero;
+
+  constructor() {}
+  ngOnInit() {}
+}
+\end{lstlisting}
+
+
+\subsection{Routing}
+Routing is usually done in a separate module. It consist of two parts: 
+\begin{itemize}
+    \item The route definition, consisting of 
+    \item The html-links
+\end{itemize}
+As a side effect, when you decide to use routes, not all components need to be subcomponents of \inlinecode{app-component} anymore.
+
+
+\subsection{Modules}
+You create modules when you want to create some functionality that might be shared via npm. 
+Modules are always imported into angular in the form of a class. To import your module into a site, 
+\begin{itemize}
+    \item download the module with npm
+    \item \inlinecode{ng generate module <yourmodule>}
+    \item add the module to the app-modules \inlinecode{import}s
+    \item in \inlinecode{<yourmodule>.module.ts}, 
+        \begin{itemize}
+            \item create a class \inlinecode{<Yourmodule>Module}
+            \item configure that class with \inlinecode{@ngModule}
+            \item export the class
+        \end{itemize}
+\end{itemize}
+
+
+\subsection{Services}
+Services are data providers. They do not have to call REST-interfaces. They might call a database or a file, or they might be used as a messaging service between components. But if they do happen to call a REST-service, they typically return an observable.
+
+
+\subsection{General concepts}
+
+As a singlethreaded, event-based environment, javascript has a bunch of event-based structures built in.
+
+\paragraph{Observables} are objects that maintain a list of subscribers. The subscribers must implement the subscriber-interface, which means that they must have methods \inlinecode{next, completed, error}.
+The "notify-all-subscribers" part is handled by an abstract base class from \inlinecode{RxJS}. To create an observable, you only need to pass in a function that tells the observable how to  get its data.
+
+
+\begin{lstlisting}[language=java]
+let observable = Rx.Observable.create((observer) => {
+    for (var i = 0; i<10; i++) {
+        let data = someRestRequest("myservice.com/data/" + i);
+        observer.onNext(data);
+    }
+    observer.onFinished();
+});
+    
+let observer = {
+    onNext: (nextVal) => console.log(nextVal),
+    onCompleted: () => console.log("completed"),
+    onError: (error) => console.log(error)
+};
+
+observable.subscribe(observer);
+\end{lstlisting}

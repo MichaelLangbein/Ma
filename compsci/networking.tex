@@ -218,13 +218,72 @@ Ok, so we've covered the ethernet/ip/tcp/etc stack. Email is an altogether diffe
 
 \subsection{Making things talk: Remote data transmission}
 
-\subsubsection{ISDN}
-\subsubsection{Security}
+Before we go into details, we need to know some basics of communication.
 
-\subsection{DSL}
-\subsubsection{Security}
+How radio works
+\begin{itemize}
+    \item Radio waves are the longest and contain the least energy of any electromagnetic wave. While ligthwaves are the size of bacteria, radiowaves are the size of a car of even a mountain.
+    \item AM-Radio (amplitude-modulation); the original standard. 
+        \begin{itemize}
+            \item Take a signal of constant amplitude and frequency - know as the carrier wave. 
+            \item Add your music to that signal. Even though the music has changing freqs and amps, the carrier signal transports it at its carrying frequency.
+            \item Send the signal from a radio-station
+            \item Receive the signal with a radio, where you pick the channel by chosing the carrier-frequency. The radio then subtracts the carrier-signal, leaving only the original music intact. 
+        \end{itemize}
+        This is how a signal can be transmitted on one single frequency. 
+    \item FM-Radio does the same, but instead of staying on one freq and listening to amplitude, it listens to a (small) spectrum of freqs and emmits sound whenever the frequency changes. 
+        \begin{itemize}
+            \item better against interference, because intf often causes ampl spikes
+            \item smaller range: AM can transmit over long distance because it uses a smaller frequency (though not so good quality)
+        \end{itemize}
+\end{itemize}
 
-\subsection{GSM}
-\subsubsection{Security}
 
-\subsection{LTE}
+
+Types of wires.
+\begin{itemize}
+    \item copper: traditional telephone wires. ISDN runs on these; DSL does too, but somewhat slower (this is because, contrary to ISDN, DSL needs an IP-Station as soon as possible after leaving your house. In rural areas DSL becomes much slower this way). Can carry electricity, which is why in the past telephones still worked even when a houses electricity crashed. 
+    \item glass-fibre/voip: old copper wires are being replaced with cables that end in a station with IP-adress. These don't carry electricity anymore, however. ISDN does not work on these, either. Those new voip-cables are often glass-fibre cables\footnote{Instead of electricity, glass-fibre cables carry light-signals. This technology allows for far more frequency bands to be used.}. DSL over glass-fibres is called VDSL (whereas DSL on the old copper wires is simply called DSL), telephony over DSL/glass is called VOIP.
+\end{itemize}
+
+And here a recap on important hardware: 
+\begin{itemize}
+    \item Router: really consists of three devices: 
+        \begin{itemize} 
+            \item router: sends packets by ip either to your devices or the next router on the internet
+            \item switch: broadcasts incomming packets to all your home-devices or moves outgoing packets to the router
+            \item wireless access point
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{ISDN (wired)}
+Your computer is attached to a modem\footnote{modem stands for modulator/demodulator: a device which receives electrical waves comming from the copper-wire and transforms them into analog (sound) or digital (bits) waves; and back.}, which is attached to a telephone-cable or even a telephone-earpiece (!). The modem translates your TCP-requests to sound-signals which would be carried over the telephone-wire in the form of sound. With ISDN, you cannot use both your telephone and your internet at the same time.  
+Since everyone in a neighbourhood shares the same cable, your speed will drop when many people use netflix at the same time. 
+On the other hand, ISDN uses a boosting technology that makes sure that your phone-conversation stays clear over large distances. This means that ISDN does not require a relay nearby - contrary to DSL. So in rural areas, ISDN may be actually faster. 
+Speed: around 0.1 Mbit/s.
+
+
+\subsection{DSL (wired)}
+DSL (digital subscriber line) is using ordinary telephone wires or the more modern glass-wires (in that case it is called VDSL). Both a telephone-cable as well as a your routers output will be plugged into a DSL-splitter (shown below).
+\includegraphics{images/dsl_splitter.png}
+With ISDN, you could not use your telephone and your computer at the same time. This is because your internet-traffic is going through the copper-wire on a different frequency-band than the one telephone-conversations use.  
+To further increase speed for the average user, there is \emph{A}DSL, with A standing for asymetric. Here, downstream traffic is much prefered to upstream, since the average user does not host a server.
+Contrary to ISDN, DSL connections are not shared between all users in a neighbourhood. Instead, a dedicated connection runs directly to a station with its own IP-adress near your house. 
+Speed: up to 16 Mbit/s, but only 1-2 Mbit/s in rural areas where IP-Stations are far from your house.
+
+
+\subsection{WiFi (really only those few meters up to your wired router)}
+WiFi really uses the same "everyone-shout-first-gets-served" protocol as MAC does. That means that every device has to wait its turn to use the router. 
+There are two frequencies at which devices may communicate:
+\begin{itemize}
+    \item 2.4 GHz: slower, further reach
+    \item 5.0 Ghz: faster, but only at shorter distance
+\end{itemize}
+
+
+\subsection{GSM, EDGE, 3G=HSDPA, 4G=LTE=HSDPA(+) (radio)}
+When your device has no WLAN or LAN access to a router, you can only access the internet by going over radio-stations (or satellite, see later). 
+
+
+\subsection{GPS (satellite)}
+Since with GPS a signal has to travel all the way to space and back, this is the slowest of the communication methods. 
