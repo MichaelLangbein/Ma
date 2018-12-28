@@ -236,6 +236,7 @@ How radio works
             \item better against interference, because intf often causes ampl spikes
             \item smaller range: AM can transmit over long distance because it uses a smaller frequency (though not so good quality)
         \end{itemize}
+    \item in modems, isdn and dsl we use am, fm and phase-modulation together to allow for multiple channels. 
 \end{itemize}
 
 
@@ -257,7 +258,8 @@ And here a recap on important hardware:
 \end{itemize}
 
 \subsubsection{ISDN (wired)}
-Your computer is attached to a modem\footnote{modem stands for modulator/demodulator: a device which receives electrical waves comming from the copper-wire and transforms them into analog (sound) or digital (bits) waves; and back.}, which is attached to a telephone-cable or even a telephone-earpiece (!). The modem translates your TCP-requests to sound-signals which would be carried over the telephone-wire in the form of sound. With ISDN, you cannot use both your telephone and your internet at the same time.  
+Your computer is attached to a modem\footnote{modem stands for modulator/demodulator: a device which receives electrical waves comming from the copper-wire and transforms them into analog (sound) or digital (bits) waves; and back.}, which is attached to a telephone-cable or even a telephone-earpiece (!). The modem translates your TCP-requests to sound-signals which would be carried over the telephone-wire in the form of sound. With ISDN, you cannot use both your telephone and your internet at the same time (actually, with am, fm and pm you can; you'd obtain up to 3 channels).  
+Actually, isdn is different from a modem. Modems came first. There you put your telephone directly on the earpiece. Isdn then skipped the earpiece and put the modem directly onto the copper wire - this way a higher sampling frequency was possible. 
 Since everyone in a neighbourhood shares the same cable, your speed will drop when many people use netflix at the same time. 
 On the other hand, ISDN uses a boosting technology that makes sure that your phone-conversation stays clear over large distances. This means that ISDN does not require a relay nearby - contrary to DSL. So in rural areas, ISDN may be actually faster. 
 Speed: around 0.1 Mbit/s.
@@ -267,6 +269,7 @@ Speed: around 0.1 Mbit/s.
 DSL (digital subscriber line) is using ordinary telephone wires or the more modern glass-wires (in that case it is called VDSL). Both a telephone-cable as well as a your routers output will be plugged into a DSL-splitter (shown below).
 \includegraphics{images/dsl_splitter.png}
 With ISDN, you could not use your telephone and your computer at the same time. This is because your internet-traffic is going through the copper-wire on a different frequency-band than the one telephone-conversations use.  
+ISDN was hampered by interference, because multiple wires would lie in the ground close to each other. While ISDN did already use am, fm and pm, DSL has a technique for interference-cancelling that allows it to increase its throughput even more. But this technology requires an ip-station at the end of the line. 
 To further increase speed for the average user, there is \emph{A}DSL, with A standing for asymetric. Here, downstream traffic is much prefered to upstream, since the average user does not host a server.
 Contrary to ISDN, DSL connections are not shared between all users in a neighbourhood. Instead, a dedicated connection runs directly to a station with its own IP-adress near your house. 
 Speed: up to 16 Mbit/s, but only 1-2 Mbit/s in rural areas where IP-Stations are far from your house.
