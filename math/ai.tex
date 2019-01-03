@@ -156,4 +156,18 @@ Say you want to locate the position of the nose in a portrait.
 \subsection{Symbolic AI}
 
 Contrary to the before mentioned approaches, symbolic AI uses logical deduction instead of numerical processing to arrive at decissions. A good tutorial can be found here: \href{codeproject.com/Articles/179375/Man-Marriage-and-Machine-Adventures-in-Artificia}.
-
+A inference engine can do the following: 
+\begin{itemize}
+	\item Learning: 
+		\begin{itemize}
+			\item Gather if-then statements (usually in the form of Horn-clauses).
+			\item Create a graph of dependencies between statements (a so called and-or-tree).
+		\end{itemize}
+	\item Applying the learned things: Given a question: 
+		\begin{itemize}
+			\item Possible answers: find all potential answers to the problem
+			\item Backward pass: go through the graph to see what data is required
+			\item Data aquisition: ask user to provide the data
+			\item Forward pass: trace the graph forward again to arrive at a single one of the possible answers
+		\end{itemize}
+\end{itemize}

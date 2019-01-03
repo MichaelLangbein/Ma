@@ -1,17 +1,12 @@
 \section{Maps}
 
-A lot of this information comes from here: http://cite.opengeospatial.org/pub/cite/files/edu/wmts/text/operations.html
+A lot of this information comes from here: \url{http://cite.opengeospatial.org/pub/cite/files/edu/wmts/text/operations.html}
 
 \subsection{Available software} 
 
-There are so many non-orthogonal tools out there that an overview can't do damage
+There are so many non-orthogonal tools out there that an overview can't do harm.
 
 \begin{itemize}
-    \item Data-handling: There is a good tutorial here: \href{https://programminghistorian.org/en/lessons/mapping-with-python-leaflet}{https://programminghistorian.org/en/lessons/mapping-with-python-leaflet}
-        \begin{itemize}
-            \item GeoPandas: pandas is good at handling windows of csv-data. GeoPandas extends it with geographic datatypes and queries. 
-            \item geopy: lots of unseful APIs and transformations.
-        \end{itemize}
     \item Data-storage in db
         \begin{itemize}
             \item Any PostgeSQL binding
@@ -19,14 +14,19 @@ There are so many non-orthogonal tools out there that an overview can't do damag
         \end{itemize}
     \item Map-creation
         \begin{itemize}
-            \item MapServer
-            \item GeoServer
-            \item Cartopy(python): Creates map-images from data
+            \item simple numpy raster data to geo-tiffs: gdal + basemap (deprecated) or cartopy. There is very good documentation here: \href{\url{https://annefou.github.io/metos_python/04-plotting/}}{\url{https://annefou.github.io/metos_python/04-plotting/}}
+            \item QGis
+            \item MapServer (c)
+            \item GeoServer (java)
+            \item Mapnik (c, python)
+            \item TileMill (python)
         \end{itemize}
     \item Serving data
         \begin{itemize}
+	    \item QGis Server
             \item MapServer (c)
             \item GeoServer (java)
+            \item Mapnik (c, python)
             \item FeatureServer (python): a WFS 
         \end{itemize}
     \item Displaying data
