@@ -24,7 +24,7 @@ Threads share the same memory with their parents.
 Creation      & Copy of mother process                                                                                &                                                                                                                                      \\
 Memory        & Own memory                                                                                            & Shared memory                                                                                                                        \\
 Communication & \begin{tabular}[c]{@{}l@{}}Communicates with mother through \\ syscalls, pipes and files\end{tabular} & \begin{tabular}[c]{@{}l@{}}Can directly call methods of \\ mother process\end{tabular}                                               \\
-Usecase       &                                                                                                       & \begin{tabular}[c]{@{}l@{}}Ideal if thread output to be processed \\ by mother process, \\ because no piping neccessary\end{tabular} \\ \bottomrule
+Usecase       & \begin{tabular}[c]{@{}l@{}}Ideal if mother and subprocesses\\ must be separated for security reasons,\\ like apache-server does.\end{tabular}  & \begin{tabular}[c]{@{}l@{}}Ideal if thread output to be processed \\ by mother process, \\ because no piping neccessary\end{tabular} \\ \bottomrule
 \end{tabular}%
 }
 \end{table}
