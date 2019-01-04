@@ -155,7 +155,7 @@ Say you want to locate the position of the nose in a portrait.
 
 \subsection{Symbolic AI}
 
-Contrary to the before mentioned approaches, symbolic AI uses logical deduction instead of numerical processing to arrive at decissions. A good tutorial can be found here: \href{codeproject.com/Articles/179375/Man-Marriage-and-Machine-Adventures-in-Artificia}.
+Contrary to the before mentioned approaches, symbolic AI uses logical deduction instead of numerical processing to arrive at decissions. If neural nets and decision-trees learning from data can be called building \emph{experince}, then an inference engine deducting from rules can be called building \emph{expertise}. A good tutorial can be found here: \href{codeproject.com/Articles/179375/Man-Marriage-and-Machine-Adventures-in-Artificia}{codeproject.com}.
 A inference engine can do the following: 
 \begin{itemize}
 	\item Learning: 
@@ -170,4 +170,12 @@ A inference engine can do the following:
 			\item Data aquisition: ask user to provide the data
 			\item Forward pass: trace the graph forward again to arrive at a single one of the possible answers
 		\end{itemize}
+\end{itemize}
+
+Depending on how much effort you put into the expressions that the engine can understand, we differentiate between different levels of logic: 
+\begin{itemize}
+    \item 0th order logic: understands simple facts and chains them using modus ponens
+    \item 1st order logic: understands variables: can interpret the symbols $\forall$ and $\thereis$ and properties
+    \item 2nd order logic: understands relations: can interpret the symbol $\in$ 
+    \item higher order logic: is better at inference; can create new if-then-statements as a result of inference or even explore
 \end{itemize}
