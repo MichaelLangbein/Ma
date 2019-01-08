@@ -10,6 +10,7 @@
 
 A component consists of a html-template and a ts-class. The template can access the classes properties and methods through directives.
 These directives are special syntax like \inlinecode{\{\}} or \inlinecode{*ngIf} that contain a string of ts-code that can be evaluated in the context of the class.
+It makes sense to think of a component as a way to view your model, not as directly related to the model itself. For example, if your model is a joke, you might have the components JokeDetail, JokeList, and JokeAdd.
 
 \begin{itemize}
     \item ts-file: has a method for every lifecycle-hook and a property for every bindable data.
@@ -31,38 +32,62 @@ These directives are special syntax like \inlinecode{\{\}} or \inlinecode{*ngIf}
 
 \paragraph{*ngIf} 
 
-\subsubsection{Subcomponents}
-
-Subcomponents can obtain the values of their properties from supercomponents. 
-
-A component-class can have properties annotated with \inlinecode{@Input}. That means that the value of this property will be given through the components html-tag. 
-For example, the component \inlinecode{Heroes} might have this tag in its template:
-
-\begin{lstlisting}[language=html]
-    <app-hero-detail [hero]="chosenHero"></app-hero-detail>
-\end{lstlisting}
-
-This \inlinecode{chosenHero} would be bound to the \inlinecode{hero} property in the \inlinecode{HeroDetail} component.
-
-\begin{lstlisting}[language=java]
-export class HeroDetailComponent implements OnInit {
-
-  @Input()
-  hero: Hero;
-
-  constructor() {}
-  ngOnInit() {}
-}
-\end{lstlisting}
-
 
 \subsection{Routing}
 Routing is usually done in a separate module. It consist of two parts: 
 \begin{itemize}
-    \item The route definition, consisting of 
+    \item The route definition, consisting of a path and the component that is to be displayed under that path.
     \item The html-links
 \end{itemize}
 As a side effect, when you decide to use routes, not all components need to be subcomponents of \inlinecode{app-component} anymore.
+
+Configuring routing requires three steps. First, configure the routing in your \inlinecode{app.componnent.ts}: 
+\begin{lstlisting}[language=java]
+    import { RouterModule, Routes } from '@angular/router';
+    
+    const routes: Routes = [
+      {path: "", component: JokeListComponent},
+      {path: "details/:id", component: JokeComponent},
+      {path: "overview", component: JokeListComponent},
+      {path: "add", component: JokeAddComponent}
+    ];
+    
+    @NgModule({
+      imports: [
+        BrowserModule,
+        HttpClientModule,
+        RouterModule.forRoot(routes)
+      ]
+    })
+    export class AppModule { }
+\end{lstlisting}
+
+Second, change your \inlinecode{app.componnent.html} to include the router-outlet:
+\begin{lstlisting}[language=html]
+    <h1>Welcome to {{title}}!</h1>
+    <router-outlet></router-outlet>
+\end{lstlisting}
+
+Third, make use of the routing:
+\begin{itemize}
+    \item creating a reference: \inlinecode{<a routerLink="details/\{\{joke.id\}\}">\{\{joke.title\}\}</a>}
+    \item getting data from a reference: 
+        \begin{lstlisting}[language=java]
+            import {ActivatedRoute} from "@angular/router";
+
+            constructor(private route: ActivatedRoute) {
+                let id = this.route.snapshot.paramMap.get('id');
+            }
+        \end{lstlisting}
+        Or, if you want to continue observing the url:
+        \begin{lstlisting}[language=java]
+            import {ActivatedRoute} from "@angular/router";
+
+            constructor(private route: ActivatedRoute) {
+                this.route.params.subscribe( params => console.log(params) );
+            }
+        \end{lstlisting}
+\end{itemize}
 
 
 \subsection{Modules}
@@ -110,3 +135,32 @@ let observer = {
 
 observable.subscribe(observer);
 \end{lstlisting}
+
+
+
+
+
+\subsubsection{Subcomponents}
+
+Subcomponents can obtain the values of their properties from supercomponents. 
+
+A component-class can have properties annotated with \inlinecode{@Input}. That means that the value of this property will be given through the components html-tag. 
+For example, the component \inlinecode{Heroes} might have this tag in its template:
+
+\begin{lstlisting}[language=html]
+    <app-hero-detail [hero]="chosenHero"></app-hero-detail>
+\end{lstlisting}
+
+This \inlinecode{chosenHero} would be bound to the \inlinecode{hero} property in the \inlinecode{HeroDetail} component.
+
+\begin{lstlisting}[language=java]
+export class HeroDetailComponent implements OnInit {
+
+  @Input()
+  hero: Hero;
+
+  constructor() {}
+  ngOnInit() {}
+}
+\end{lstlisting}
+

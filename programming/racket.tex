@@ -1,0 +1,41 @@
+\section{Racket}
+
+\begin{lstlisting}[language=lisp]
+
+; definitions are identical for variables and functions
+(define name "Michael")
+(define (add x y)
+    (+ x y))
+
+; use anonymous functions to create functions as return-values on the fly
+(define (createPowerFunc pwr)
+  (lambda (base)
+    (expt base pwr)))
+(define pwr4 (createPowerFunc 4))
+(pwr4 3)
+> 81
+
+
+; conditionals
+; if/else is simple:
+(if (equal? name "Andreas")
+      "Zieh ab!"
+      "Servus!")
+; if you want if/else with more than two cases, use cond:
+(define (commentMyWeight w)
+    (cond
+      [(< w 50) "Gosh, you're a fether!"]
+      [(< w 70) "Sounds fine."]
+      [(< w 90) "You're a dude, right?"]
+      [else "Seriously, thats too much!"])
+
+
+; datatypes
+; list
+'("1" 2 c)
+(list "a" "b")
+
+
+\end{lstlisting}
+
+
