@@ -36,3 +36,39 @@
 \begin{definition}
     Modulus: $ a\%d = r \iff d|(a-r) \land 0 \leq r \leq d $
 \end{definition}
+
+
+\subsection{Hashing}
+
+\subsection{Encryption}
+
+\subsubsection{Symmetric encryption}
+
+\subsubsection{Asymmetric encryption}
+
+The basic idea of the Diffie-Hellman algorithm is as follows: instead of a secret key used for encryption and decryption, use a two-part-key. We can then find an algorithm where only the public part of the key is ever visible to Eve. 
+
+Here is an analogy:
+\begin{itemize}
+	\item You have a lock (pubK) and a key (prvK). Send your lock publically to Bob, while you keep your key hidden in your vest. 
+	\item Bob writes his message to you and locks it with your lock in a box. Neither he nor Eve can now open the box again. Bob sends the box to you.
+	\item You open the box with your key and read the message
+\end{itemize}
+
+\includegraphics[]{images/diffie_hellman}
+
+This general concept is known as Diffie-Hellman asymmetric encryption. To implement it, one needs 
+\begin{itemize}
+	\item A function to generate a key-pair
+	\item A function for encryption using the message and another persons public key
+	\item A function for decryption using a cypher and your own private key
+\end{itemize}
+The first successful implementation of this principle is known as the WPA algorithm. 
+
+\paragraph{In practice} WPA takes too long to be used very often, whereas symmetric encryption is much faster. For this reason, one usually follows a two step process:
+\begin{itemize}
+	\item create a new symK
+	\item exchange that symK via WPA
+	\item use the symK to do symmetric encryption
+\end{itemize}
+
