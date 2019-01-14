@@ -34,31 +34,27 @@
 \end{proof}
 
 \begin{theorem}
-	$$ \forall a,b: \thereis ! q, r: a = qb + r \land 0 \leq r \leq q$$
+	$ \forall a,b: \thereis ! q, r: a = qb + r \land 0 \leq r \leq q $
 \end{theorem}
 
-\begin{definition}
-    Modulus: $ a\%d = r \iff d|(a-r) \land 0 \leq r \leq d $
-\end{definition}
-
-
-\begin{theorem}[Euclids algorithm] 
-	We can simplify the greatest common divisor like this: 
-	$$ \gcd{a, b} = \gcd{b, \rem{a,b}} $$
+\begin{theorem}	
+    Euclids algorithm: We can simplify the greatest common divisor like this: $ \gcd{a}{b} = \gcd{b}{\rem{a,b}} $
 \end{theorem}
+
 \begin{proof}
-	\subprf{}{We'll prove that $\CD{a,b} = \CD{b, \rem{a,b}}$}{
-		\subprf{Let $d_0 \in \CD{a,b}$}{Prove that $d_0 \in \CD{b,\rem{a,b}}}{
-			
-		}
-		\subprf{Let $d_0 \in \CD{b,\rem{a,b}$}{Prove that $d_0 \in \CD{a,b}}{
-			
-		}
-	}
-	\subprf{}{Since $A=B \then \max{A} = \max{B}$, it follows that $\gcd{a,b} = \gcd{b, \rem{a,b}}}{
-	
-		
-	}
+    \subprf{}{$ \gcd{a}{b} = \gcd{b}{\rem{a,b}} $}{
+	    \subprf{}{ $ \CD{a}{b} = \CD{b}{\rem{a}{b}} $ } {
+	    	\subprf{ Let $ d_0 \in \CD{a}{b} $ }{ Prove that $ d_0 \in \CD{b}{\rem{a,b}} $ }{
+	    	    Since ...	
+	    	} 
+	    	\subprf{ Let $ d_0 \in \CD{b}{\rem{a}{b}} $ }{ Prove that $ d_0 \in \CD{a}{b} $ }{
+	    		Since ...
+	    	}
+	    }
+	    \subprf{}{ Since $ A=B \then \maxOf{A} = \maxOf{B} $, it follows that $ \gcd{a,b} = \gcd{b, \rem{a,b}} $ }{
+	    	It is easy to prove that $A \subseteq B \then \maxOf{A} \leq \maxOf{B}$. The reverse holds too, of course. 
+	    }
+    }
 \end{proof}
 
 
