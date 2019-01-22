@@ -107,10 +107,55 @@ Modules are always imported into angular in the form of a class. To import your 
 
 
 \subsection{Services}
-Services are data providers. They do not have to call REST-interfaces. They might call a database or a file, or they might be used as a messaging service between components. But if they do happen to call a REST-service, they typically return an observable.
+Services are data providers. They do not have to call REST-interfaces. They might call a database or a file, or they might be used as a messaging service between components, or they might be a way for all your components to access the global game-state. But if they do happen to call a REST-service, they typically return an observable.
 
 
-\subsection{General concepts}
+
+
+
+\subsection{Component interaction}
+Usually, components will interact with each other by using a service, especially then when some shared data is held by that service (like state, a database or simmilar). Sometimes however, it makes sense to let components access each other more directly, especially when we're dealing with a parent-child relationship.
+
+\subsubsection{Subcomponents}
+Subcomponents can obtain the values of their properties from supercomponents. 
+
+A component-class can have properties annotated with \inlinecode{@Input}. That means that the value of this property will be given through the components html-tag. 
+For example, the component \inlinecode{Heroes} might have this tag in its template:
+
+\begin{lstlisting}[language=html]
+    <app-hero-detail [hero]="chosenHero"></app-hero-detail>
+\end{lstlisting}
+
+This \inlinecode{chosenHero} would be bound to the \inlinecode{hero} property in the \inlinecode{HeroDetail} component.
+
+\begin{lstlisting}[language=java]
+export class HeroDetailComponent implements OnInit {
+
+  @Input()
+  hero: Hero;
+
+  constructor() {}
+  ngOnInit() {}
+}
+\end{lstlisting}
+
+\subsubsection{Supercomponents}
+On the other hand, sometimes a component needs access to it's children. A component can access its child-components with the \inlinecode{@ViewChildren} property-annotation.
+
+
+
+\subsection{Forms}
+Forms are a difficult subject in any framework or library. Angular offers to approaches to handling forms, template-driven (simple) or reactive (larger).
+
+
+
+\subsection{Angular for maps}
+Angular's modular design allows us to create a declarative map-API, one where the whole map including markers is defined using html. We let ourselves be inspired by the \inlinecode{@agm} module, which implements google-maps bindings for angular. 
+
+
+
+
+\subsection{RxJs: General concepts}
 
 As a singlethreaded, event-based environment, javascript has a bunch of event-based structures built in.
 
@@ -134,33 +179,5 @@ let observer = {
 };
 
 observable.subscribe(observer);
-\end{lstlisting}
-
-
-
-
-
-\subsubsection{Subcomponents}
-
-Subcomponents can obtain the values of their properties from supercomponents. 
-
-A component-class can have properties annotated with \inlinecode{@Input}. That means that the value of this property will be given through the components html-tag. 
-For example, the component \inlinecode{Heroes} might have this tag in its template:
-
-\begin{lstlisting}[language=html]
-    <app-hero-detail [hero]="chosenHero"></app-hero-detail>
-\end{lstlisting}
-
-This \inlinecode{chosenHero} would be bound to the \inlinecode{hero} property in the \inlinecode{HeroDetail} component.
-
-\begin{lstlisting}[language=java]
-export class HeroDetailComponent implements OnInit {
-
-  @Input()
-  hero: Hero;
-
-  constructor() {}
-  ngOnInit() {}
-}
 \end{lstlisting}
 
