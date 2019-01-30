@@ -33,6 +33,50 @@ It makes sense to think of a component as a way to view your model, not as direc
 \paragraph{*ngIf} 
 
 
+
+\subsection{Directives}
+Directives are essentially components without a template. 
+\subsubsection{Attribute-directives}
+Instead of exposing a new custom html-element (as components do), attribute-directives expose a new custom \emph{attribute} that we may add to any html-element. 
+Here is an example of an attribute-directive in its simplest form: \href{}{}.
+Very often, you will want to create attribute-directives that fire events. This is where the \inlinecode{@Output} annotation comes into play. See this example: 
+\begin{lstlisting}[language=java]
+    import { Directive, Output, EventEmitter, ElementRef, HostListener } from '@angular/core';
+
+
+    @Directive({
+      selector: '[guClickOutside]'
+    })
+    export class ClickOutsideInsideDirective {
+      
+      @Output() guClickOutside = new EventEmitter<MouseEvent>();
+      @Output() guClickInside = new EventEmitter<MouseEvent>();
+      
+      constructor(
+        private elementRef: ElementRef
+      ) { }
+    
+      @HostListener('document:click', ['$event'])
+      public onDocumentClick(event: MouseEvent): void {
+        const targetElement = event.target as HTMLElement;
+        if (targetElement && !this.elementRef.nativeElement.contains(targetElement)) {
+          this.guClickOutside.emit(event);
+        } else {
+          this.guClickInside.emit(event);
+        }
+      }
+    }
+\end{lstlisting}
+This directive can be used inside any component like so: 
+\begin{lstlisting}[language=java]
+    <gu-moveable 
+        [xPos]="xPos" [yPos]="yPos"  
+        ClickOutsideInsideDirective (guClickOutside)="onClickOutside($event)" 
+        ClickOutsideInsideDirective (guClickInside)="onClickInside($event)"
+    > ...
+\end{lstlisting}
+
+
 \subsection{Routing}
 Routing is usually done in a separate module. It consist of two parts: 
 \begin{itemize}
@@ -116,14 +160,16 @@ Services are data providers. They do not have to call REST-interfaces. They migh
 \subsection{Component interaction}
 Usually, components will interact with each other by using a service, especially then when some shared data is held by that service (like state, a database or simmilar). Sometimes however, it makes sense to let components access each other more directly, especially when we're dealing with a parent-child relationship.
 
-\subsubsection{Subcomponents}
+\subsubsection{Subcomponents obtaining data from parent-template through Input}
 Subcomponents can obtain the values of their properties from supercomponents. 
 
 A component-class can have properties annotated with \inlinecode{@Input}. That means that the value of this property will be given through the components html-tag. 
 For example, the component \inlinecode{Heroes} might have this tag in its template:
 
 \begin{lstlisting}[language=html]
-    <app-hero-detail [hero]="chosenHero"></app-hero-detail>
+    <li *ngFor="let chosenHero of heroes"> 
+        <app-hero-detail [hero]="chosenHero"></app-hero-detail>
+    <li>
 \end{lstlisting}
 
 This \inlinecode{chosenHero} would be bound to the \inlinecode{hero} property in the \inlinecode{HeroDetail} component.
@@ -139,13 +185,151 @@ export class HeroDetailComponent implements OnInit {
 }
 \end{lstlisting}
 
-\subsubsection{Supercomponents}
+\subsubsection{Child notifying parent through EventEmitter}
+Children may annotate some properties with \inlinecode{@Output}.
+\begin{lstlisting}[language=java]
+@Component({
+    selector: 'app-voter',
+    template: `
+        <h4>{{name}}</h4>
+        <button (click)="vote(true)"  [disabled]="didVote">Agree</button>
+        <button (click)="vote(false)" [disabled]="didVote">Disagree</button>
+    `
+})
+export class VoterComponent {
+    @Input()  name: string;
+    @Output() voted = new EventEmitter<boolean>();
+    didVote = false;
+    
+    vote(agreed: boolean) {
+        this.voted.emit(agreed);
+        this.didVote = true;
+    }
+}
+\end{lstlisting}
+
+With the \inlinecode{@Output} annotation, a new input-binding is available for the parents template: \inlinecode{(voted)}.
+\begin{lstlisting}[language=java]
+@Component({
+    selector: 'app-vote-taker',
+    template: `
+        <h2>Should mankind colonize the Universe?</h2>
+        <h3>Agree: {{agreed}}, Disagree: {{disagreed}}</h3>
+        <app-voter *ngFor="let voter of voters"
+        [name]="voter"
+        (voted)="onVoted($event)">
+        </app-voter>
+    `
+})
+export class VoteTakerComponent {
+    agreed = 0;
+    disagreed = 0;
+    voters = ['Mr. IQ', 'Ms. Universe', 'Bombasto'];
+    
+    onVoted(agreed: boolean) {
+        agreed ? this.agreed++ : this.disagreed++;
+    }
+}
+\end{lstlisting}
+
+
+\subsubsection{Supercomponents calling child-methods directly through ViewChild}
 On the other hand, sometimes a component needs access to it's children. A component can access its child-components with the \inlinecode{@ViewChildren} property-annotation.
-
-
+\begin{lstlisting}[language=java]
+import { CountdownTimerComponent }  from './countdown-timer.component';
+ 
+@Component({
+  selector: 'app-countdown-parent-vc',
+  template: `
+  <h3>Countdown to Liftoff (via ViewChild)</h3>
+  <button (click)="start()">Start</button>
+  <button (click)="stop()">Stop</button>
+  <div class="seconds">{{ seconds() }}</div>
+  <app-countdown-timer></app-countdown-timer>
+  `,
+  styleUrls: ['../assets/demo.css']
+})
+export class CountdownViewChildParentComponent implements AfterViewInit {
+ 
+  @ViewChild(CountdownTimerComponent)
+  private timerComponent: CountdownTimerComponent;
+ 
+  seconds() { return 0; }
+ 
+  ngAfterViewInit() {
+    // Redefine `seconds()` to get from the `CountdownTimerComponent.seconds` ...
+    // but wait a tick first to avoid one-time devMode
+    // unidirectional-data-flow-violation error
+    setTimeout(() => this.seconds = () => this.timerComponent.seconds, 0);
+  }
+ 
+  start() { this.timerComponent.start(); }
+  stop() { this.timerComponent.stop(); }
+}
+\end{lstlisting}
 
 \subsection{Forms}
 Forms are a difficult subject in any framework or library. Angular offers to approaches to handling forms, template-driven (simple) or reactive (larger).
+
+\subsubsection{Template driven forms}
+These require little code, but they have a rather cluncky syntax.
+
+\subsubsection{Reactive (f.k.a. model-driven) forms}
+
+\begin{lstlisting}[language=html]
+<form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+    <label>
+        First Name:
+        <input type="text" formControlName="firstName">
+      </label>
+      <label>
+          Last Name:
+          <input type="text" formControlName="lastName">
+      </label>
+      <button type="submit" [disabled]="!profileForm.valid">Submit</button>
+</form>
+\end{lstlisting}
+\begin{lstlisting}[language=java]
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms';
+    
+@Component({
+      selector: 'app-profile-editor',
+      templateUrl: './profile-editor.component.html',
+      styleUrls: ['./profile-editor.component.css']
+})
+export class ProfileEditorComponent implements OnInit {
+    
+      profileForm: FormGroup;
+    
+      constructor() { }
+    
+      ngOnInit() {
+    
+        // An example of a custom validator
+        let nameMustNotBeBobValidator = function (): ValidatorFn {
+          return (control: AbstractControl) => {
+            let isValid =  control.value != "Bob";
+            if(isValid) return null;
+            else return {"MustNotBeBob": "The name must not be Bob!"};
+          };
+        };
+    
+        // the form
+        this.profileForm = new FormGroup({
+          firstName: new FormControl('First name', 
+            [Validators.required, Validators.minLength(4), nameMustNotBeBobValidator ]
+          ),
+          lastName: new FormControl('Last name')
+        });
+      }
+    
+      onSubmit() {
+        console.warn(this.profileForm.value);
+      }
+    
+}
+\end{lstlisting}    
 
 
 
