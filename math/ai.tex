@@ -47,7 +47,7 @@ $$                              = \partDiff{e}{x_{t_0}^l} y_{f_0}^{l-1} $$
 
 Or, in vector form: 
 
-$$ \partDiff{e}{\mtrx{W}^l} = {\partDiff{e}{\vec{x}^l}}^T  {\vec{y}^{l-1}}^T $$ 
+$$ \partDiff{e}{\mtrx{W}^l} = \left( \partDiff{e}{\vec{x}^l} \right)^T  \left( \vec{y}^{l-1} \right)^T $$ 
 
 So we should change the weigths by: 
 
@@ -62,12 +62,12 @@ $$ \partDiff{e}{\vec{y}^L} = (\vec{y}^* - \vec{y}^L)^T := \delta^L $$
 
 Then we go through the highest layer:
 $$ \partDiff{e}{\vec{x}^L} = \delta^L \pointwise f'(\vec{x}^L)  $$
-$$ \partDiff{e}{\mtrx{W}^L} = {\partDiff{e}{\vec{x}^L}}^T {\vec{y}^{L-1}}^T $$
+$$ \partDiff{e}{\mtrx{W}^L} = \left( \partDiff{e}{\vec{x}^L} \right)^T \left( \vec{y}^{L-1} \right)^T $$
 $$ \delta^{L-1} = \partDiff{e}{\vec{x}^L} \mtrx{W}^L $$
 
 Then we pass $\delta^{L-1}$ to the next layer. 
 $$ \partDiff{e}{\vec{x}^l} = \delta^l \pointwise f'(\vec{x}^l)  $$
-$$ \partDiff{e}{\mtrx{W}^l} = {\partDiff{e}{\vec{x}^l}}^T {\vec{y}^{l-1}}^T $$
+$$ \partDiff{e}{\mtrx{W}^l} = \left( \partDiff{e}{\vec{x}^l} \right)^T  \left( \vec{y}^{l-1} \right)^T $$
 $$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} \mtrx{W}^l $$
 
 
