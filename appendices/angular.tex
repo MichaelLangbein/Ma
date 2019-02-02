@@ -335,7 +335,7 @@ export class ProfileEditorComponent implements OnInit {
 
 \subsection{Angular for maps}
 Angular's modular design allows us to create a declarative map-API, one where the whole map including markers is defined using html. We let ourselves be inspired by the \inlinecode{@agm} module, which implements google-maps bindings for angular. 
-
+ 
 
 
 
@@ -347,21 +347,89 @@ As a singlethreaded, event-based environment, javascript has a bunch of event-ba
 The "notify-all-subscribers" part is handled by an abstract base class from \inlinecode{RxJS}. To create an observable, you only need to pass in a function that tells the observable how to  get its data.
 
 
+
+There are multiple types of observables: 
+Promise: 
+ - lets you wait for data
+ - however, data is delivered in a single batch - there is no \inlinecode{observer.onCompleted()} method
+observable: 
+ - vs promises: 
+        - observables are like promises, but they can emmit multiple calls to \inlinecode{observer.onNext(data)}, and are cancelable and unsubscribeable.
+ - vs subjects: 
+        - the next method is executed for every subscriber individually as soon as the subscriber subscribes. 
+        - observable cannot subscribe anywhere
+subject: 
+ - the next method is executed at some point, but not neccessarily when a subscriber subscribes. all subscribers receive the same data. 
+ - subjects implement both Obeservable and Observer interface, so they can also subscribe to other Observables if they want to. 
+ - \inlinecode{next} is called from outside the subject, instead of from inside like it is the case with observables. This makes that basically anyone can trigger a broadcast. 
+behaviour subjects: 
+ - are subjects that have an initial state. 
+
+
+Subjects are like radio stations: you can tune in at any time, but from that moment on everybody gets the same data.
 \begin{lstlisting}[language=java]
-let observable = Rx.Observable.create((observer) => {
-    for (var i = 0; i<10; i++) {
-        let data = someRestRequest("myservice.com/data/" + i);
-        observer.onNext(data);
-    }
-    observer.onFinished();
-});
-    
-let observer = {
-    onNext: (nextVal) => console.log(nextVal),
+
+let radio = new Subject();
+
+let listener1 = {
+    onNext: (nextVal) => console.log("listener1 is hearing: " + nextVal),
     onCompleted: () => console.log("completed"),
     onError: (error) => console.log(error)
 };
+let session1 = radio.subscribe(listener1);
 
-observable.subscribe(observer);
+radio.next('Hello! Youre listening to ...');
+// sleep
+
+let listener2 = {
+    onNext: (nextVal) => console.log("listener2 is hearing: " + nextVal);
+}
+let session2 = radio.subscribe(listener2);
+
+radio.next('... RxJs radio!');
+// sleep
+
+session1.unsubscribe();
+session2.unsubscribe();
+
 \end{lstlisting}
 
+Obeservables are like signing a rent-contract: depending on at what time you sign, your rent may be higher. 
+\begin{lstlisting}[language=java]
+
+let landlord = Rx.Observable.create((tenant) => {
+    while(true) {
+        let currentRent = Math.random();
+        tenant.onNext(currentRent);
+        // sleep
+    }
+});
+
+
+let observer1 = {
+    onNext: (nextVal) => console.log(nextVal),
+    onCompleted: () => console.log("completed"),
+    onError: (error) => console.log(error)
+}
+
+let observer2 = {
+    onNext: (nextVal) => console.log("blub!");
+}
+
+let contract1 = landlord.subscribe(tenant1);
+// sleep
+let contract2 = landlord.subscribe(tenant2);
+// sleep
+
+contract1.unsubscribe();
+// sleep
+contract2.unsubscribe();
+
+\end{lstlisting}
+
+These subtle differences yield different use-cases: 
+\begin{itemize}
+    \item To implement a clock, you want to use an observable, that sends you the current time and then an update every n milliseconds. 
+    \item To implement a game-loop, you want to use a subject, that sends the call to do \inlinecode{onUpdate} to all observers at the same time. 
+    \item To implement a chat-app you want to have a chat-app, where everyone can trigger a \inlinecode{next} when they hit enter. 
+\end{itemize}
