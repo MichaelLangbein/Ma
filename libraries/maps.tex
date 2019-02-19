@@ -73,85 +73,37 @@ A popular choice for serverside software is MapServer (C, CGI and PHP) or GeoSer
         \begin{itemize}
             \item 
         \end{itemize}
+
+    \item WPS
 \end{itemize}
 
 Usually, service providers expose \emph{multiple} urls for you to query, so that you can fetch images from several servers in parallel. 
 
+\subsubsection{Geoserver}
+
+Geoserver is a type of CMS for geodata. It is built with spring as its backend. 
+You can create plugins that implement a certain type of OWS (WMS, WFS, WPS, or something completely custom) by building a jar that has geoserver as its maven-parent and then dropping the built jar into the geoserver-home-directory.
+
+
+
 \subsection{Client}
-A popular javascript mapping library is openlayers. amongst other things, it facilitates the usage of wms and wmts. Note that openlayers has \emph{two} types of clients for wms: \inlinecode{ImageWms} and \inlinecode{TiledWMS}.
 
-\begin{lstlisting}
-require('ol/ol.css');
-var Proj         = require('ol/proj').default;
-var Extent       = require('ol/extent').default;
-var Map          = require('ol/map').default;
-var ImageLayer   = require('ol/layer/image').default;
-var TileLayer    = require('ol/layer/tile').default;
-var ImageWms     = require('ol/source/imagewms').default;
-var Wmts         = require('ol/source/wmts').default;
-var WmtsTileGrid = require('ol/tilegrid/wmts').default;
-var View         = require('ol/view').default;
+A popular javascript mapping library is openlayers. 
 
-
-
-var projection = Proj.get('EPSG:3857');
-var projectionExtent = projection.getExtent();
+\begin{itemize}
+    \item source: the ogc-protocol for how to \emph{obtain} the data
+        \begin{itemize}
+            \item \inlinecode{TileWMS}
+            \item \inlinecode{WMTS}
+            \item \inlinecode{XYZ}
+        \end{itemize}
+    \item layer: the ol-graphics for how to \emph{display} the data
+        \begin{itemize}
+            \item \inlinecode{TileLayer}
+            \item \inlinecode{VectorLayer}
+        \end{itemize}
+\end{itemize}
 
 
-// Step 1: including a WMS
-
-var wmsLayer = new ImageLayer({
-    extent: projectionExtent,
-    source: new ImageWms({
-        url: "https://ahocevar.com/geoserver/wms",
-        params: {"LAYERS": "topp:states"}
-    }),
-});
 
 
-// Step 2: including a WMTS
-
-var size = Extent.getWidth(projectionExtent) / 256;
-var resolutions = new Array(14);
-var matrixIds = new Array(14);
-for (var z = 0; z < 14; ++z) {
-    resolutions[z] = size / Math.pow(2, z);
-    matrixIds[z] = z;
-}
-
-var wmtsLayer = new TileLayer({
-    source: new Wmts({
-        url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
-        layer: '0',
-        matrixSet: 'EPSG:3857',
-        style:'default',
-        tileGrid: new WmtsTileGrid({
-            origin: Extent.getTopLeft(projectionExtent),
-            resolutions: resolutions,
-            matrixIds: matrixIds
-        })
-    })
-});
-
-
-// Step 3: display
-
-var layers = [
-    wmsLayer,
-    wmtsLayer
-];
-
-
-var view = new View({
-    center: [0, 0],
-    zoom: 0
-});
-
-
-var map = new Map({
-  target: 'map',
-  layers: layers,
-  view: view
-});
-
-\end{lstlisting}
