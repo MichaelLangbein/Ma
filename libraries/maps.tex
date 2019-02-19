@@ -4,7 +4,6 @@ A lot of this information comes from here: \href{http://cite.opengeospatial.org/
 The map-stack is certainly one of the most demanding stacks of technology that is in widespread use today, and clearly a field where a developer can sharpen his profile.
 
 \subsection{Available software} 
-
 There are so many non-orthogonal tools out there that an overview can't do harm.
 
 \begin{itemize}
@@ -41,11 +40,10 @@ There are so many non-orthogonal tools out there that an overview can't do harm.
 
 
 
-\subsection{Server}
-A popular choice for serverside software is MapServer (C, CGI and PHP) or GeoServer (Java). Servers locally create GeoTiff files: high resolution images that are geo-referenced. They are then converted to png's and exposed via a HTTP-based API. We need to know about two important implementations. Both of them can be called via SOAP or REST-Parameters (KVP, for key-value-pairs, in geo-lingo). We'll only describe the GET-Parameters here. 
-
+\subsection{Types of services}
+Servers expose a number of services, commonly referred to as OWS. They are called via SOAP or REST-Parameters (KVP, for key-value-pairs, in geo-lingo). We'll only describe the GET-Parameters here. Here is an overview:
 \begin{itemize}
-    \item WMS: delivers custom made images for a given map-square. 
+    \item WMS: delivers custom made images for a given map-square. Servers locally create GeoTiff files: high resolution images that are geo-referenced. They are then converted to png's and exposed via a HTTP-based API.
     \begin{itemize}
         \item Version 1.1.1
             \begin{itemize}
@@ -79,14 +77,19 @@ A popular choice for serverside software is MapServer (C, CGI and PHP) or GeoSer
 
 Usually, service providers expose \emph{multiple} urls for you to query, so that you can fetch images from several servers in parallel. 
 
-\subsubsection{Geoserver}
 
-Geoserver is a type of CMS for geodata. It is built with spring as its backend. 
+\subsection{Server: Geoserver}
+A popular choice for serverside software is MapServer (C, CGI and PHP) or GeoServer (Java). Geoserver is a kind of CMS for geodata. It is built with spring as its backend. 
+
+\subsection{Configuring standard OWS}
+...
+
+\subsubsection{Creating custom OWS}
 You can create plugins that implement a certain type of OWS (WMS, WFS, WPS, or something completely custom) by building a jar that has geoserver as its maven-parent and then dropping the built jar into the geoserver-home-directory.
 
 
 
-\subsection{Client}
+\subsection{Client: OpenLayers}
 
 A popular javascript mapping library is openlayers. 
 
