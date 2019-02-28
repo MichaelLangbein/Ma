@@ -332,6 +332,13 @@ export class ProfileEditorComponent implements OnInit {
 \end{lstlisting}    
 
 
+\subsection{External libraries}
+\begin{itemize}
+  \item Installing library by running: \inlinecode{npm install --save hashwords}
+  \item Importing it to the angular.json: \inlinecode{"scripts": ["../node_modules/hashwords/dist/hashwords.min.js"]}. By this action, we made it available on the window object.
+  \item Now, we can register it in the providers property of theNgModule: \inlinecode{providers: [\{ provide: 'Hashwords', useValue: window['hashwords']() \}]}
+  \item Now we can inject the library in any constructor: \inlinecode{constructor( @Inject('Hashwords') public hashwords: any) \{}
+\end{itemize}
 
 \subsection{Angular for maps}
 Angular's modular design allows us to create a declarative map-API, one where the whole map including markers is defined using html. We let ourselves be inspired by the \inlinecode{@agm} module, which implements google-maps bindings for angular. 

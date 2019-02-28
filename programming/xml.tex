@@ -1,0 +1,64 @@
+\section{xml}
+
+XML is the de-facto standard language for specifying capabilites, interfaces etc.
+
+\subsection{Structure}
+XML consist of elements with attributes.
+
+\subsection{Namespaces: xmlns}
+Because the naming of xml-elements and attributes can lead to conflicts, they are usually prefixed with a namespace. 
+
+\subsection{Schema definitions: xsd}
+With xsd we can consult an online-resource to make sure a given xml-file conforms to a specification.
+
+\paragraph{Xsd's description of elements (aka. element type)} is used to describe what elements look like. 
+Xsd defines simple and complex types. 
+\begin{itemize}
+    \item \inlinecode{<simpleType>} simple types can only have content directly contained between the element’s opening and closing tags. They cannot have attributes or child elements.
+    \item \inlinecode{<complexType>} complex types can have attributes, can contain other elements, can contain a mixture of elements and text, etc etc.
+\end{itemize}
+Xsd also has its own, custom elements that are used to describe certain requirements.
+\begin{itemize}
+    \item \inlinecode{restriction} restricts an elements' content to a certain type (string, numeric, ...)
+    \item \inlinecode{sequence}
+\end{itemize} 
+
+Here is an example from a simple xsd: 
+\begin{lstlisting}[language=XML]
+<element name="email">
+    <simpleType>
+      <restriction base="xsd:string" />
+    </simpleType>
+  </element>
+  
+  <element name="getPreferences">
+    <complexType>
+      <sequence>
+        <element name="email" type="email" />
+      </sequence>
+    </complexType>
+  </element>
+\end{lstlisting}
+
+\paragraph{Xsd's description of element's contents (aka. content type)} is used to describe what is expected to be inside an elements brackets. 
+\begin{itemize}
+    \item A simple type’s content can be one of:
+        \begin{itemize}
+            \item atomic types, which have indivisible values, such as \#000 and \#AACCDD
+            \item list types, which have whitespace-separated lists of indivisible values, such as blue green red
+            \item union types, which have either atomic or list values, but they can be the union of other types, such as blue \#000 red for a set of colors
+        \end{itemize}
+    \item Complex types have a “content model,” which refers to how the content (the data between the element’s opening and closing tags) is arranged:
+        \begin{itemize}
+            \item simple content is only character data, no child elements allowed
+            \item element-only content is only children, no data allowed
+            \item mixed content means character data and child elements can be intermingled
+            \item empty content means the element is empty (<foo/>) and either conveys information by just existing, or has attributes but no content.
+        \end{itemize}
+\end{itemize}
+
+Just to clarify: elements have an \emph{element type}, and their content has a \emph{content type}. By the way, attributes can only have simple types, because they cannot themselves have attributes or children.
+
+\subsection{Marhsalling}
+\paragraph{XML to Pojo}: JAXB
+\paragraph{XML to JSON}: Jsonix

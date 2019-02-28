@@ -93,23 +93,7 @@ r2d2.fight();
 \end{lstlisting}
 
 
-\subsection{Module Pattern}
-A module is created with a self-executing closure: 
 
-\begin{lstlisting}
-// buz.js
-var buz = (function ($) {
-    var buz;
-    
-    buz.sayHi = function () {
-        console.log("hi!");
-    };
-    
-    return buz;
-} ($));
-\end{lstlisting}
-
-Ultimately, this can be a little hard to read. There are tools like browserify, however, that let you write your sourcecode locally like you would in node, and then bundle all your requires together into one single script. 
 
 
 \subsection{Binding this}
@@ -130,6 +114,31 @@ printThis();  // window
 printThisBound(); // me
 \end{lstlisting}
 
+
+\subsection{Var, let and const}
+\begin{itemize}
+    \item use \inlinecode{var} for a variable scoped inside this function. 
+    \item use \inlinecode{let} for a variable scoped inside this curly braces (this often a smaller scope than this function. Consider for example for-loops. Var will still exist after a for-loop, while let only exists inside it.) 
+    \item use \inlinecode{const} for a constant, that is, a variable that gets a value once and cannot  thereafter be reassigned. (Works as expected when using primitives. But notice that in \inlinecode{const dog = {age:3};} we can still change the age-property.)
+\end{itemize}
+
+
+\subsection{Events versus Promises}
+Javascript doesn't do multithreading, but it does do asynchronous execution. Both events and promises are a tool that is meant to help you deal with asynchronous code. 
+
+Events are great for things that can happen multiple times on the same object—keyup, touchstart etc. Here is an example of how we would use events: 
+\begin{lstlisting}
+var img1 = document.querySelector('.img-1');
+
+img1.addEventListener('load', function() {
+  // woo yey image loaded
+});
+
+img1.addEventListener('error', function() {
+  // argh everything's broken
+});
+
+\end{lstlisting}
 
 
 \subsection{Node and NPM}
@@ -229,29 +238,65 @@ Your code will be automatically updated with \inlinecode{npm run devel}. It will
 
 
 
+\subsection{Module Pattern}
+A module is created with a self-executing closure: 
 
-\subsection{Var, let and const}
-\begin{itemize}
-    \item use \inlinecode{var} for a variable scoped inside this function. 
-    \item use \inlinecode{let} for a variable scoped inside this curly braces (this often a smaller scope than this function. Consider for example for-loops. Var will still exist after a for-loop, while let only exists inside it.) 
-    \item use \inlinecode{const} for a constant, that is, a variable that gets a value once and cannot  thereafter be reassigned. (Works as expected when using primitives. But notice that in \inlinecode{const dog = {age:3};} we can still change the age-property.)
-\end{itemize}
-
-
-\subsection{Events versus Promises}
-Javascript doesn't do multithreading, but it does do asynchronous execution. Both events and promises are a tool that is meant to help you deal with asynchronous code. 
-
-Events are great for things that can happen multiple times on the same object—keyup, touchstart etc. Here is an example of how we would use events: 
 \begin{lstlisting}
-var img1 = document.querySelector('.img-1');
-
-img1.addEventListener('load', function() {
-  // woo yey image loaded
-});
-
-img1.addEventListener('error', function() {
-  // argh everything's broken
-});
-
+// buz.js
+var buz = (function ($) {
+    var buz;
+    
+    buz.sayHi = function () {
+        console.log("hi!");
+    };
+    
+    return buz;
+} ($));
 \end{lstlisting}
 
+Ultimately, this can be a little hard to read. There are tools like browserify, however, that let you write your sourcecode locally like you would in node, and then bundle all your requires together into one single script. 
+
+
+\subsection{Module systems}
+
+\subsubsection{Commonjs}
+\begin{itemize}
+  \item Implemented by node, used for server-side modules. 
+  \item Imports a copy of the module-object, \emph{not} a reference to it.
+  \item import: \inlinecode{var mymod = require('./mymod');}
+  \item export: \inlinecode{module.exports = \{mymod\}}
+\end{itemize}
+
+\subsubsection{amd: Async module definition}
+\begin{itemize}
+  \item Implemented by requirejs.
+  \item Used in frontend when we need to dynamically load modules. 
+  \item export: \inlinecode{ define(["mymod"], function () \{ return mymod; \});  }
+  \item import: \inlinecode{ require(["mymod"], function(m) \{ ... using m ... \}); }
+\end{itemize}
+
+\subsubsection{umd: Universal module definition}
+\begin{itemize}
+  \item Combination of CommonJs + AMD (that is, Syntax of CommonJs + async loading of AMD). Works in frontend and backend.
+\end{itemize}
+
+\subsubsection{ES6 harmony}
+\begin{itemize}
+  \item Both backend and frontend
+  \item Imports a reference to the imported object(s), \emph{not} a copy of them.
+  \item Tree-shakeable
+  \item export: \inlinecode{export mymod;}
+  \item import: \inlinecode{import mymod from './mymod';}
+\end{itemize}
+
+\subsubsection{Serving them all}
+When you create a module, you want to serve both umd and harmony.
+
+\subsubsection{Bundling}
+
+\paragraph{Webpack} for bundling apps
+
+\paragraph{RollupJs} for libraries
+
+
+\subsection{Typescript}
