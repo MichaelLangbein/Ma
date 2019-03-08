@@ -1,6 +1,6 @@
 \section{Javascript}
 
-
+Javascript has evolved a \emph{lot} in a short time, due to the imense preasure from the largest programming community in the world. As a consequence, it is now in many ways more complex than c++.
 
 \subsection{Prototype inheritance}
 
@@ -300,3 +300,91 @@ When you create a module, you want to serve both umd and harmony.
 
 
 \subsection{Typescript}
+Usage example of Typescript with rollup: 
+
+\begin{lstlisting}[language=java, caption=package.json]
+  {
+    "name": "tsrollup",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",  // commonjs module entry point
+    "module": "dist/index.es.js", // es6 module entry point
+    "files": ["dist"], // what gets installed inside a user's node_modules when they install your module
+    "types": "dist/index.d.ts", // TypeScript declaration file
+    "scripts": {
+      "build": "rollup -c",
+      "watch": "rollup -cw"
+    },
+    "author": "michael",
+    "license": "ISC",
+    "devDependencies": {
+      "rollup": "^1.4.1",
+      "rollup-plugin-typescript2": "^0.19.3",
+      "typescript": "^3.3.3333"
+    }
+  }
+\end{lstlisting}
+
+\begin{lstlisting}[language=java, caption=tsconfig.json]
+  {
+    "compilerOptions": {
+        "declaration": true, // automatically generates a *.d.ts file
+        "declarationDir": "./dist",
+        "outDir": "./dist", 
+        "module": "es6", // use the import/export module-syntax (aka. harmony, as opposed to amd or commonjs)
+        "target": "es5", // compile to vanilla es5-js.
+        "noImplicitAny": true // strict typing
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
+  }
+\end{lstlisting}
+
+\begin{lstlisting}[language=java, caption=rollup.config.js]
+import typescript from 'rollup-plugin-typescript2';
+import pkg from './package.json';
+
+export default {
+    input: "src/index.ts", // where to look for code to bundle
+    output: [{
+            file: pkg.main,
+            format: "cjs" // creating a commonjs module
+        }, {
+            file: pkg.module,
+            format: "es" // creating a ES6 module
+        }],
+    external: [                                  // what to exclude from packaging
+            ...Object.keys(pkg.dependencies || {}), // will be installed by npm
+            ...Object.keys(pkg.peerDependencies || {}), // peers are expected to be installed by user
+        ],
+    plugins: [
+        typescript({
+          typescript: require('typescript'),
+        }),
+      ]
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=java, caption=src/index.ts]
+  export const greet = () => console.log("Module created!")
+\end{lstlisting}
+
+Now run: 
+\begin{lstlisting}[language=bash]
+  npm run build
+\end{lstlisting}
+
+To create a dev-server, expand your \inlinecode{rollup.config.js} like this: 
+\begin{lstlisting}[language=java]
+import serve from 'rollup-plugin-serve'
+import livereload from 'rollup-plugin-livereload'
+ 
+export default {
+  entry: 'entry.js',
+  dest: 'bundle.js',
+  plugins: [
+    serve(),      // index.html should be in root of project
+    livereload()
+  ]
+}
+\end{lstlisting}
