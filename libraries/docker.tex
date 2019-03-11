@@ -1,0 +1,84 @@
+\section{Docker}
+
+\subsection{Containers}
+
+\begin{itemize}
+    \item an \emph{image} is an executable package that includes everything needed to run an application--the code, a runtime, libraries, environment variables, and configuration files.
+    \item a \emph{container} is a runtime instance of an image--what the image becomes in memory when executed (that is, an image with state, or a user process).
+\end{itemize}
+
+
+Containers and virtual machines.
+\begin{itemize}
+    \item A container runs natively on Linux and shares the kernel of the host machine with other containers. It runs a discrete process, taking no more memory than any other executable, making it lightweight.
+    \item By contrast, a virtual machine (VM) runs a full-blown “guest” operating system with virtual access to host resources through a hypervisor. In general, VMs provide an environment with more resources than most applications need.
+\end{itemize}
+
+Images are described by \emph{Dockerfiles} that list all the contents of an image. These image files can be downloaded from a central repository called \emph{docker hub}.
+Usually, you write your own dockerfile that specifies as a dependency a more general dockerfile as your base. 
+
+\begin{lstlisting}[language=bash]
+# Use an official Python runtime as a parent image
+FROM python:2.7-slim
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Define environment variable
+ENV NAME World
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]
+\end{lstlisting}
+
+You then write your app. 
+\begin{lstlisting}[caption=requirements.txt]
+Flask
+Redis
+\end{lstlisting}
+
+\begin{lstlisting}[language=python, caption=main.py]
+    from flask import Flask
+    from redis import Redis, RedisError
+    import os
+    import socket
+    
+    # Connect to Redis
+    redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
+    
+    app = Flask(__name__)
+    
+    @app.route("/")
+    def hello():
+        try:
+            visits = redis.incr("counter")
+        except RedisError:
+            visits = "<i>cannot connect to Redis, counter disabled</i>"
+    
+        html = "<h3>Hello {name}!</h3>" \
+               "<b>Hostname:</b> {hostname}<br/>" \
+               "<b>Visits:</b> {visits}"
+        return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname(), visits=visits)
+    
+    if __name__ == "__main__":
+        app.run(host='0.0.0.0', port=80)
+\end{lstlisting}
+Then you package your app and send it to \inlinecode{/var/lib/docker/images} by calling \inlinecode{sudo docker build --tag=<nameofyourappalllowercase> .}
+Then you execute that package by calling \inlinecode{sudo docker run <nameofyourappalllowercase -p 4000:80} (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000})
+
+
+\subsubsection{Services}
+
+\subsubsection{Stacks}
+
+\subsubsection{Deployment}
+
