@@ -340,6 +340,17 @@ export class ProfileEditorComponent implements OnInit {
   \item Now we can inject the library in any constructor: \inlinecode{constructor( @Inject('Hashwords') public hashwords: any) \{}
 \end{itemize}
 
+\subsection{Libraries}
+At some point, you will want to outsource your module(s) into a library.
+\begin{lstlisting}
+    ng generate library game-utils --prefix=gu
+\end{lstlisting}
+This creates a \inlinecode{projects} folder.
+\begin{lstlisting}
+    ng build game-utils
+\end{lstlisting}
+This builds the library into a npm-package situated in a new \inlinecode{dist} folder.
+
 \subsection{Angular for maps}
 Angular's modular design allows us to create a declarative map-API, one where the whole map including markers is defined using html. We let ourselves be inspired by the \inlinecode{@agm} module, which implements google-maps bindings for angular. 
  
