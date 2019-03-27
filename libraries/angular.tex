@@ -268,6 +268,39 @@ export class CountdownViewChildParentComponent implements AfterViewInit {
 }
 \end{lstlisting}
 
+
+\subsubsection{Childcomponents don't need to know that their @Input is passed in asynchronously}
+
+\begin{lstlisting}[language=java, caption=Parent]
+  @Component({
+    selector: 'app-parent',
+    template: `
+      This is the parent compoent. 
+      <app-child [val]="value | async"></app-child>
+    `
+  })
+  export class ParentComponent implements OnInit {
+    value: Subject<number> = new Subject<number>();
+    ngOnInit() {
+      window.setInterval(() => this.value.next( Math.random() ), 1000);
+    }
+  }
+\end{lstlisting}
+
+\begin{lstlisting}[language=java, caption=Child]
+  @Component({
+    selector: 'app-child',
+    template: `
+      <p>
+      This is the child-component. Current value: {{val}}.
+    </p>
+    `
+  })
+  export class ChildComponent implements OnInit { 
+    @Input() val: number
+  }
+\end{lstlisting}
+
 \subsection{Forms}
 Forms are a difficult subject in any framework or library. Angular offers to approaches to handling forms, template-driven (simple) or reactive (larger).
 

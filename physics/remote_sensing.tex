@@ -55,6 +55,7 @@ with rasterio.open("example.tif") as dataset:
 
 \paragraph{Wgs84 aka. Epsg4326} is a global spherical (aka non-projected, using lat/lon) CRS and the stuff that comes from GPS-satellites. GeoJson should by now only  use Wgs84 in its data (it used to be allowed to add a field named "crs"). 
 \paragraph{UTM aka. Epsg20**} is a projected CRS using a  two-dimensional cartesian grid in meters. Projections needs to be done on individual areas, which is why there several Epsg-codes for this projection.
+\paragraph{Web Merkator aka. EPSG:900913 aka. Epsg3857} is the google projection and a variant of UTM.
 
 \subsection{NDVI}
 The normalized difference vegetation index (NDVI) is used to assess the state of vegetation. In living plants chlorophyll-A, from the photosynthetic machinery, strongly absorbs red color; on the other hand, near-infrared light is strongly reflected. Live, healthy vegetation reflects around 8% of red light and 50% of near-infrared light. Dead, unhealthy, or sparse vegetation reflects approximately 30% of red light and 40% of near-infrared light.
