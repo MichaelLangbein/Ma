@@ -369,3 +369,13 @@ Up to now we have used the points $0, 1, 2, 3$ for our evaluation. However, ther
 
 In general, the $k$th root of 1 is $e^{2 \pi i \frac{k}{n} }$. So let's do the evaluation at $(1^{1/4})_1, (1^{1/4})_2, (1^{1/4})_3, (1^{1/4})_4 = 1, i, -1, -i$.
 
+
+
+\subsection{Stream algorithms}
+Stream algorithms handle the case where a function is not applied once for a single input, but continuously on a neverending stream of inputs. This creates some constraints: 
+\begin{itemize}
+  \item The algorithm must not take longer than the feed-rate of the stream
+  \item The algorithm must use only a constant ammount of storage (because otherwise at some point the disc will be full)
+\end{itemize}
+\href{https://www.americanscientist.org/article/the-britney-spears-problem}{Here} is a good introduction to the toppic. 
+Sidenote: a popular software to provide a stream to (multiple) subscriber(s) would be \href{https://kafka.apache.org/}{Apache kafka}.

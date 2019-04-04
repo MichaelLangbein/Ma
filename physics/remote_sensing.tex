@@ -8,6 +8,20 @@
 
 \subsection{Important satellites and service providers}
 
+\begin{table}[]
+    \begin{tabular}{@{}llll@{}}
+    \toprule
+    Satellite  & Bands & Data available at & Description \\ \midrule
+    Landsat    &       &                   &             \\
+    Modis      &       &                   &             \\
+    Copernicus &       &                   &             \\
+    Sentinel   &       &                   &             \\
+    TerraSarX  &       &                   &             \\
+    RapidEye   &       &                   &             \\
+    Ikonos     &       &                   &             \\ \bottomrule
+    \end{tabular}
+\end{table}
+
 \paragraph{Landsat} program is the longest-running enterprise for acquisition of satellite imagery of Earth. On July 23, 1972 the Earth Resources Technology Satellite was launched. This was eventually renamed to Landsat.[1] The most recent, Landsat 8, was launched on February 11, 2013. The instruments on the Landsat satellites have acquired millions of images. The images, archived in the United States and at Landsat receiving stations around the world, are a unique resource for global change research and applications in agriculture, cartography, geology, forestry, regional planning, surveillance and education, and can be viewed through the U.S. Geological Survey (USGS) 'EarthExplorer' website. Landsat 7 data has eight spectral bands with spatial resolutions ranging from 15 to 60 meters; the temporal resolution is 16 days.[2] Landsat images are usually divided into scenes for easy downloading. Each Landsat scene is about 115 miles long and 115 miles wide (or 100 nautical miles long and 100 nautical miles wide, or 185 kilometers long and 185 kilometers wide).
 
 \paragraph{Modis} ...
@@ -50,6 +64,8 @@ with rasterio.open("example.tif") as dataset:
     print(dataset.transform * (dataset.width, dataset.height))
 \end{lstlisting}
 
+\paragraph{GeoPackage} (GPKG) is an open, non-proprietary, platform-independent and standards-based data format for geographic information system implemented as a SQLite database container. Defined by the Open Geospatial Consortium (OGC)[1] with the backing of the US military[2] and published in 2014, GeoPackage has seen wide widespread support from various government, commercial, and open source organizations[3].
+
 
 \subsection{Projections}
 
@@ -81,7 +97,7 @@ Calculation of the NDVI is sensitive to to a few factors:
 Image registration is the process of transforming different sets of data into one coordinate system.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{images/imageRegistration.png}
-    \caption{Registering and summing multiple exposures of the same scene improve signal to noise ratio, allowing one to see things previously impossible to see. In this picture, the distant Alps are made visible, although they are tens of kilometers into the haze.}
-  \end{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{images/imageRegistration.png}
+\caption{Registering and summing multiple exposures of the same scene improve signal to noise ratio, allowing one to see things previously impossible to see. In this picture, the distant Alps are made visible, although they are tens of kilometers into the haze.}
+\end{figure}
