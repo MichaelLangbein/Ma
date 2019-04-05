@@ -104,6 +104,10 @@ Notice that this is a matrix operation.
     
     $$ A (\vec{a} + \vec{b}) = A \vec{a} + A \vec{b} $$
     
+    Remember that a matrix-multiplication is always a change of basis: the vector $\vec{v}_I$ (as displayed in the euclidian system $\mtrx{I}$) can also be expressed relative to the Fourier-base $\mtrx{F}$ as $\vec{v}_F$. 
+    $$ \mtrx{F}^{-1} \vec{v}_I = \vec{v}_F $$
+    where (according to \ref{changeOfBasis}): 
+    $$ \mtrx{F}^{-1} = \begin{bmatrix} \vec{x}_F & \vec{y}_F & \vec{z}_F \end{bmatrix} $$
     
 \end{proof}
 

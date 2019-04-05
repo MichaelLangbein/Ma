@@ -1,8 +1,9 @@
-\section{Artificial intelligence}
+\section{Machine learning}
 
-\subsection{Categorisation}
 
-\subsubsection{Neural networks}
+\subsection{Classification}
+
+\subsubsection{Supervised Classification: Neural networks, random forrest}
 
 \paragraph{Backpropagation networks}
 
@@ -145,11 +146,21 @@ $$ \partDiff{e}{\vec{x}^l} = \partDiff{e}{\vec{y}^l} \partDiff{\vec{y}^l}{\vec{x
 $$ \partDiff{e}{\vec{w}^l} = 0 $$
 $$ \delta^{l-1} = \frac{1}{4} \partDiff{e}{\vec{x}^l}  $$
 
+
+
+\subsubsection{Unsupervised Classification: Clustering}
+
+
 \subsection{Computer vision}
 
 \paragraph{Feature detection and pose estimation}
 
 Say you want to locate the position of the nose in a portrait. 
+
+
+
+\subsection{Feature extraction and dimensionality reduction}
+The art of preprocessing input has developed in a branch of machine learning itself. Classifiers like SVM's and nnets work better when they get cleaned up and encoded input instead of raw data. 
 
 
 
