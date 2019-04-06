@@ -18,6 +18,10 @@ We'll begin with the discrete case. For one, this case is the basis of the FFT. 
 
 We'll use the base $B = \{ \vec{w}_N^n | n \in [0, N-1]\}$. Here, $\vec{w}_N^n$ is the vector we get by evaluating $e^{i 2\pi \frac{n}{N} k}$ at the points $k=0, k=1, ..., k=N-1$. Thus if we call $w_N = e^{i 2 \pi \frac{1}{N}}$, then the vector $\vec{w}_N^n$ consists of the elements $w_N^{nk}$. Throughout this chapter, $k$ will be the index of time/the signalvector and $n$ will be the index of frequency/the basevectors.
 
+In the case of $N = 4$ we obtain the matrix:
+$$ \left[\begin{matrix}e^{0.25 i \pi} & e^{0.5 i \pi} & e^{0.75 i \pi} & e^{1.0 i \pi}\\e^{0.5 i \pi} & e^{1.0 i \pi} & e^{1.5 i \pi} & e^{2.0 i \pi}\\e^{0.75 i \pi} & e^{1.5 i \pi} & e^{2.25 i \pi} & e^{3.0 i \pi}\\e^{1.0 i \pi} & e^{2.0 i \pi} & e^{3.0 i \pi} & e^{4.0 i \pi}\end{matrix}\right] $$
+Note that fourier bases are symmetric matrices. 
+
 The Fourier-base is a very particular choice: each element of each base-vector turns out to be one of the $N$ complex $N$th roots of one. We could have chosen any base-vectors, but these complex roots will turn out to have a few useful properties that we will exploit to speed up the Fourier transformation. These properties are:
 
 \begin{enumerate}
