@@ -17,8 +17,8 @@ It makes sense to think of a component as a way to view your model, not as direc
     \item html-file:
             \begin{itemize}
                 \item interpolation: curly braces can read a classes properties. \inlinecode{<li>\{\{hero.name | uppercase\}\}</li>}
-                \item input-binding: round braces capture input-events. \inlinecode{(click)="onSelect(hero)"} Captures an input and directs to a method
-                \item value-binding: square braces write to a classes properties. \inlinecode{[hero]="chosenHero"} assigns an object to a property. 
+                \item input-binding: round braces capture input-events. \inlinecode{(click)="onSelect(hero)"} Captures an input and directs to a method. The event has been emitted through \inlinecode{@Output() out: Emitter<number>()}
+                \item value-binding: square braces write to a classes properties. \inlinecode{[hero]="chosenHero"} assigns an object to a property. The input is set through \inlinecode{@Input() prop;}
                 \item two-way-binding: for reading \emph{and} writing properties. \inlinecode{[(ngModel)]="hero.name"}, requires \inlinecode{FormsModule}
                 \item loops: \inlinecode{*ngFor="let hero of heroes"}
                 \item conditionals: \inlinecode{*ngIf="!selected"}
@@ -300,6 +300,29 @@ export class CountdownViewChildParentComponent implements AfterViewInit {
     @Input() val: number
   }
 \end{lstlisting}
+
+
+\subsubsection{Have one component configure another one: two-way-binding}
+\begin{lstlisting}
+
+  <textComp [textSize]="theTextSize">
+  </textComp>
+
+  <integerConfigurer [(confableInt)]="theTextSize">
+  </integerConfigurer>
+
+\end{lstlisting}
+... or ...
+\begin{lstlisting}
+
+  <parentComp>
+    <integerConfigurer [(confableInt)]="theParentsTextSize">
+    </integerConfigurer>
+  </parentComp>
+
+\end{lstlisting}
+
+
 
 \subsection{Forms}
 Forms are a difficult subject in any framework or library. Angular offers to approaches to handling forms, template-driven (simple) or reactive (larger).
