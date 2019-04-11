@@ -1,0 +1,227 @@
+\section{PHP}
+
+Php is like a dynamically typed, scripted clone of java exclusively for webserver use. 
+
+
+\subsection{Absolute and relative paths}
+
+You say your website is in \inlinecode{http://localhost/mywebsite}, and let's say that your image is inside a subfolder named \inlinecode{pictures/}:
+
+\paragraph{Absolute path}
+
+If you use an absolute path, \inlinecode{/} would point to the root of the site, not the root of the document: \inlinecode{localhost} in your case. That's why you need to specify your document's folder in order to access the pictures folder:
+
+\inlinecode{"/mywebsite/pictures/picture.png"}
+And it would be the same as: \inlinecode{"http://localhost/mywebsite/pictures/picture.png"}
+
+\paragraph{Relative path}
+
+A relative path is always relative to the root of the document, so if your html is at the same level of the directory, you'd need to start the path directly with your picture's directory name: \inlinecode{"pictures/picture.png"}
+
+But there are other perks with relative paths:
+
+\emph{dot-slash (./)}: Dot (.) points to the same directory and the slash (/) gives access to it.
+So this: \inlinecode{"pictures/picture.png"}
+Would be the same as this: \inlinecode{"./pictures/picture.png"}
+
+\emph{Double-dot-slash (../)} In this case, a double dot (..) points to the upper directory and likewise, the slash (/) gives you access to it. So if you wanted to access a picture that is on a directory one level above of the current directory your document is, your URL would look like this: \inlinecode{"../picture.png"} 
+
+
+\paragraph{In practice} Let's say you're on directory A, and you want to access directory X.
+
+\begin{lstlisting}
+- root
+   |- a
+      |- A
+   |- b
+   |- x
+      |- X
+\end{lstlisting}
+      
+Your URL would look either:
+
+\emph{Absolute path}: \inlinecode{"/x/X/picture.png"}
+\emph{Relative path}: \inlinecode{"./../x/X/picture.png"}
+
+
+
+
+
+\subsection{XDebug}
+
+\paragraph{The profiler} can be very helpful. Setup: 
+\begin{itemize}
+    \item Make sure xdebug is installed
+    \item append this to your apache-php.ini:
+        \begin{lstlisting}
+        xdebug.profiler_enable=0
+        xdebug.profiler_enable_trigger=1
+        xdebug.profiler_output_dir=/home/hnd/freeForAll/
+        \end{lstlisting}
+    \item append this to the url you want to profile: \inlinecode{&XDEBUG_PROFILE}.
+    \item To render the resulting \inlinecode{cachegrind.out} file: \inlinecode{git clone https://github.com/jokkedk/webgrind}.
+\end{itemize}
+
+Note that the resulting file can be over 500 MB big. 
+
+
+
+
+
+
+\subsection{Apache}
+
+\subsection{Setting up tls}
+\begin{itemize}
+
+    \item Buy Certificate (or create a self-signed one for development). At the end you should end up with a certificate somwhere on your server, like \inlinecode{/home/hnd/tls/server.crt}.
+    
+    \item Configure Apache to resolve https-calls. 
+\end{itemize}
+
+\subsubsection{htaccess}
+
+\subsubsection{IP based and name based resolution}
+
+\paragraph{IP based}: this is for when more than one IP-adress points to your server. Then you can differentiate between different IP-adresses in your apache-configuration: \inlinecode{<VirtualHost 10.112.70.171:80>} and \inlinecode{<VirtualHost 10.112.70.172:80>}.
+
+\paragraph{Name based}: this is for when multiple DNS-records point to the one ip of your server. Then you can differentiate between these records using the \inlinecode{ServerName} pragma: \inlinecode{<VirtualHost *:80> ServerName www.hnd.bybn.de} and \inlinecode{<VirtualHost *:80> ServerName www.gkd.bybn.de}.
+
+\subsection{Modes}
+\subsubsection{mod php}
+\subsubsection{CGI}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Configuration}
+\verb /etc/php5/apache2/php.ini  .
+Additionally, all directives in the \verb php.ini  can be overwritten with 
+\begin{itemize}
+    \item \inlinecode{ini_get(string <directive name>)}: Retrieves current directive setting
+    \item \inlinecode{ini_set(string <directive name>, mixed <setting>)}: Sets a directive
+\end{itemize}
+
+
+\subsubsection{Apache config}
+\paragraph{Global config}
+\paragraph{Vhost config}
+
+\subsubsection{Php config}
+\paragraph{global}
+\paragraph{CLI}
+\paragraph{apache}
+
+
+
+
+\subsection{Logging}
+When coding java, there is a strict, by-default differentiation between your app's output and your error-output. Your app is displayed as is (stdout), your errors in the console (stderr). Since php-apps are usually deployed on a server, you can only acces stdout via a browser and stderr via the servers logs. Php-devs tend to use \inlinecode{echo} calls in their code to display logging information inside the stdout. This is actually very bad practice! Avoid doing this! Good practice is to write logging information to the logs using \inlinecode{error_log("<pre>".print_r($werte,true)."</pre>", 3, "/home/hnd/freeForAll/php_custom_error.log");
+} and keeping the error logs open at all times. 
+Here are the logs you should keep open: 
+\begin{itemize}
+    \item \verb ...  : The apache-access-log.
+    \item \verb ...  : The apache-error-log.
+    \item \verb ...  : The php-error-log.
+    \item Any custom log you specify with \inlinecode{error_log}.
+\end{itemize}
+
+\paragraph{The configuration} of logs is handled in the \verb php.ini  with the following directives: 
+
+\begin{table}[ht]
+\centering
+\caption{Php logging directives (recommendations are for production server)}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Directive                & Default Setting & Recommend Setting & Description                                                                                                                        \\ \midrule
+*docref\_root            & 1               & 0                                   & An error format containing a documentation page reference                                                                          \\
+**display\_errors        & 1               & 0                                   & Defines whether error output is sent along with regular output                                                                     \\
+display\_startup\_errors & 0               & 0                                   & Whether to display PHP startup sequence errors                                                                                     \\
+error\_append\_string    & null            & null                                & String to output after an error message                                                                                            \\
+***error\_log            & null            & “/path/to/log/file”                 & File path to a writable (by web server user) error log file. This will be the default destination used by the error\_log function. \\
+error\_prepend\_string   & null            & null                                & String to output before an error message                                                                                           \\
+error\_reporting         & null            & E\_ALL (or 32767)                    & Sets the error reporting level                                                                                                     \\
+log\_errors              & 0               & 1                                   & Defines whether application errors are logged                                                                                      \\
+log\_errors\_max\_length & 1024            & 0                                   & Sets the maximum byte length of log messages. “0” represents no maximum.                                                           \\
+ignore\_repeated\_errors & 0               & 0                                   & Do not log repeated messages                                                                                                       \\
+ignore\_repeated\_source & 0               & 0                                   & Ignore message source when ignoring repeated messages                                                                              \\
+report\_memleaks         & 1               & 0                                   & Reports memory leaks detected by the Zend memory manager                                                                           \\
+track\_errors            & 0               & 1                                   & Last error message available in \$php\_errormsg                                                                                    \\ \bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Build automation}
+
+We build, test and distribute php-projects using Jenkins. For this, we make use of a pipeline. The scirpt can be found here: http://hnd-jens.rz-sued.bayern.de:8181/applikation/jenkinsPipeline/blob/master/jenkinsfile.groovy
+
+
+
+
+
+\subsubsection{Phpunit}
+
+\paragraph{Structure} A \emph{testsuite} is a group of \emph{testcases}. Testcases\footnote{Before the introduction of namespaces, these were known as \inlinecode{PHPUnit_Framework_TestCase}.} are the baseclass that every testclass must extend to get access to the different \inlinecode{assert} methods. 
+
+\paragraph{configuration} When php-unit is invoked we can tell it to use a configuration-xmlfile instead of getting all its arguments from the commandline. We tell it where to look for that file by calling \inlinecode{phpunit --configuration tests/phpunit.xml}. Here is an example: 
+
+\begin{lstlisting}[language=xml]
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.3/phpunit.xsd"
+     backupGlobals="true"
+     backupStaticAttributes="false"
+     <!--bootstrap="/path/to/bootstrap.php"-->
+     cacheTokens="false"
+     colors="false"
+     convertErrorsToExceptions="true"
+     convertNoticesToExceptions="true"
+     convertWarningsToExceptions="true"
+     forceCoversAnnotation="false"
+     mapTestClassNameToCoveredClassName="false"
+     printerClass="PHPUnit_TextUI_ResultPrinter"
+     <!--printerFile="/path/to/ResultPrinter.php"-->
+     processIsolation="false"
+     stopOnError="false"
+     stopOnFailure="false"
+     stopOnIncomplete="false"
+     stopOnSkipped="false"
+     stopOnRisky="false"
+     testSuiteLoaderClass="PHPUnit_Runner_StandardTestSuiteLoader"
+     <!--testSuiteLoaderFile="/path/to/StandardTestSuiteLoader.php"-->
+     timeoutForSmallTests="1"
+     timeoutForMediumTests="10"
+     timeoutForLargeTests="60"
+     verbose="true">
+  <!-- ... -->
+</phpunit>
+\end{lstlisting}
+
+\paragraph{Autoload} the file \inlinecode{--bootstrap autoload.php} is a php file that contains any php-code that needs to be executed before the actual tests are run. Usually it consists merely of a bunch of \inlinecode{require} statements. These are used to load the testable files as well as their testfiles. 
+
+\paragraph{Fixtures: setUp() and tearDown()} ...
+
+
+
+
+
+\subsection{Drupal}
+
+\subsubsection{Database}
+
+You can have drupal print out a query with \inlinecode{\$query->__toString()} or just \inlinecode{print \$query}. To also see the arguments, try \inlinecode{strtr((string) \$query, \$query->arguments());}.
+
+

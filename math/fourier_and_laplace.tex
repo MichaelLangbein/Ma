@@ -263,3 +263,22 @@ Consider the example of a rgb-image.
 Note that the resulting fourier spectrum consist of complex 3d-vectors.
 
 Sometimes, however, you either have an input function that contains \emph{multivector} elements, or you want to apply a filter to the fourier spectrum based on mulitvectors. In that case, you can find an introduction to geometric-algebra Fourier transforms here: \inlinecode{https://pdfs.semanticscholar.org/41ce/67428ee60748a4142dee0eea28ed997855e6.pdf}
+
+
+
+\subsection{Fourier Transforms and Convolutions}
+One major reason that Fourier transforms are so important in image processing is the convolution theorem which states that
+
+If $f(x)$ and $g(x)$ are two functions with Fourier transforms $F(u)$ and $G(u)$, then the Fourier transform of the convolution $f(x)*g(x)$ is simply the product of the Fourier transforms of the two functions, $F(u) G(u)$.
+
+Thus in principle we can undo a convolution. e.g. to compensate for a less than ideal image capture system:
+
+\begin{itemize}
+	\item Take the Fourier transform of the imperfect image,
+	\item Take the Fourier transform of the function describing the effect of the system,
+	\item Divide the former by the latter to obtain the Fourier transform of the ideal image.
+	\item Inverse Fourier transform to recover the ideal image.
+\end{itemize}
+This process is sometimes referred to as deconvolution.
+
+
