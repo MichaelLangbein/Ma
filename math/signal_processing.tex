@@ -1,0 +1,57 @@
+\section{Signal processing}
+
+\subsection{LTI's: Linear, time-invariant systems}
+
+\subsubsection{Preliminaries: Shift-matrix}
+
+We define 
+$$ \vec{\delta}_k :=  $$
+And based on this we define the shift-matrix $\mtrx{S}_\Delta$ as
+$$ \mtrx{S}_k = \left[ \vec{\delta}_{k}, \vec{\delta}_{k+1}, \vec{\delta}_{k+2}, ... \right] $$
+This matrix $\mtrx{S}_k$ has a few useful properties.
+
+\subsubsection{Definition}
+
+A function $f$ is considered a LTI iff: 
+
+\begin{itemize}
+    \item it is a linear transformation: $f(\sum_i \alpha_i \vec{x}_i) = \sum_i \alpha_i f(\vec{x}_i)$
+    \item it is time invariant: $ f(\mtrx{S}_\Delta \vec{x}) = \mtrx{S}_\Delta f(\vec{x})$.
+\end{itemize}
+
+Time invariance is equivalent to $f$ being not a direct function of time. That is, the function has signature \inlinecode{def func(x: number[]): number[]}, not \inlinecode{def func(x: number[], t): number[]}.
+
+\subsubsection{Impulse response and convolution}
+
+If we know $\vec{h} := f(\vec{\delta}_1)$, the response of $f$ to a unit-impuls, we know \emph{all} of its responses as $\vec{y} = \vec{x} * \vec{h}$.
+
+\subprf{Let $\vec{h} := f(\vec{\delta}_1)$}{$\forall \vec{x}: f(\vec{x}) = \vec{x} * \vec{h}$}{
+    Consider the identity:
+   $$ \vec{x} = \mtrx{I} \vec{x} = \mtrx{S}_1 \vec{x} $$
+
+   Using this identity in $f$: 
+   \begin{equation}
+        \begin{aligned}
+            f(\vec{x})  &= f(\mtrx{S}_1 \vec{x}) \\
+                        &= f(\sum_k \vec{x}[k] \vec{\delta}_k) \\
+                        &\stackrel{l.t.}{=} \sum_k \vec{x}[k]  f(\vec{\delta}_k) \\
+                        &\stackrel{t.i.}{=} \sum_k \vec{x}[k] \mtrx{S}_k f(\vec{\delta}_1) \\
+                        &= \sum_k \vec{x}[k] \mtrx{S}_k \vec{h} \\
+        \end{aligned}
+   \end{equation}
+
+   Considering the single element $t$:
+   \begin{equation}
+        \begin{aligned}
+            f(\vec{x})[t]   &= \sum_k \vec{x}[k] (\mtrx{S}_k \vec{h})[t] \\
+                            &= \sum_k \vec{x}[k] \vec{h}[t-k] \\
+                            &= \sum_k \vec{x}[t - k] \vec{h}[k] \\
+        \end{aligned}
+    \end{equation}
+}
+
+\subsubsection{Eigenvalues}
+
+\subsubsection{Fourier transform}
+
+\subsubsection{Convolution theorem}
