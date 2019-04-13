@@ -52,6 +52,16 @@ If we know $\vec{h} := f(\vec{\delta}_1)$, the response of $f$ to a unit-impuls,
 
 \subsubsection{Eigenvalues}
 
-\subsubsection{Fourier transform}
+\subsubsection{Fourier transform, Laplace transform and transfer function}
 
 \subsubsection{Convolution theorem}
+
+\subsection{Signals as differential equations}
+Many systems can be modelled with the differential equation
+$$ \alpha_0 y(t) + \alpha_1 \partDiff{}{t} y(t) + \alpha_2 \partDiff{}{t}^2 y(t) + ... =   \beta_0 x(t) + \beta_1 \partDiff{}{t} x(t) + \beta_2 \partDiff{}{t}^2 x(t) + ...   $$
+Note that $t$ is not a direct variable in this equation, meaning that the system is time invariant. 
+
+This equation can be simplified using the Laplace transform. 
+This way, we obtain a very simple expression for the transfer function:
+$$ H(s) = \frac{Y(s)}{X(s)} = \frac{\beta_0 + \beta_1 s + \beta_2 s^2 + ...}{\alpha_0 + \alpha_1 s + \alpha_2 s^2 + ...}  $$
+

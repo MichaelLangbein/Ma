@@ -241,3 +241,31 @@ Lstm's can be tricky in that they need input in a very specific format.
     )
     
 \end{lstlisting}
+
+
+\subsubsection{Deep dream}
+
+Usually in tensorflow, we want to minimize the difference between a label and the network's output. Deep dreaming is somewhat different. Here we pick a layer that spots interesting shapes (in this case \inlinecode{"layer7"}, let's say it spots cat-eyes) and maximize it's activation by repeatedly nudging the input image in direction of the gradient.  
+\begin{lstlisting}[language=python, caption=Pseudocode]
+# variables ending in "T" denote a tensor
+# variables ending in "Val" denote a value of a tensor
+
+inputImgVal = load_image("testImage.png")
+
+model = VGC16("imagenet")
+
+inputImgT = model.input
+targetT = model.layers["layer7"].output
+gradsT = K.gradients(targetT, inputImgT)[0]
+pipe = K.function([inputImgT], [targetT, gradsT])
+
+for i in range(10):
+	targetVal, gradVal = pipe(inputImgVal)
+	inputImgVal += alpha * gradVal
+\end{lstlisting}
+Really, the name deep dream is chosen somewhat badly. It should rather be "middle-deep interpretation" or "reading into things". Here is what an actual deep dream shouls look like in our opinion. 
+\begin{lstlisting}[language=python]
+inputImgVal = load_image("randomNoise.png")
+targetT = model.layers[-1].output
+\end{lstlisting}
+
