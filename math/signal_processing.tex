@@ -21,7 +21,7 @@ A function $f$ is considered a LTI iff:
 
 Time invariance is equivalent to $f$ being not a direct function of time. That is, the function has signature \inlinecode{def func(x: number[]): number[]}, not \inlinecode{def func(x: number[], t): number[]}.
 
-\subsubsection{Impulse response and convolution}
+\subsubsection{Impulse response, convolution and transfer function}
 
 If we know $\vec{h} := f(\vec{\delta}_1)$, the response of $f$ to a unit-impuls, we know \emph{all} of its responses as $\vec{y} = \vec{x} * \vec{h}$.
 
@@ -50,9 +50,23 @@ If we know $\vec{h} := f(\vec{\delta}_1)$, the response of $f$ to a unit-impuls,
     \end{equation}
 }
 
+The function $h$ is known as the transfer function of the system. 
+
 \subsubsection{Eigenvalues}
 
-\subsubsection{Fourier transform, Laplace transform and transfer function}
+It turns out that exponential functions in $n$ are eigenfunctions of LTI's. Consider $\vec{z}[n] = e^{cn}$, for some constant $c$.
+\begin{equation}
+	\begin{aligned}
+		f(\vec{z})[n] 	&= \sum_k \vec{h}[k] \vec{z}[n-k] \\
+				&= \vec{z}[n] \sum_k \vec{h}[k] \vec{z}[-k] \\
+	\end{aligned}
+\end{equation}
+Note that $\sum_k \vec{h}[k] \vec{z}[-k]$ is just a scalar and independent of $n$. Let's call it $\lambda$. Thus: 
+$$ f(\vec{z}) = \lambda \vec{z} $$
+
+\paragraph{Fourier} Consider the special case where $c = i f$. Then 
+$$ \lambda_f = \sum_k \vec{h}[k] \vec{z}_f[-k] = \fourier(\vec{h})[f] $$
+
 
 \subsubsection{Convolution theorem}
 
