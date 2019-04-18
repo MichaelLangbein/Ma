@@ -1,0 +1,35 @@
+\section{Javascript}
+
+\subsection{The js-runtime}
+
+\subsection{Module system}
+
+\subsection{Promises, async-await and rxjs}
+\inlinecode{async} - \inlinecode{await} lets you handle asynchronous code as if it was synchronous. 
+
+\subsection{Webworkers: multithreading}
+
+\subsection{WASM}
+\begin{itemize}
+    \item If wasm does not get a garbage-collector, 
+        \begin{itemize}
+            \item there will be no easy way for non-gc languages to run in wasm. They need to bring their own gc (or even runtime) with them (like c\# does now). 
+            \item In that case, a situation like python + numy will probably evolve.
+        \end{itemize}
+    \item If wasm will not allow DOM-manipulation, 
+        \begin{itemize}
+            \item then there really is no point for non nummeric-focussed languages to be implemented in wasm.
+            \item In that case, a situation like python + numy will probably evolve.
+        \end{itemize}
+    \item If, however, wasm will get a gc and allow DOM-manipulation, 
+        \begin{itemize}
+            \item Then python, ruby etc. will all develop angular-clones to run on the web. 
+            \item However, given the large js-ecosystem, those will not kick in too mightily. 
+        \end{itemize}
+\end{itemize}
+
+\subsection{Typescript}
+
+\subsubsection{Building}
+
+\subsubsection{Module resolution}
