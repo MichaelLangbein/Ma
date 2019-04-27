@@ -225,21 +225,18 @@ Orthogonality turns out to be an important concept for statistics and signal ana
 
 Although conceptually similar, orthogonality is a stricter concept than linear independence. It requires an inner product space instead of just a vector space. Also, two vectors may be linearly independent, but not orthogonal (allthough we can use Gram-Schmidt orthogonalisation to make any li vectors orthogonal).
 
-\begin{proof} If a set of vectors is orthogonal, then it is linearly independent. \\
-    \subprf{}{$B:orth \then B:li$}{
+\begin{proof} If a set of vectors is orthogonal, then it is linearly independent: $B:orth \then B:li$. \\
+    \subprf{Suppose that $\forall b_i, b_j \in B: b_i \innerprod b_j = 0$}{$\forall \alpha_1, ..., \alpha_n: \sum \alpha_i b_i = 0 \then \alpha_1 = ... = \alpha_n = 0$}{
         
-        \subprf{Suppose that $\forall b_i, b_j \in B: b_i \innerprod b_j = 0$}{$\forall \alpha_1, ..., \alpha_n: \sum \alpha_i b_i = 0 \then \alpha_1 = ... = \alpha_n = 0$}{
+        \subprf{Let $\alpha_1^0, ..., \alpha_n^0$ be chosen. Suppose $\sum \alpha_i^0 b_i = 0$}{$\alpha_1 = ... = \alpha_n = 0$}{
+        
+            \subprf{}{$\alpha_j^0 = 0$ for any $j \in [1, n]$}{
             
-            \subprf{Let $\alpha_1^0, ..., \alpha_n^0$ be chosen. Suppose $\sum \alpha_i^0 b_i = 0$}{$\alpha_1 = ... = \alpha_n = 0$}{
-            
-                \subprf{}{$\alpha_j^0 = 0$ for any $j \in [1, n]$}{
-                
-                    $\sum \alpha_i^0 b_i = 0$ \\
-                    Multiplied by $b_j$: \\
-                    $\sum \alpha_i^0 b_i \innerprod b_j = 0 \innerprod b_j$ \\
-                    With $B:orth$: \\
-                    $\alpha_j^0 = 0$ \\
-                }
+                $\sum \alpha_i^0 b_i = 0$ \\
+                Multiplied by $b_j$: \\
+                $\sum \alpha_i^0 b_i \innerprod b_j = 0 \innerprod b_j$ \\
+                With $B:orth$: \\
+                $\alpha_j^0 = 0$ \\
             }
         }
     }

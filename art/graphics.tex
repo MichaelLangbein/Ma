@@ -67,7 +67,7 @@ $$ \alpha = \frac{ ( \vec{b_l} - \vec{b_p} ) \cdot \vec{n} }{ \vec{\Delta} \cdot
 
 Alternatively, we can make use of the two-line-definition of the plane and obtain: 
 
-$$ \vec{b} + a\vec{p_1} + b\vec{p_2} = \vec{b} + \alpha \cdot \vec{\Delta} $$
+$$ \vec{b}_p + a\vec{p_1} + b\vec{p_2} = \vec{b}_l + \alpha \cdot \vec{\Delta} $$
 
 $$ \vec{b_l} - \vec{b_p} = \myarray{ \vec{p_1} & \vec{p_2} & \vec{\Delta} } \myarray{a \\ b \\ \alpha} $$
 
@@ -106,6 +106,20 @@ The solution lies in imagening the vector $\vec{b}$ being expressed inside a coo
 
 $$ [ \vec{a}, \vec{a^T} ] \myarray{ \alpha \\ \beta } = \vec{b} $$
 
+
+\subsubsection{Flattening: expressing the points on a 3d-plane in a 2d-system}
+From a screen placed in 3d-space we want to obtain a 2d-image that can be displayed on a computer. Consider the plane 
+$$ P = {\vec{x} | \vec{x} = \vec{b} + \alpha \vec{p}_1 + \beta \vec{p}_2}$$
+A point $\vec{x}_0$ on the screen can be expressed as
+$$ \vec{x}_0 = \vec{b} + \alpha \vec{p}_1 + \beta \vec{p}_2 $$
+In that case, we just use $\alpha$ and $\beta$ as coordinates. If instead we were using 
+$$ P = {\vec{x} | (\vec{x} - \vec{b})\vec{n} = 0} $$
+we can still obtain $\vec{p}_1 $ and $ \vec{p}_2$ as 
+\begin{align}
+    \vec{p}_1 &= \vec{z} \\
+    \vec{p}_2 &= \vec{n} \times \vec{z}
+\end{align}
+
 \subsection{Rotation}
 
 \subsubsection{In 2d}
@@ -140,7 +154,9 @@ $$ \mtrx{R}_x = \begin{bmatrix}
     0            & 0             & 1
 \end{bmatrix}$$
 This way we obtain 
-$$ $$
+$$ 
+\left[\begin{matrix}\cos{\left(\beta \right)} \cos{\left(\gamma \right)} & - \sin{\left(\gamma \right)} \cos{\left(\beta \right)} & \sin{\left(\beta \right)}\\\sin{\left(\alpha \right)} \sin{\left(\beta \right)} \cos{\left(\gamma \right)} + \sin{\left(\gamma \right)} \cos{\left(\alpha \right)} & - \sin{\left(\alpha \right)} \sin{\left(\beta \right)} \sin{\left(\gamma \right)} + \cos{\left(\alpha \right)} \cos{\left(\gamma \right)} & - \sin{\left(\alpha \right)} \cos{\left(\beta \right)}\\\sin{\left(\alpha \right)} \sin{\left(\gamma \right)} - \sin{\left(\beta \right)} \cos{\left(\alpha \right)} \cos{\left(\gamma \right)} & \sin{\left(\alpha \right)} \cos{\left(\gamma \right)} + \sin{\left(\beta \right)} \sin{\left(\gamma \right)} \cos{\left(\alpha \right)} & \cos{\left(\alpha \right)} \cos{\left(\beta \right)}\end{matrix}\right]
+$$
 
 \subsubsection{Why is there one rotation axis in 2d, but 3 in 3d?}
 The rotation axis for any pair of axii that define a plane in space is a third axis perpendicular to that plane. In conventional 2D (XY plane), all rotation is done in the Z axis. 
