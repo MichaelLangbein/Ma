@@ -106,7 +106,45 @@ The solution lies in imagening the vector $\vec{b}$ being expressed inside a coo
 
 $$ [ \vec{a}, \vec{a^T} ] \myarray{ \alpha \\ \beta } = \vec{b} $$
 
+\subsection{Rotation}
 
+\subsubsection{In 2d}
+To find the rotation matrix $\mtrx{R}_2$  in 2d, you could take the naive approach by taking a generic vector $\begin{bmatrix}x \\ y\end{bmatrix}$ and try to solve this equation: 
+\begin{align}
+    r = \sqrt{x^2 + y^2} \\
+    \theta_0 = \cos^{-1}(x/r) \\
+    \mtrx{R}_2 \begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix} 
+        r \sin(\theta + \theta_0) \\
+        r \cos(\theta + \theta_0)
+    \end{bmatrix}
+\end{align}
+While this is a feasible approach, we can have it much easier. Remember from \ref{changeOfBasis} that 
+$$ \vec{v} = \mtrx{T} \vec{v}_T $$
+If T is invertible:
+$$ \vec{v}_T = \mtrx{T}^{-1} \vec{v} $$
+Where:
+$$ \mtrx{T}^{-1} = [\vec{x}_T, \vec{y}_T, ...] $$
+Specifically, in our case this results in 
+$$ \mtrx{R}_2 = \begin{bmatrix} 
+    \cos{\theta} & -\sin{\theta} \\
+    \sin{\theta} & \cos{\theta}
+\end{bmatrix} $$
+
+\subsubsection{In 3d}
+While in 2d we only had one axis to rotate around, in 3d we can chose if we want to rotate around x, y, or z. In the general case: 
+$$ \mtrx{R}_3 = \mtrx{R}_x \mtrx{R}_y \mtrx{R}_z $$. 
+It is easy to obtain $\mtrx{R}_z$, the rotation around the z-axis. Just imagine you viewed everything from above:
+$$ \mtrx{R}_x = \begin{bmatrix}
+    \cos{\theta} & -\sin{\theta} & 0 \\
+    \sin{\theta} & \cos{\theta}   & 0 \\
+    0            & 0             & 1
+\end{bmatrix}$$
+This way we obtain 
+$$ $$
+
+\subsubsection{Why is there one rotation axis in 2d, but 3 in 3d?}
+The rotation axis for any pair of axii that define a plane in space is a third axis perpendicular to that plane. In conventional 2D (XY plane), all rotation is done in the Z axis. 
+But what about spherical coordinates? There we need only two angles! ...
 
 \subsection{Implicit versus parameterized representation of bodies}
 
