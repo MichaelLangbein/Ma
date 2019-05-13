@@ -52,6 +52,24 @@ Here are some suggested values:
 \end{itemize}
 
 
+\subsubsection{Versions}
+Unfortunately, with java11 and its module system and the deprecation of former JavaEE packages, java has introduced its own breaking change á lá python2/3. Often, you will find that older programs only run in java8 or lower. 
+You can see which java versions you have installed and choose the appropriate one by 
+
+\begin{lstlisting}
+update-alternatives --config java
+\end{lstlisting}
+
+Usually, java programs will have their own, linux-specific startup-script, like \inlinecode{/etc/init.d/openfire}. Here, these scripts will pick java based on \inlinecode{\$JAVA_HOME}.
+To set this variable for your own user only, append 
+
+\begin{lstlisting}
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
+export PATH=$JAVA_HOME/bin:$PATH
+\end{lstlisting}
+
+to \inlinecode{\~/.bashrc}, to set it for every user, append to \inlinecode{/etc/profiles} for login-shells and \inlinecode{/etc/bash.bashrc} for non-login-shells. Even better, put it in \inlinecode{/etc/environment} to cover both cases at once. 
+
 \subsection{Maven}
 
 Maven is a build- and dependency-resolution tool. Building eg. webprojects with maven is encouraged, also because maven takes away buildsteps from your IDE. Relying on maven instead of an IDE to do your building then makes your builds portable between different developement environments. 
