@@ -269,8 +269,12 @@ Matplotlib is a matlab inspired library for plotting.
 
 \begin{lstlisting}[language=python]
 import matplotlib.pyplot as plt
-plt.plot([1,2,3,4])
-plt.ylabel('some numbers')
+
+plt.plot(ns, NsShallow)
+plt.plot(ns, NsDeep)
+plt.xlabel("input size")
+plt.ylabel("number of nodes")
+plt.legend(["node in shallow net to acchieve accuracy = {}".format(epsilon), "node in deep net to acchieve accuracy = {}".format(epsilon) ], loc="upper left")
 plt.show()
 \end{lstlisting}
 
