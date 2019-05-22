@@ -1,15 +1,9 @@
 \section{Machine learning}
 
+\subsection{Neural networks}
 
-\subsection{Classification}
-
-\subsubsection{Supervised Classification: Neural networks, random forrest}
-
-\paragraph{Backpropagation networks}
-
-There are two ways in which we can derive the backpropagation-algorithm. One is purely analytical, the other bayesian. We'll demonstrate both. 
-
-\paragraph{The analytical way of deriving the backpropagaion algorithm} consist of just a few steps. 
+\subsubsection{Backpropagation}
+The analytical way of deriving the backpropagaion algorithm consist of just a few steps. 
 A few definitions: 
 
 \begin{itemize}
@@ -73,13 +67,7 @@ $$ \delta^{l-1} = \partDiff{e}{\vec{x}^l} \mtrx{W}^l $$
 
 
 
-
-\paragraph{Gaussian processes}
-
-The bayesian derivation of the backpropagation algorithm gives rise to the interesting idea that backprop-networks may be generalized into ...
-
-
-\paragraph{Universial approximation}
+\subsubsection{Universial approximation}
 Let $f$ be a function mapping images to labels. $f$ stems from a vector space of functions $\mathscr{F}$. Let $B$ be a basis for $\mathscr{F}$, meaning that 
 $$ \forall f \in \mathscr{F}: \thereis \vec{\alpha}: \sum \alpha_n b_n = f $$
 So far, so simple. This holds for any basis of any vector space. Let's just propose that sigmoid functions do constitute a basis for these image-to-label functions. We cannot prove this, since we don't know what the image-to-label functions look like, but notice the potential: 
@@ -90,7 +78,20 @@ It turns out that sigmoid functions do indeed form a basis for any continuous fu
 There is an important point that the universal approximation theorem does not cover, however. The UAT only deals with a single layer net. We know from practice, however, that a multilayer net can approximate functions with far less nodes than what a single-layer net would need. There is some strength to having multiple layers.
 
 
-\paragraph{Convolutional networks}
+
+\subsubsection{Some data in n dimensions requires more than n neurons in a layer}
+The backpropagation algorithm requires a networks layers to transform its input data in a continous fashion, i.e. distort the input surface without cutting it at any point. In topology, such a transformation is known as a homomorphism.  
+
+\subsubsection{Some functions can be better approximated with a deep net than with a shallow one}
+Consider the case of a hierarchical function. 
+$$ f(x_1, x_2) = h_2( h_11(x_1), h_12(x_2))$$
+We will prove that a deep net needs less neurons than a shallow one to approximate this function.
+
+
+
+
+
+\subsubsection{Convolutional networks}
 
 These are the networks most commonly found employed in image-classification. Really, they are just a simplified version of our backpropagation-networks (they are even trained using an only slightly altered algorithm). Instead of connecting every node from layer $l$ to every node of layer $l+1$, they impose some restrictions on the connection-matrix:
 \begin{itemize}
@@ -147,8 +148,6 @@ $$ \partDiff{e}{\vec{w}^l} = 0 $$
 $$ \delta^{l-1} = \frac{1}{4} \partDiff{e}{\vec{x}^l}  $$
 
 
-
-\subsubsection{Unsupervised Classification: Clustering}
 
 
 \subsection{Computer vision}
