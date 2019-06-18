@@ -37,11 +37,11 @@ In vanilla python, we could do this:
 
 \begin{lstlisting}[language=python]
 def myDecorator(someFunc):
-    def wrapper():
+    def wrappedFunc():
         print("This is printed before the function is called")
         someFunc()
         print("This is printed after the function is called")
-    return wrapper
+    return wrappedFunc
 
 def sayWhee():
     print("Wheee!")
@@ -62,6 +62,41 @@ def sayWhee():
     print("Wheee!")
     
 sayWhee()
+\end{lstlisting}
+
+This also works with functions that take arguments: 
+
+\begin{lstlisting}[language=python]
+def addOne(func):
+    def wrapped(*args):
+        out = func(*args)
+        return out + 1
+    return wrapped
+
+
+@addOne
+def timesTwo(n):
+    return 2*n
+
+timesTwo(2)  # <-- 5
+\end{lstlisting}
+
+As you can see, a decorator takes a function as an argument. We can also create decorators that depend on an argument themselves: 
+
+\begin{lstlisting}[language=python]
+def addN(n):
+    def decorator(func):    
+        def wrapped(*args):
+            out = func(*args)
+            return out + n
+        return wrapped
+    return decorator
+
+@addN(2)
+def timesTwo(n):
+    return 2*n
+    
+timesTwo(2)  # <-- 6
 \end{lstlisting}
 
 
