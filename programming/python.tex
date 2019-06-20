@@ -16,6 +16,13 @@ We can also do dict-comprehensions:
 dict2 = {k*2:v for (k,v) in dict1.items()}
 \end{lstlisting}
 
+List comprehensions can be conditional: 
+\begin{lstlisting}[language=python]
+listA = ["a", "b", "c", "d"]
+listB = ["c", "d", "e", "f"] 
+[entry for entry in listA if entry in listB]  # <-- [c, d]
+\end{lstlisting} 
+
 \subsection{Functional programming}
 
 Anonymous functions are declared by using the \inlinecode{lambda} keyword. 
@@ -310,6 +317,15 @@ plt.plot(ns, NsDeep)
 plt.xlabel("input size")
 plt.ylabel("number of nodes")
 plt.legend(["node in shallow net to acchieve accuracy = {}".format(epsilon), "node in deep net to acchieve accuracy = {}".format(epsilon) ], loc="upper left")
+plt.show()
+\end{lstlisting}
+
+In general, you want to avoid \inlinecode{plt}. \inlinecode{plt} is just the header of the current plotting state. Use axes insead - axes have all the same methods as \inlinecode{plt}. But contrary to \inlinecode{plt}, they can be passed around freely. 
+\begin{lstlisting}[language=python]
+fig, axesArr = plt.sublplots(2, 2)
+doFirstPlot(axesArr[0])
+doSecondPlot(axesArr[1])
+...
 plt.show()
 \end{lstlisting}
 
