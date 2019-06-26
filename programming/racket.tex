@@ -1,7 +1,9 @@
 \section{Racket}
 
 The hallmark of the Lisp family is that programs are defined in terms of data structures rather than in terms of a text-based syntax. The most visible consequence is a rather peculiar visual aspect, which is dominated by parentheses. The more profound implication, and in fact the motivation for this uncommon choice, is the equivalence of code and data. Program execution in Lisp is nothing but interpretation of a data structure. It is possible, and common practice, to construct data structures programmatically and then evaluate them. The most frequent use of this characteristic is writing macros (which can be seen as code preprocessors) to effectively extend the language with new features. In that sense, all members of the Lisp family are “programmable programming languages”. 
+There is a nice set of tutorials \href{https://beautifulracket.com/stacker/}{here}.
 
+\subsection{Basics}
 \begin{lstlisting}[language=lisp]
 
 ; definitions are identical for variables and functions
@@ -40,4 +42,24 @@ The hallmark of the Lisp family is that programs are defined in terms of data st
 
 \end{lstlisting}
 
-There is a nice set of tutorials \href{https://beautifulracket.com/stacker/}{here}.
+\subsection{Metaprogramming}
+
+
+\subsection{Nomenclature}
+
+Lisps are often used for metaprogramming. For that reason, we need a firm grasp on the intricacies of the nomenclature of the language. We want to be able to give distincitve names to every part of a statement. 
+
+\begin{itemize}
+  \item statement: anything that is written 
+  \begin{itemize}
+    \item combination: aka. expression, aka. form 
+    \begin{enumerate}
+      \item eval all subexpressions
+      \item apply leftmost value to rest
+    \end{enumerate}
+  \item special forms are all statements that are not combinations. 
+  \begin{itemize}
+    \item Definitions: \inlinecode{ (define name "Michael") } does not evaluate all subexpressions, because \inlinecode{name} does not exist yet and can therefore not be evaluated. What \inlinecode{define} does is to save a new entry in the workspace-memory under the label \inlinecode{name}
+  \end{itemize}
+  \end{itemize}
+\end{itemize}
