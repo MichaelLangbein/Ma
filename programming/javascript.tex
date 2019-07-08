@@ -4,6 +4,19 @@
 
 \subsection{Module system}
 
+\begin{table}[]
+    \begin{tabular}{lllll}
+                    & CommonJs                                                                                         & NodeJs                                                                                                    & AMD            & ES2015 aka. ES6                                                  \\
+    used by         & formerly node                                                                                    & node                                                                                                      & requirejs      &                                                                  \\
+    module-file     & exports.area = (r) =\textgreater PI * r * r;                                                     & \begin{tabular}[c]{@{}l@{}}module.exports = \{\\    area: (r) =\textgreater PI * r * r;\\ \}\end{tabular} &                & export const sqrt = Math.sqrt;                                   \\
+    user-file       & \begin{tabular}[c]{@{}l@{}}const module = require('./module.js');\\ module.area(4);\end{tabular} & \begin{tabular}[c]{@{}l@{}}const module = require('./module.js');\\ module.area(4);\end{tabular}          &                & \textbf{import \{ sqrt \} from 'module';}                        \\
+    loads modules   & synchronously                                                                                    & synchronously                                                                                             & asynchronously &                                                                  \\
+    implementations & webpack, browserify                                                                              & node, webpack, browserify                                                                                 & requirejs      & webpack, babel                                                   \\
+    Notes           & Used to be a candidate for node, but now abandoned.                                              &                                                                                                           &                & Official JS standard, but so far not implemented in any browser.
+    \end{tabular}
+    \end{table}
+
+
 \subsection{Promises, async-await and rxjs}
 \inlinecode{async} - \inlinecode{await} lets you handle asynchronous code as if it was synchronous. 
 

@@ -42,7 +42,21 @@ There is a nice set of tutorials \href{https://beautifulracket.com/stacker/}{her
 
 \end{lstlisting}
 
-\subsection{Metaprogramming}
+\subsection{Macros}
+
+Is there a way we con do something like this?
+\begin{lstlisting}[language=lisp]
+(define (faculty n)
+  (if (= n 1) n
+      (* n (faculty (- n 1)))))
+
+
+(hypothetical-macro-function (n !)
+  (faculty n))
+
+(4 !) ; ---> yields 24
+\end{lstlisting}
+
 
 
 \subsection{Nomenclature}
