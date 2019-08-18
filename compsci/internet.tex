@@ -22,11 +22,13 @@ Since http is a stateless protocol, we need some helper to store state over seve
 
 \subsection{Security}
 
-\paragraph{CORS} (cross origin resource sharing) is the act of one site (www.mysite.com) requesting data from another, third-party site (www.puppyimagehost.org?img=3241). Doing so is forbidden by default, and browsers will block such requests. The reason is that 
-\begin{itemize}
-	\item cross-site scripting 
-	\item by accident, www.puppyimagehost.org might leak some sensitive data when being requested. 
-\end{itemize}
+\paragraph{CORS} (cross origin resource sharing) is the act of one site (www.mysite.com) requesting data from another, third-party site (www.puppyimagehost.org?img=3241). Doing so is forbidden by default, and browsers will block such requests. The reason is that a hacker could use his browser to do something malicious. This here is a perfectly fine request: 
+\includegraphics[width=0.7\textwidth]{images/cookie_3.jpg}
+After that request, the \inlinecode{jsessionid} cookie will be stored on the browser. A hacker could now steal that cookie and do this: 
+\includegraphics[width=0.7\textwidth]{images/cookie_4.jpg}
+This is called Cross-site-request-forgery. Honestly, it seems that this is something that should be fought on the \emph{sever}side, not from the client.
+
+
 However, some sites depend on CORS.
 \begin{itemize}
 	\item For one, images and scripts can be loaded from third-party sites (using the \inlinecode{src} attribute). As such, for historical reasons, images are exempt from CORS-blocking
@@ -55,4 +57,3 @@ CORB will block the response of a request if all of the following are true:
 	\item The server responds with an X-Content-Type-Options: nosniff header, or if this header is omitted, Chrome detects the content type is one of HTML, XML, or JSON from inspecting the file
 	\item CORS does not explicitly allow access to the resource
 \end{itemize}
-

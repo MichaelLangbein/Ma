@@ -2,37 +2,67 @@
 
 We implement distributed systems when our system becomes too big to be run from a single computer. Distribution always makes things more complex, so there is no reason to implement it when you don't have to. But in almost every case, you eventually will. 
 
-We need to serve multible needs: 
+\subsection{Model}
 \begin{itemize}
-    \item Programmer needs: consisten API that abstracts away the details of the data-storage. A programmer should not need to know on what server the requested data is stored (except when we want to use that detail-knowledge to get better performance).
-    
-    \item Business needs: 
-        \begin{itemize}
-            \item consistency: a request mustn't result in different responses
-            \item availability: your requests must always be served
-            \item low latency: a response should come fast
-        \end{itemize}
+    \item \textbf{Communication graph} $G$: a directed, two-way graph
+      \begin{itemize}
+        \item nodes: \nodes{G}
+        \item edges: \edges{G}
+        \item $\forall (u, v) \in \edges{G}: (v, u) \in \edges{G}$
+      \end{itemize}
+    \item \textbf{Subgraph} $U_G$:
+      \begin{itemize}
+        \item nodes: \nodes{U}
+        \item edges: $\edges{U} = \{(u, v) | u \in \nodes{U} \land v \in \nodes{U}\}$
+      \end{itemize}
+    \item \textbf{Inedge border} of $U_G$: $\{(u, v) | u \notin \nodes{U} \land v \in \nodes{U}\}$
+    \item \textbf{System} $\mathcal{G}$:
+      \begin{itemize}
+        \item a communication graph $G$
+        \item device $A$ for each node $n$ of $G$ (we say: $n$ runs $A$)
+        \item input to each node $n$ of $G$
+        \item behaviour $\mathcal{B_G}$
+      \end{itemize}
 \end{itemize}
 
 
-Operations on a single machine have a total order, on distributed machines a partial order
-transition functions: when is a transition function commutative? That would mean that the timing in which input arrives at a state machine does not matter. We know this is not always true. Just consider the state function $f(s, x) = sx + x$. 
+\subsection{Axioms}
+\paragraph{The locality axiom} states that a subsystems behaviour is only influenced by its inedge border.
+\paragraph{The fault axiom} states that 
+
+\subsection{Theorems}
+
+\subsubsection{Byzantine agreement}
+\subsubsection{Week agreement}
+\subsubsection{Byzantine fireing squad}
+\subsubsection{Approximate agreement}
+\subsubsection{Clock syncing}
+
+
+\subsubsection{When timing does and does not matter}
+Operations on a single machine have a total order, on distributed machines we can at least hope to acchieve a partial order.
+Consider a transition function from one state to another. When is a transition function commutative? That would mean that the timing in which input arrives at a state machine does not matter. We know this is not always true. Just consider the state function $f(s, x) = sx + x$. 
 $$ f : S \times X \to S$$
 Theorem:
 $$ f: \text{some property} \then f(f(s_0, x_0), x_1) = f(f(s_0, x_1), x_0)$$
 
-\subsection{Important theorems}
 \subsubsection{flp theorem}
+
 \paragraph{System model} consists of:
 \paragraph{In an asynchronous system, a server-failure can alter the outcome} This is
 \paragraph{When you are at a bivalent state, you can delay a message such that you end up at a bivalent state again} This means that you can forever postpone the system from ever reaching a conclusion. 
 
 \subsubsection{CAP-Theorem}
 
+
 \subsection{Important alogrithms}
+
 \subsubsection{one-, two- and tree-phase commit}
+
 \subsubsection{paxos algorithm}
+
 \subsubsection{raft algorithm}
+
 \subsubsection{map reduce algorithm}
 where in map reduce is the window of failure according to flp?
 
