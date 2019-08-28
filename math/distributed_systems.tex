@@ -32,10 +32,10 @@ We implement distributed systems when our system becomes too big to be run from 
 \subsection{Theorems}
 
 \subsubsection{Coverings}
-Define the \emph{neighborhood} of node $u$ as $\text{nbh}_u = \{ v \in \nodes{G} | (v, u) \in \edges{G} \}$. A graph $S$ \emph{covers} $G$ if there is a mapping $\phi$ from any node $s \in S$ to $u \in G$ that preservers neighborhood, that is: 
+Define the \emph{neighborhood} of node $u$ as $\text{nbh}_u = \{ v \in \nodes{G} | (v, u) \in \edges{G} \}$. The neighborhood of $u$ is simply the inedge border of a one-node-graph $U := \{u\}$. A graph $S$ \emph{covers} $G$ if there is a mapping $\phi$ from any node $s \in S$ to $u \in G$ that preservers neighborhood, that is: 
 $$ \phi: \nodes{S} \to \nodes{G} $$
 $$ \forall s \in \nodes{S}: \phi(s) = w \then \phi( \text{nbh}_s ) = \text{nbh}_w $$
-Under such a mapping, $S$ looks locally like $G$.
+Under such a mapping, $S$ looks locally like $G$. This is trivially proven. By the locality axiom, the behavior of a subsystem is only influenced by its inedge border. That means that the behaviour of the system on $u$ is only influenced by its neighborhood. Since every node $s \in \nodes{S}$ has a neighborhood identical to that of some $u \in \nodes{G}$, the behaviour of every node in $S$ is identical to that of some node in $G$.
 
 \subsubsection{Byzantine agreement}
 \subsubsection{Week agreement}
