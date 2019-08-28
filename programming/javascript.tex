@@ -1,4 +1,23 @@
 \section{Javascript}
+At its heart, javascript is a simple language. Its has however two very unconventional features that are not used in any other languages.  
+
+ \paragraph{this}: every function implicity gets a parameters named \inlinecode{this}, containing the context. 
+\begin{lstlisting}
+    function add (x, y) {
+        console.log(this);
+        return x + y;
+    }
+\end{lstlisting}
+The context \inlinecode{this} can also be explicitly assigned.
+\begin{lstlisting}
+    const add3 = add.bind("michael", 2);
+\end{lstlisting}
+Note that this does not work for arrow-functions, which keep their once assigned context!
+
+
+\paragraph{prototype}: Every object has a \inlinecode{.prototype} and a \inlinecode{.__proto__}.
+
+
 
 \subsection{The js-runtime}
 

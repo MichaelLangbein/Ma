@@ -19,18 +19,23 @@ We implement distributed systems when our system becomes too big to be run from 
     \item \textbf{System} $\mathcal{G}$:
       \begin{itemize}
         \item a communication graph $G$
-        \item device $A$ for each node $n$ of $G$ (we say: $n$ runs $A$)
+        \item a program $A$ for each node $n$ of $G$ (we say: $n$ runs $A$) (in the original paper, a program was called a \emph{device})
         \item input to each node $n$ of $G$
         \item behaviour $\mathcal{B_G}$
       \end{itemize}
 \end{itemize}
-
 
 \subsection{Axioms}
 \paragraph{The locality axiom} states that a subsystems behaviour is only influenced by its inedge border.
 \paragraph{The fault axiom} states that 
 
 \subsection{Theorems}
+
+\subsubsection{Coverings}
+Define the \emph{neighborhood} of node $u$ as $\text{nbh}_u = \{ v \in \nodes{G} | (v, u) \in \edges{G} \}$. A graph $S$ \emph{covers} $G$ if there is a mapping $\phi$ from any node $s \in S$ to $u \in G$ that preservers neighborhood, that is: 
+$$ \phi: \nodes{S} \to \nodes{G} $$
+$$ \forall s \in \nodes{S}: \phi(s) = w \then \phi( \text{nbh}_s ) = \text{nbh}_w $$
+Under such a mapping, $S$ looks locally like $G$.
 
 \subsubsection{Byzantine agreement}
 \subsubsection{Week agreement}
