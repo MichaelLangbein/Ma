@@ -1,6 +1,6 @@
 \section{Distributed systems}
 
-We implement distributed systems when our system becomes too big to be run from a single computer. Distribution always makes things more complex, so there is no reason to implement it when you don't have to. But in almost every case, you eventually will. 
+We implement distributed systems when our system becomes too big to be run from a single computer. Distribution always makes things more complex, so there is no reason to implement it when you don't have to. But in almost every case, you eventually will. Most of the following text is based on \href{https://disco.ethz.ch/courses/podc_allstars/lecture/chapter17.pdf}{this lecture series}.
 
 \subsection{Model}
 \begin{itemize}
@@ -40,7 +40,7 @@ Under such a mapping, $S$ looks locally like $G$. This is trivially proven. By t
 In practice, we use this finding for the following strategy: Consider a big graph $S$. In $S$, we consider a subgraph $S'$. We might not know a lot about the behaviour of $S'$, but very likely, $G'$, which is covered by $S'$, is much simpler. Using the locality axiom we prove that $S'$ has to behave like $G'$.
 
 \subsubsection{Byzantine agreement}
-Imagine three byzantine generals laying siege to an enemy city. They have to decide if they want to attack the city or not. An attack can only be successful if they all attack together, so they must agree on attack or abstain together. Each general has his own information on whether an attack, even with all three generals involved, will be successful or not. Finally, there is a traitor among them, who will do everything he can to make them decide on the wrong strategy. The two loyal generals follow some algorithm (like e.g. majority-vote, or seniority) for making their decision, while the traitor will do anything he wants.
+Imagine three byzantine generals laying siege to an enemy city. They have to decide if they want to attack the city or not. An attack can only be successful if they all attack together, so they must agree on attack or abstain together. Each general has his own information on whether an attack, even with all three generals involved, will be successful or not. Finally, there is a traitor among them, who will do everything he can to make them decide on the wrong strategy. The two loyal (a.k.a. \emph{correct}) generals follow some algorithm (like e.g. majority-vote, or seniority) for making their decision, while the traitor will do anything he wants.
 For byzantine agreement to be possible, the following must hold:
 \begin{enumerate}
     \item \emph{Agreement}: The two loyal generals decide upon the same value, that is, whether to attack or not.
@@ -48,8 +48,9 @@ For byzantine agreement to be possible, the following must hold:
 \end{enumerate}
 In other words, if byzantine agreement were possible, it would mean that there is an one traitor cannot make the generals choose a bad strategy. However, we will proof that byzantine agreement is \emph{not} possible.
 
+We can easily proof this. We have three nodes $u$,$v$,$w$. In order to achieve validity, a correct node must decide on its own value if another node supports that value.The third node might disagree, but that node could be a traitor. If correct node $u$ has input 0 and correct node $v$ has input 1, the byzantine node $w$ can fool them by telling $u$ that its value is 0 and simultaneously telling $v$ that its value is 1. This leads to $u$ and $v$ deciding on their own values, which results inviolating the agreement condition. Even if $u$ talks to $v$, and they figure out that they have different assumptions about $w$’s value, $u$ cannot distinguish whether $w$ or $v$ is a traitor.
 
-The general idea of the proof is as follows. 
+But there is another, more general proof, which we can use for the following theorems as well. The general idea of the proof is as follows. 
 \begin{enumerate}
     \item Assume byzantine agreement (B.A.) is possible.
     \item Consider $S$, a 6-n graph with inputs and programs, which we will construct in a cunning way. $S$ does not need to exhibit B.A. It only needs to be free of contradictions.
