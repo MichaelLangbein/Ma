@@ -4,42 +4,69 @@ The hallmark of the Lisp family is that programs are defined in terms of data st
 There is a nice set of tutorials \href{https://beautifulracket.com/stacker/}{here}.
 
 \subsection{Basics}
+
+\begin{itemize}
+  \item \emph{list}: \inlinecode{'(1 2 3)}
+  \item \emph{syntax}: \inlinecode{#'(+ 1 2)}, or \inlinecode{#'car}
+\end{itemize}
+
 \begin{lstlisting}[language=lisp]
+#lang racket
 
-; definitions are identical for variables and functions
-(define name "Michael")
-(define (add x y)
-    (+ x y))
-
-; use anonymous functions to create functions as return-values on the fly
-(define (createPowerFunc pwr)
-  (lambda (base)
-    (expt base pwr)))
-(define pwr4 (createPowerFunc 4))
-(pwr4 3)
-> 81
+(provide make-complex get-real get-complex +c -c *c)
 
 
-; conditionals
-; if/else is simple:
-(if (equal? name "Andreas")
-      "Zieh ab!"
-      "Servus!")
-; if you want if/else with more than two cases, use cond:
-(define (commentMyWeight w)
-    (cond
-      [(< w 50) "Gosh, you're a fether!"]
-      [(< w 70) "Sounds fine."]
-      [(< w 90) "You're a dude, right?"]
-      [else "Seriously, thats too much!"])
+(define (make-complex r c)
+  (cons r c))
 
+(define (get-real a)
+  (car a))
 
-; datatypes
-; list
-'("1" 2 c)
-(list "a" "b")
+(define (get-complex a)
+  (cdr a))
 
+(define (piecewise op a b)
+  (make-complex
+    (op (get-real a) (get-real b))
+    (op (get-complex a) (get-complex b))))
 
+(define (add-complex a b)
+  (piecewise + a b))
+
+(define (substr-complex a b)
+  (piecewise - a b))
+
+(define (mult-complex a b)
+  (let ((ar (get-real a))
+        (ac (get-complex a))
+        (br (get-real b))
+        (bc (get-real b)))
+    (make-complex
+      (- (* ar br) (* ac bc))
+      (+ (* ar bc) (* ac br)))))
+
+(define (reduce func arglist carry)
+  (let* ((first-el (car arglist))
+          (rest-els (cdr arglist))
+          (carry2 (func carry first-el)))
+    (if (<= (length rest-els) 0)
+        carry2
+        (reduce func rest-els carry2))))
+
+(define (+c firstarg . restargs)
+  (reduce add-complex restargs firstarg))
+
+(define (-c firstarg . restargs)
+  (reduce substr-complex restargs firstarg))
+
+(define (*c firstarg . restargs)
+  (reduce mult-complex restargs firstarg))
+
+  ;; (define a (make-complex 1 1))
+  ;; (define b (make-complex 2 1))
+  ;; (define c (make-complex 3 3))
+  ;; (*c a b c)
+  ;; (+c a a a b)
 \end{lstlisting}
 
 \subsection{Macros}
