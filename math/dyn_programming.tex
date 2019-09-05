@@ -77,7 +77,7 @@ counterexample: minimal number of coins
 
 Dynamic programming tries to solve problems by breaking them apart into subproblems. But how do we find those subproblems?
 
-The sollution $S$ we are looking for should be obtained by some function $sol$.
+The solution $S$ we are looking for should be obtained by some function $sol$.
 $$ S = sol(para) $$
 
 Try to find a way to split $S$ into a large part $S'$ and a small part $s$ \marginnote{In more advanced problems we might instead want to partition $S$ into several new sets $S'$ and $S''$}.
@@ -87,4 +87,28 @@ The large part itself must be the result of $sol$ for some other set of paramete
 $$ S' = sol(para') $$
 
 
-\subsection{Dynamic programming for hidden Markov-models (Viterbi algorithm)}
+
+
+
+\subsection{Markow chains}
+
+\subsection{Markov decision process with known state-transition-function}
+
+MDPs are an extension of Markov chains, they add actions (allowing choice) and rewards (giving motivation). Conversely, if only one action exists for each state (e.g. "wait") and all rewards are the same (e.g. "zero"), a Markov decision process reduces to a Markov chain. 
+
+An MDP is a tuple $(S, A, P_a, R_a)$, where 
+\begin{itemize}
+	\item $S$: finite set of states
+	\item $A$: finite set of actions
+	\item $P_a(s, s') = P(s_{t+1} = s' | s_t = s, a_t = a)$
+	\item $R_a(s, s')$ is the immediate reward received after transitioning from $s$ to $s'$ through action $a$.
+\end{itemize}
+
+The goal is to find a policy $\pi(s) = a$ that maximizes the cumulative reward $\sum_{t=0}^\infty \gamma_t R_{a_t}(s_t, s_{t+1})$, where $\gamma_t$ is the discount-factor. The discount factor is used so that the decision maker favours taking actions early and doesn't postpone them indefinitely. 
+
+Because of the Markov property, the optimal policy for this particular problem can indeed be written as a function of $s$ only, as assumed above.
+
+
+
+\subsection{Reinforcement learning: MDP without explicitly known state-transition-function}
+

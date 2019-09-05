@@ -84,6 +84,17 @@ Is there a way we con do something like this?
 (4 !) ; ---> yields 24
 \end{lstlisting}
 
+Macros are func­tions that take one syntax object \inlinecode{#'syntx-obj} as input and return another syntax object. These syntax objects contain literal code, pack­aged with meta­data like lexical context and source loca­tion.
+The syntax object passed to a macro contains the whole calling expres­sion that invoked the macro. So if we invoke and like this:
+\begin{lstlisting}[language=lisp]
+(and (expr a) (expr b) (expr c))
+\end{lstlisting}
+and does not get three argu­ments as input, the way an ordi­nary func­tion would. Rather, it gets a syntax object like this, which retains a refer­ence to the lexical context of the calling site:
+\begin{lstlisting}[language=lisp]
+(and #'(and (expr a) (expr b) (expr c)))
+\end{lstlisting}
+
+
 
 
 \subsection{Nomenclature}
