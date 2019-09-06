@@ -75,50 +75,39 @@ Redis
     if __name__ == "__main__":
         app.run(host='0.0.0.0', port=80)
 \end{lstlisting}
-Then you package your app and send it to \inlinecode{/var/lib/docker/images} by calling \inlinecode{sudo docker image build --tag=<nameofyourappalllowercase> .}
-Then you execute that package by calling \inlinecode{sudo docker container run -p 4000:80 -d --name=<nameofyourcontaineralllowercase> <nameofyourappalllowercase>} (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000} and \inlinecode{-d} stands for \emph{detached}, i.e. get back control of your command-line after starting the container).
 
-
-\subsection{Services and docker-compose}
-
-A service is a group of containers of the same image. Where \inlinecode{docker} creates a container from a \inlinecode{Dockerfile}, the program \inlinecode{docker-compose} creates a service from a \inlinecode{docker-compose.yml} file. 
-
-Services allow you to scale containers across multiple Docker daemons, which all work together as a swarm with multiple managers and workers. Each member of a swarm is a Docker daemon, and the daemons all communicate using the Docker API. A service allows you to define the desired state, such as the number of replicas of the service that must be available at any given time. By default, the service is load-balanced across all worker nodes. To the consumer, the Docker service appears to be a single application. 
-To set up a service, provide a \inlinecode{docker-compose.yml} file.
-
-\begin{lstlisting}
-    version: "3"
-    services: 
-        web: 
-            image: username/repo:tag
-            deploy: 
-                replicas: 5
-                resources:
-                    limits: 
-                        cpus: "0.1"
-                        memory: 50M
-                restart_policy: 
-                    condition: on-failure
-            ports: 
-                - "4000:80"
-            networks: 
-                - webnet
-    networks: 
-        webnet:
-        
-\end{lstlisting}
-
-This docker-compose.yml file tells Docker to do the following:
 \begin{itemize}
-    \item Pull the image we uploaded in step 2 from the registry.
-    \item Run 5 instances of that image as a service called web, limiting each one to use, at most, 10\% of a single core of CPU time (this could also be e.g. “1.5” to mean 1 and half core for each), and 50MB of RAM.
-    \item Immediately restart containers if one fails.
-    \item Map port 4000 on the host to web’s port 80.
-    \item Instruct web’s containers to share port 80 via a load-balanced network called webnet. (Internally, the containers themselves publish to web’s port 80 at an ephemeral port.)
-    \item Define the webnet network with the default settings (which is a load-balanced overlay network).
+    \item  \inlinecode{sudo docker image build --tag=<nameofyourappalllowercase> .}: package your app and send it to \inlinecode{/var/lib/docker/images}
+    \item \inlinecode{sudo docker container run -p 4000:80 -d --name=<nameofyourcontaineralllowercase> <nameofyourappalllowercase>}: execute that package (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000} and \inlinecode{-d} stands for \emph{detached}, i.e. get back control of your command-line after starting the container).
+    \item \inlinecode{sudo docker image ls}
+    \item \inlinecode{sudo docker container ls -a}
+    \item \inlinecode{sudo docker image rm <imagename>}
+    \item \inlinecode{sudo docker container rm <containername>}
 \end{itemize}
 
 
+\subsection{Services and docker-compose}
+While \inlinecode{docker} is the basic CLI to control docker, it is more practical to use docker's equivalent of a makefile: a \inlinecode{docker-compose.yml}. In such a file, you
+\begin{itemize}
+    \item specify a list of \emph{services}. A service is a set of one or more container-instances of one root image. Each service can be configured as follows:
+    \begin{itemize}
+        \item \inlinecode{build}: path to dockerfile
+        \item \inlinecode{ports}: list of portmappings
+    \end{itemize}
+\end{itemize}
 
 
+\begin{lstlisting}
+version: "3"
+services: 
+    <imagetag>: 
+        build: .
+        ports: 
+            - "4000:80"
+\end{lstlisting}
 
+\begin{itemize}
+    \item \inlinecode{sudo docker-compose up -d} (builds and) runs the container(s)
+    \item \inlinecode{sudo docker-compose up -d --build} forces a rebuild of all images and runs the containers
+    \item \inlinecode{sudo docker-compose down} stops the containers and deletes them (but leaves the images intact)
+\end{itemize}
