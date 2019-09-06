@@ -75,8 +75,8 @@ Redis
     if __name__ == "__main__":
         app.run(host='0.0.0.0', port=80)
 \end{lstlisting}
-Then you package your app and send it to \inlinecode{/var/lib/docker/images} by calling \inlinecode{sudo docker build --tag=<nameofyourappalllowercase> .}
-Then you execute that package by calling \inlinecode{sudo docker run <nameofyourappalllowercase -p 4000:80} (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000})
+Then you package your app and send it to \inlinecode{/var/lib/docker/images} by calling \inlinecode{sudo docker image build --tag=<nameofyourappalllowercase> .}
+Then you execute that package by calling \inlinecode{sudo docker container run -p 4000:80 -d --name=<nameofyourcontaineralllowercase> <nameofyourappalllowercase>} (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000} and \inlinecode{-d} stands for \emph{detached}, i.e. get back control of your command-line after starting the container).
 
 
 \subsection{Services and docker-compose}
