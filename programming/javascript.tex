@@ -1,5 +1,5 @@
 \section{Javascript}
-At its heart, javascript is a simple language. Its has however two very unconventional features that are not used in any other languages.  
+At its heart, javascript is a simple language. Its has however two very unconventional features that are not used in any other languages: \emph{this} and \emph{prototpye}s.  
 
  \paragraph{this}: every function implicity gets a parameters named \inlinecode{this}, containing the context. 
 \begin{lstlisting}
@@ -15,25 +15,50 @@ The context \inlinecode{this} can also be explicitly assigned.
 Note that this does not work for arrow-functions, which keep their once assigned context!
 
 
-\paragraph{prototype}: Every object has a \inlinecode{.prototype} and a \inlinecode{.__proto__}.
-
-
+\paragraph{prototype}: Prototype-languages should really only achieve inheritance by copying objects. Javascript implements this badly, though, because it offers \emph{two} means of inheritance: object-copying and constructor-functions.
+\begin{itemize}
+    \item Instances 
+        \begin{itemize}
+            \item Every object has a \inlinecode{.__proto__}. 
+            \item \inlinecode{.__proto__} contains the list of inherited props and methods and \emph{should} not be modified.
+        \end{itemize}
+    \item Constructing new objects
+        \begin{itemize}
+            \item With \inlinecode{Object.create}: passing \inlinecode{theObject.__proto__} and \inlinecode{theObject}'s own properties.
+                \begin{itemize}
+                    \item Calling \inlinecode{const vender = Object.create(bender); vender.name = 'Vender';} will give \inlinecode{vender} these properties: \inlinecode{bender.__proto__} and \inlinecode{bender}'s own properties;
+                \end{itemize}
+            \item With constructor functions: passing \inlinecode{TheFunction.prototype}
+                \begin{itemize}
+                    \item Functions are objects, so they, too, have a \inlinecode{.__proto__}
+                    \item Additionally, functions have a \inlinecode{.prototype}. This is because any function may serve as a constructor, so they need this \inlinecode{.prototype}.
+                    \item Calling any function with \inlinecode{new} is expected to have the function assign some things to its internal \inlinecode{this}.
+                    \item Contrary to \inlinecode{.__proto__}, \inlinecode{.prototype} may and should be modified.
+                    \item So, calling \inlinecode{const bender = new Robot('Bender');} will give \inlinecode{bender} these properties: \inlinecode{Robot.prototype};
+                \end{itemize}
+            \item Funfact: \inlinecode{Object} is a constructor-function, which is why there is a \inlinecode{Object.prototype}. Indeed, calling \inlinecode{{name: 'Michael'}} is shorthand for \inlinecode{new Object({name: 'Michael'})} 
+        \end{itemize}
+\end{itemize}
 
 \subsection{The js-runtime}
 
 \subsection{Module system}
 
-\begin{table}[]
-    \begin{tabular}{lllll}
-                    & CommonJs                                                                                         & NodeJs                                                                                                    & AMD            & ES2015 aka. ES6                                                  \\
-    used by         & formerly node                                                                                    & node                                                                                                      & requirejs      &                                                                  \\
-    module-file     & exports.area = (r) =\textgreater PI * r * r;                                                     & \begin{tabular}[c]{@{}l@{}}module.exports = \{\\    area: (r) =\textgreater PI * r * r;\\ \}\end{tabular} &                & export const sqrt = Math.sqrt;                                   \\
-    user-file       & \begin{tabular}[c]{@{}l@{}}const module = require('./module.js');\\ module.area(4);\end{tabular} & \begin{tabular}[c]{@{}l@{}}const module = require('./module.js');\\ module.area(4);\end{tabular}          &                & \textbf{import \{ sqrt \} from 'module';}                        \\
-    loads modules   & synchronously                                                                                    & synchronously                                                                                             & asynchronously &                                                                  \\
-    implementations & webpack, browserify                                                                              & node, webpack, browserify                                                                                 & requirejs      & webpack, babel                                                   \\
-    Notes           & Used to be a candidate for node, but now abandoned.                                              &                                                                                                           &                & Official JS standard, but so far not implemented in any browser.
-    \end{tabular}
-    \end{table}
+\begin{table}[h]
+    \begin{tabularx}{1.2*\textwidth}{XXXXXX}
+                    & CommonJs                                                            & NodeJs                                                                   & AMD            & UMD                    & ES2015 aka. ES6                                           \\
+    used by         & formerly node                                                       & node                                                                     & requirejs      &                        &                                                           \\
+    module-file     & \inlinecode{exports.area = (r) =\textgreater PI * r * r;}           & \inlinecode{module.exports = \{area: (r) =\textgreater PI * r * r; \}}   &                & First tries AMD, then commonJs, then exports as global.         & \inlinecode{export const sqrt = Math.sqrt;}               \\
+    user-file       & \inlinecode{const module = require('./module.js'); module.area(4);} & \inlinecode{const module = require('./module.js'); module.area(4);}      &                &                        & \inlinecode{\textbf\{import \{ sqrt \} from 'module';\}}  \\
+    loads modules   & synchronously                                                       & synchronously                                                            & asynchronously &                        &                                                           \\
+    implementations & webpack, browserify                                                 & node, webpack, browserify                                                & requirejs      &                        & webpack, babel                                            \\
+    Notes           & Used to be a candidate for node, but now abandoned.                 &                                                                          &                &                        & Official JS standard, but so far not implemented in any browser or nodejs.
+    \end{tabularx}
+\end{table}
+
+\subsubsection{Building}
+My builder of choice is webpack. 
+
 
 
 \subsection{Promises, async-await and rxjs}
@@ -61,8 +86,4 @@ Note that this does not work for arrow-functions, which keep their once assigned
         \end{itemize}
 \end{itemize}
 
-\subsection{Typescript}
 
-\subsubsection{Building}
-
-\subsubsection{Module resolution}
