@@ -24,21 +24,40 @@ Note that this does not work for arrow-functions, which keep their once assigned
         \end{itemize}
     \item Constructing new objects
         \begin{itemize}
-            \item With \inlinecode{Object.create}: passing \inlinecode{theObject.__proto__} and \inlinecode{theObject}'s own properties.
+            \item With \inlinecode{Object.create}: passing \inlinecode{theObject.__proto__} and \inlinecode{theObject}'s instance-properties.
                 \begin{itemize}
-                    \item Calling \inlinecode{const vender = Object.create(bender); vender.name = 'Vender';} will give \inlinecode{vender} these properties: \inlinecode{bender.__proto__} and \inlinecode{bender}'s own properties;
+                    \item Calling \inlinecode{const vender = Object.create(bender); vender.name = 'Vender';} will give \inlinecode{vender} these properties: \inlinecode{bender.__proto__} and \inlinecode{bender}'s instance-properties;
                 \end{itemize}
             \item With constructor functions: passing \inlinecode{TheFunction.prototype}
                 \begin{itemize}
                     \item Functions are objects, so they, too, have a \inlinecode{.__proto__}
                     \item Additionally, functions have a \inlinecode{.prototype}. This is because any function may serve as a constructor, so they need this \inlinecode{.prototype}.
-                    \item Calling any function with \inlinecode{new} is expected to have the function assign some things to its internal \inlinecode{this}.
+                    \item Even though not all functions are intended as constructors, js expects them to be that. So every function can be called with \inlinecode{new}. Doing this expects the function to do two things:
+                        \begin{itemize}
+                            \item it expects to have the function assign some things to its internal \inlinecode{this}. These assignments will be instance-properties.
+                            \item it expects \inlinecode{TheFunction.prototype} to have a few props that are to be shared between all instances.
+                        \end{itemize}
                     \item Contrary to \inlinecode{.__proto__}, \inlinecode{.prototype} may and should be modified.
                     \item So, calling \inlinecode{const bender = new Robot('Bender');} will give \inlinecode{bender} these properties: \inlinecode{Robot.prototype};
                 \end{itemize}
             \item Funfact: \inlinecode{Object} is a constructor-function, which is why there is a \inlinecode{Object.prototype}. Indeed, calling \inlinecode{{name: 'Michael'}} is shorthand for \inlinecode{new Object({name: 'Michael'})} 
         \end{itemize}
 \end{itemize}
+
+\begin{lstlisting}
+const Robot = function(name) {
+    this.name = name;
+}
+Robot.prototype.sayHi = function() {
+    return 'Hi from ' + this.name;
+};
+const bender = new Robot('Bender');
+bender.sayHi();
+Robot.prototype.sayHi = function() {
+    return 'Bugger off from ' + this.name;
+}
+bender.sayHi();
+\end{lstlisting}
 
 \subsection{The js-runtime}
 
