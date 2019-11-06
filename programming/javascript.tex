@@ -65,20 +65,52 @@ bender.sayHi();
 
 \begin{table}[h]
     \begin{tabularx}{1.2*\textwidth}{XXXXXX}
-                    & CommonJs                                                            & NodeJs                                                                   & AMD            & UMD                    & ES2015 aka. ES6                                           \\
-    used by         & formerly node                                                       & node                                                                     & requirejs      &                        &                                                           \\
-    module-file     & \inlinecode{exports.area = (r) =\textgreater PI * r * r;}           & \inlinecode{module.exports = \{area: (r) =\textgreater PI * r * r; \}}   &                & First tries AMD, then commonJs, then exports as global.         & \inlinecode{export const sqrt = Math.sqrt;}               \\
-    user-file       & \inlinecode{const module = require('./module.js'); module.area(4);} & \inlinecode{const module = require('./module.js'); module.area(4);}      &                &                        & \inlinecode{\textbf\{import \{ sqrt \} from 'module';\}}  \\
-    loads modules   & synchronously                                                       & synchronously                                                            & asynchronously &                        &                                                           \\
-    implementations & webpack, browserify                                                 & node, webpack, browserify                                                & requirejs      &                        & webpack, babel                                            \\
-    Notes           & Used to be a candidate for node, but now abandoned.                 &                                                                          &                &                        & Official JS standard, but so far not implemented in any browser or nodejs.
+                    & CommonJs                                                            & NodeJs                                                                   & AMD                  & UMD                    & ES2015 aka. ES6                                           \\
+    used by         & formerly node                                                       & node                                                                     & requirejs            &                        &                                                           \\
+    module-file     & \inlinecode{exports.area = (r) =\textgreater PI * r * r;}           & \inlinecode{module.exports = \{area: (r) =\textgreater PI * r * r; \}}   & \inlinecode{define}  & First tries AMD, then commonJs, then exports as global.         & \inlinecode{export const sqrt = Math.sqrt;}               \\
+    user-file       & \inlinecode{const module = require('./module.js'); module.area(4);} & \inlinecode{const module = require('./module.js'); module.area(4);}      & \inlinecode{require} &                        & \inlinecode{\textbf\{import \{ sqrt \} from 'module';\}}  \\
+    loads modules   & synchronously                                                       & synchronously                                                            & asynchronously       &                        &                                                           \\
+    implementations & webpack, browserify                                                 & node, webpack, browserify                                                & requirejs            &                        & webpack, babel                                            \\
+    Notes           & Used to be a candidate for node, but now abandoned.                 &                                                                          &                      &                        & Official JS standard, but so far not implemented in any browser or nodejs.
     \end{tabularx}
 \end{table}
 
-\subsubsection{Building}
-My builder of choice is webpack. 
+\subsubsection{Building with webpack}
+My builder of choice is webpack. Basically, webpack makes ES6-import and -export work. There is some nice documentation \href{https://what-problem-does-it-solve.com/webpack/index.html}{here}.
 
+paragraph{General concepts}: Some concepts and nomenclature.
 
+\begin{itemize}
+    \item Loaders vs Plugins: loaders work on the individual file-level, plugins work at the bundle- or chunk-level.
+\end{itemize}
+
+\paragraph{Module-resolution}: Webpack can work with most module-types that javascript has to offer.
+
+\begin{itemize}
+    \item Javascript: webpack works fine with commonJs, nodeJs, and AMD, but will sometimes have problems with UMD.
+    \item Other languages: how to resolve other languages (ts, sass, shader, ...) is let over to loaders.
+\end{itemize}
+
+\paragraph{Shimming}: Webpack only loads a module when it sees it required at some point. This makes for smaller bundles, of course, but here is one problem this can cause. Say you have a dependency to jQuery and bootstrap. JQuery exposes \inlinecode{window.\$} as a global object. Bootstrap requires there to be a global \inlinecode{window.\$} object. However, since bootstrap just assumes that \inlinecode{window.\$} is there without ever calling \inlinecode{import}, webpack won't resolve the dependency and never include jQuery in the package. To avoid such problems, there is something called \emph{shimming}. 
+
+\beign{lstlisting}
+plugins: [
+    new CopywebpackPlugin([ { from: path.resolve(__dirname, 'node_modules/cesium/Build/Cesium/Workers'), to: 'Workers' } ]),
+    new CopywebpackPlugin([ { from: path.resolve(__dirname, 'node_modules/cesium/Source/Assets'), to: 'Assets' } ]),
+    new CopywebpackPlugin([ { from: path.resolve(__dirname, 'node_modules/cesium/Source/Widgets'), to: 'Widgets' } ]),
+    new webpack.DefinePlugin({
+        CESIUM_BASE_URL: JSON.stringify(''),
+    }),
+    new webpack.ProvidePlugin({
+        Cesium: 'cesium/Build/Cesium/Cesium'
+    })
+],
+\end{lstlisting}
+
+The \inlinecode{ProviderPlugin} makes Cesium available to the global workspace. If you don't want this, you might want to instead use the \inlinecode{module.rules.imports-loader}.
+
+paragraph{Path-resolution}: When you ask to import a string that doesn't have a leading ./, it tells Webpack: “Look for the file everywhere on my hard drive except the current directory”. I'm not kidding. You can see the output desperately climbing up your directory hierarchy looking for a directory called node_modules in which it hopes to find index.js.
+When you precede the module name with a ./, it tells Webpack to look in the current directory for the file. So, the rule of thumb is: your code usually has a ./ and third-party libraries don't.
 
 \subsection{Promises, async-await and rxjs}
 \inlinecode{async} - \inlinecode{await} lets you handle asynchronous code as if it was synchronous. 
