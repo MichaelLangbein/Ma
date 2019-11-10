@@ -193,12 +193,12 @@ As a sidenote, when you find a set-expression of a body that contains a $thereis
 \begin{table}[H]
 \centering
 \caption{Explicit and parametric set of plane and ellipsoid}
-\begin{tabular}{c|cc}
+\begin{tabularx}{\textwidth}{c|cc}
            & implicit                                                 & parametric \\
 \hline 
 linear     & $\left \{\vec{x} | ( \vec{x} - \vec{b} ) \dot \vec{n} = 0 \right \}$  & $\left \{\vec{x} | \thereis \alpha, \beta: \vec{x} = \begin{bmatrix} \vec{b} && \vec{p}_1 && \vec{p}_2 \end{bmatrix} \begin{bmatrix} 1 \\ \alpha \\ \beta \end{bmatrix}  \right \}$ \\
 non-linear & $\left \{\vec{x} | \frac{x^2}{r_x} + \frac{y^2}{r_y} + \frac{z^2}{r_z} = 1 \right \}$ &  $\left \{\vec{x} | \thereis \theta, \phi: \vec{x} = \begin{bmatrix} r_x \cos{\theta} \cos{\phi} \\ r_y \cos{\theta} \sin{\phi} \\ r_z \sin{\theta} \end{bmatrix} \right \}$       
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 We can find more about this topic here: https://en.wikipedia.org/wiki/Implicit\_surface. In this section, we have been careful to never mention the term \emph{explicit}. In this section, we dealt with bodies. But if we only wanted surfaces, that is, bodies where there are never two z values at on x/y spot, there is also the explicit representation $z=f(x,y)$.

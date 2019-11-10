@@ -63,8 +63,8 @@ bender.sayHi();
 
 \subsection{Module system}
 
-\begin{table}[h]
-    \begin{tabularx}{1.2*\textwidth}{XXXXXX}
+\begin{table}[ht]
+\begin{tabularx}{1.2\textwidth}{XXXXXX}
                     & CommonJs                                                            & NodeJs                                                                   & AMD                  & UMD                    & ES2015 aka. ES6                                           \\
     used by         & formerly node                                                       & node                                                                     & requirejs            &                        &                                                           \\
     module-file     & \inlinecode{exports.area = (r) =\textgreater PI * r * r;}           & \inlinecode{module.exports = \{area: (r) =\textgreater PI * r * r; \}}   & \inlinecode{define}  & First tries AMD, then commonJs, then exports as global.         & \inlinecode{export const sqrt = Math.sqrt;}               \\
@@ -72,7 +72,7 @@ bender.sayHi();
     loads modules   & synchronously                                                       & synchronously                                                            & asynchronously       &                        &                                                           \\
     implementations & webpack, browserify                                                 & node, webpack, browserify                                                & requirejs            &                        & webpack, babel                                            \\
     Notes           & Used to be a candidate for node, but now abandoned.                 &                                                                          &                      &                        & Official JS standard, but so far not implemented in any browser or nodejs.
-    \end{tabularx}
+\end{tabularx}
 \end{table}
 
 \subsubsection{Building with webpack}
@@ -88,29 +88,150 @@ paragraph{General concepts}: Some concepts and nomenclature.
 
 \begin{itemize}
     \item Javascript: webpack works fine with commonJs, nodeJs, and AMD, but will sometimes have problems with UMD.
-    \item Other languages: how to resolve other languages (ts, sass, shader, ...) is let over to loaders.
+    \item Other languages: how to resolve other languages (ts, sass, shader, ...) is left over to loaders.
 \end{itemize}
 
 \paragraph{Shimming}: Webpack only loads a module when it sees it required at some point. This makes for smaller bundles, of course, but here is one problem this can cause. Say you have a dependency to jQuery and bootstrap. JQuery exposes \inlinecode{window.\$} as a global object. Bootstrap requires there to be a global \inlinecode{window.\$} object. However, since bootstrap just assumes that \inlinecode{window.\$} is there without ever calling \inlinecode{import}, webpack won't resolve the dependency and never include jQuery in the package. To avoid such problems, there is something called \emph{shimming}. 
 
-\beign{lstlisting}
+\begin{lstlisting}
 plugins: [
-    new CopywebpackPlugin([ { from: path.resolve(__dirname, 'node_modules/cesium/Build/Cesium/Workers'), to: 'Workers' } ]),
-    new CopywebpackPlugin([ { from: path.resolve(__dirname, 'node_modules/cesium/Source/Assets'), to: 'Assets' } ]),
-    new CopywebpackPlugin([ { from: path.resolve(__dirname, 'node_modules/cesium/Source/Widgets'), to: 'Widgets' } ]),
-    new webpack.DefinePlugin({
+    new CopywebpackPlugin([ \{ from: path.resolve(__dirname, 'node_modules/cesium/Build/Cesium/Workers'), to: 'Workers' \} ]),
+    new CopywebpackPlugin([ \{ from: path.resolve(__dirname, 'node_modules/cesium/Source/Assets'), to: 'Assets' \} ]),
+    new CopywebpackPlugin([ \{ from: path.resolve(__dirname, 'node_modules/cesium/Source/Widgets'), to: 'Widgets' \} ]),
+    new webpack.DefinePlugin(\{
         CESIUM_BASE_URL: JSON.stringify(''),
-    }),
-    new webpack.ProvidePlugin({
+    \}),
+    new webpack.ProvidePlugin(\{
         Cesium: 'cesium/Build/Cesium/Cesium'
-    })
+    \})
 ],
 \end{lstlisting}
 
 The \inlinecode{ProviderPlugin} makes Cesium available to the global workspace. If you don't want this, you might want to instead use the \inlinecode{module.rules.imports-loader}.
 
-paragraph{Path-resolution}: When you ask to import a string that doesn't have a leading ./, it tells Webpack: “Look for the file everywhere on my hard drive except the current directory”. I'm not kidding. You can see the output desperately climbing up your directory hierarchy looking for a directory called node_modules in which it hopes to find index.js.
-When you precede the module name with a ./, it tells Webpack to look in the current directory for the file. So, the rule of thumb is: your code usually has a ./ and third-party libraries don't.
+\paragraph{Path-resolution}: When you ask to import a string that doesn't have a leading \inlinecode{./}, it tells Webpack: "Look for the file everywhere on my hard drive except the current directory". I'm not kidding. You can see the output desperately climbing up your directory hierarchy looking for a directory called \inlinecode{node_modules} in which it hopes to find index.js.
+When you precede the module name with a \inlinecode{./}, it tells Webpack to look in the current directory for the file. So, the rule of thumb is: your code usually has a ./ and third-party libraries don't.
+
+
+\paragraph{How webpack does it}
+Webpack compiles this code:
+\begin{lstlisting}
+// helpers.ts
+export function sayHi(name: string): string {
+    return `Hi, ${name}!`;
+}
+
+// index.ts
+import { sayHi } from "./helpers";
+console.log(sayHi('Michael'));
+\end{lstlisting}
+
+to this code: 
+\begin{lstlisting}
+// self calling function
+(function(modules) {
+        // The module cache
+        var installedModules = {};
+    
+        // The require function
+        function __webpack_require__(moduleId) {
+    
+            // Check if module is in cache
+            if(installedModules[moduleId]) {
+                return installedModules[moduleId].exports;
+            }
+            // Create a new module (and put it into the cache)
+            var module = installedModules[moduleId] = {
+                i: moduleId,
+                l: false,
+                exports: {}
+            };
+    
+            // Execute the module function
+            modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+    
+            // Flag the module as loaded
+            module.l = true;
+    
+            // Return the exports of the module
+            return module.exports;
+        }
+    
+        // expose the modules object (__webpack_modules__)
+        __webpack_require__.m = modules;
+    
+        // expose the module cache
+        __webpack_require__.c = installedModules;
+    
+        // define getter function for harmony exports
+        __webpack_require__.d = function(exports, name, getter) {
+            if(!__webpack_require__.o(exports, name)) {
+                Object.defineProperty(exports, name, { enumerable: true, get: getter });
+            }
+        };
+    
+        // define __esModule on exports
+        __webpack_require__.r = function(exports) {
+            if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+                Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+            }
+            Object.defineProperty(exports, '__esModule', { value: true });
+        };
+    
+        // create a fake namespace object
+        // mode & 1: value is a module id, require it
+        // mode & 2: merge all properties of value into the ns
+        // mode & 4: return value when already ns object
+        // mode & 8|1: behave like require
+        __webpack_require__.t = function(value, mode) {
+            if(mode & 1) value = __webpack_require__(value);
+            if(mode & 8) return value;
+            if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+            var ns = Object.create(null);
+            __webpack_require__.r(ns);
+            Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+            if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+            return ns;
+        };
+    
+        // getDefaultExport function for compatibility with non-harmony modules
+        __webpack_require__.n = function(module) {
+            var getter = module && module.__esModule ?
+                function getDefault() { return module['default']; } :
+                function getModuleExports() { return module; };
+            __webpack_require__.d(getter, 'a', getter);
+            return getter;
+        };
+    
+        // Object.prototype.hasOwnProperty.call
+        __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+    
+        // __webpack_public_path__
+        __webpack_require__.p = "";
+    
+    
+        // Load entry module and return exports
+        return __webpack_require__(__webpack_require__.s = 0);
+    })({
+    
+        // dependency
+        "./src/dependency.ts": (function(module, __webpack_exports__, __webpack_require__) {
+            function sayHi(name) {
+                return "Hi, " + name + "!";
+            }
+            __webpack_require__.r(__webpack_exports__);
+            __webpack_require__.d(__webpack_exports__, "sayHi", function() { return sayHi; })
+        }),
+    
+        // script 
+        "./src/index.ts": (function(module, __webpack_exports__, __webpack_require__) {
+            __webpack_require__.r(__webpack_exports__);
+            var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/helpers.ts");
+            console.log(Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["sayHi"])('Michael'));
+        })
+});
+\end{lstlisting}
+
 
 \subsection{Promises, async-await and rxjs}
 \inlinecode{async} - \inlinecode{await} lets you handle asynchronous code as if it was synchronous. 
