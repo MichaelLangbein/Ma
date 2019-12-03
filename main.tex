@@ -2,7 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{mdframed} % For the subproof
 \usepackage{amsthm} % For theorems and proofs
-\usepackage{amssymb} % For convoultion icon
+\usepackage{amssymb} % For convoultion icon and preferrance icon
 \usepackage{amsmath} % For custom functions, matrices, 
 \usepackage{amsfonts} % For Reals
 \usepackage{listings} % For code
@@ -164,6 +164,10 @@
     }
 }
 
+% economics
+\newcommand{\preferred}{\ensuremath{\succsim}}
+\newcommand{\nonpreferred}{\ensuremath{\precsim}}
+
 
 
 
@@ -245,6 +249,11 @@
 \input{compsci/security}
 
 \chapter{Programming languages}
+A good language
+\begin{itemize}
+    \item has you thinking about the problem, not the language
+    \item has enough libraries and community
+\end{itemize}
 \input{programming/c}
 \input{programming/cpp}
 \input{programming/java}
@@ -266,8 +275,10 @@
 \input{libraries/tensorflow}
 \input{libraries/google}
 
-\chapter{Physics}
-\input{physics/remote_sensing}
+\chapter{Sciences}
+\input{science/remote_sensing}
+\input{science/economics}
+\input{science/projects}
 
 \chapter{Art}
 \input{art/graphics}

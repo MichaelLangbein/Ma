@@ -88,7 +88,24 @@ paragraph{General concepts}: Some concepts and nomenclature.
 
 \begin{itemize}
     \item Javascript: webpack works fine with commonJs, nodeJs, and AMD, but will sometimes have problems with UMD.
-    \item Other languages: how to resolve other languages (ts, sass, shader, ...) is left over to loaders.
+        \begin{itemize}
+            \item if a package.json has a \emph{module} entry, this field indicates that there is a ES6 version of the code. This will be loaded then.
+            \item if it has a \emph{main} entry, that one leads to the entry-file of a (usually UMD) module.
+            \item otherwise, you cannot import a whole module, but must load by filename.
+        \end{itemize}
+    \item Typescript: \inlinecode{ import { b } from "moduleB"; }. If in tsconfig the property \inlinecode{compilerOptions.module} is not \inlinecode{'AMD' | 'System' | 'ES2015'}, then a variation of the node-resolution is used:
+        \begin{itemize}
+            \item \inlinecode{'/node_modules/moduleB.ts'}
+            \item \inlinecode{'/node_modules/moduleB.tsx'}
+            \item \inlinecode{'/node_modules/moduleB.d.ts'}
+            \item \inlinecode{'/node_modules/moduleB/package.json'}  (if it specifies a "types" property)
+            \item \inlinecode{'/node_modules/@types/moduleB.d.ts'}
+            \item \inlinecode{'/node_modules/moduleB/index.ts'}
+            \item \inlinecode{'/node_modules/moduleB/index.tsx'}
+            \item \inlinecode{'/node_modules/moduleB/index.d.ts'}
+        \end{itemize}
+    \item A note on Typescript's \inlinecode{import} and \inlinecode{require} statements: With TypeScript, \inlinecode{import} can be used if there is a declaration file for the module. If there isn't a declaration file, the TypeScript compiler doesn't know if the module exists, so you need to use \inlinecode{require} instead which lacks the compilation checking.
+    \item Other languages: how to resolve other languages (ts, coffee, sass, shader, ...) is left over to loaders.
 \end{itemize}
 
 \paragraph{Shimming}: Webpack only loads a module when it sees it required at some point. This makes for smaller bundles, of course, but here is one problem this can cause. Say you have a dependency to jQuery and bootstrap. JQuery exposes \inlinecode{window.\$} as a global object. Bootstrap requires there to be a global \inlinecode{window.\$} object. However, since bootstrap just assumes that \inlinecode{window.\$} is there without ever calling \inlinecode{import}, webpack won't resolve the dependency and never include jQuery in the package. To avoid such problems, there is something called \emph{shimming}. 
@@ -112,6 +129,7 @@ The \inlinecode{ProviderPlugin} makes Cesium available to the global workspace. 
 \paragraph{Path-resolution}: When you ask to import a string that doesn't have a leading \inlinecode{./}, it tells Webpack: "Look for the file everywhere on my hard drive except the current directory". I'm not kidding. You can see the output desperately climbing up your directory hierarchy looking for a directory called \inlinecode{node_modules} in which it hopes to find index.js.
 When you precede the module name with a \inlinecode{./}, it tells Webpack to look in the current directory for the file. So, the rule of thumb is: your code usually has a ./ and third-party libraries don't.
 
+\paragraph{3rd party libs} d3 is a good example of a big library moving to the new ES6 module-syntax. d3 has many 3rd party libs that depend on and extend d3. As of D3 4.0, none of the D3 modules (formerly known as plugins) rely on a global d3 object. Each module is available either as a UMD bundle for use in Node or browsers, and as ES modules for use in bundlers and other modern JavaScript environments. Note that d3-plus hsa somehow still not managed to switch.
 
 \paragraph{How webpack does it}
 Webpack compiles this code:
