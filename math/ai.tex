@@ -191,3 +191,60 @@ Depending on how much effort you put into the expressions that the engine can un
     \item 2nd order logic: understands relations: can interpret the symbol $\in$ 
     \item higher order logic: is better at inference; can create new if-then-statements as a result of inference or even explore
 \end{itemize}
+
+
+\begin{lstlisting}[language=python]
+	from typing import Union, Any,Callable
+
+
+	class Fact:
+		def __init__(self, statementDescription, truth: bool, *args):
+			self.statementDescription = statementDescription
+			self.truth = truth
+			self.args = args
+	
+		def __str__(self) -> str:
+			if self.truth:
+				return f"{self.statementDescription} holds for {self.args}"
+			else:
+				return f"{self.statementDescription} holds *not* for {self.args}"
+	
+	
+	Predicate = Callable[[Any], Union[bool, None]]
+	Result = Union[Fact, None]
+	
+	
+	class Statement:
+		def __init__(self, description: str, holdsTrueFunc: Predicate = lambda inpt: None):
+			self.description = description
+			self.holdsTrueFunc = holdsTrueFunc
+	
+		def holdsTrueFor(self, *args) -> Result:
+			result = self.holdsTrueFunc(args)
+			if result is None:
+				return None
+			else:
+				return Fact(self.description, result, args)
+			
+	
+	class Rule:
+		def __init__(self, premise: Statement, consequence: Statement):
+			self.premise = premise
+			self.consequence = consequence
+		
+		def deriveFor(self, *args) -> Result:
+			result = self.premise.holdsTrueFor(args)
+			if result is None:
+				return None
+			else:
+				return Fact(self.consequence.description, result, args)
+	
+	
+	
+	socrates = 'Socrates'
+	isMan = Statement('Is a man', lambda someone: True)
+	isMortal = Statement('Is mortal')
+	allMenAreMortal = Rule(isMan, isMortal)
+	derivedFact = allMenAreMortal.deriveFor(socrates)
+	print(derivedFact)
+\end{lstlisting}
