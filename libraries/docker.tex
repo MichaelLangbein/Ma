@@ -6,8 +6,8 @@ When you have one host that hosts many processes that are all linux-based, but f
 \subsection{Containers}
 
 \begin{itemize}
-    \item an \emph{image} is an executable package that includes everything needed to run an application--the code, a runtime, libraries, environment variables, and configuration files.
-    \item a \emph{container} is a runtime instance of an image - what the image becomes in memory when executed (that is, an image with state, or a user process).
+    \item an \emph{image} is an executable package that includes everything needed to run an application--the code, a runtime, libraries, environment variables, and configuration files. Includes execution of all \inlinecode{RUN} statements
+    \item a \emph{container} is a runtime instance of an image - what the image becomes in memory when executed (that is, an image with state, or a user process). On startup, the \inlinecode{CMD} directive is executed.
 \end{itemize}
 
 
@@ -84,6 +84,39 @@ Redis
     \item \inlinecode{sudo docker image rm <imagename>}
     \item \inlinecode{sudo docker container rm <containername>}
 \end{itemize}
+
+\subsection{Layers}
+Each directive in a dockerfile creates a new \emph{layer} (aka. \emph{intermediate image}), which is cached in the engine to speed up the build of other dockerfiles. 
+If your build breaks at a certain point in the execution, like this: 
+
+\begin{lstlisting}
+    Step 16/25 : RUN cd geoserver.src/src
+     ---> Running in dff9e492bfc7
+    Removing intermediate container dff9e492bfc7
+     ---> 16c2728b1c46
+    Step 17/25 : RUN mvn clean install -Pwps,wps-remote,importer -DskipTests
+    ---> Running in f102f7633b49
+   [INFO] Scanning for projects...
+   [INFO] BUILD FAILURE
+   [WARNING] The requested profile "wps" could not be activated because it does not exist.
+   [WARNING] The requested profile "wps-remote" could not be activated because it does not exist.
+   [WARNING] The requested profile "importer" could not be activated because it does not exist.
+   [ERROR] The goal you specified requires a project to execute but there is no POM in this directory (/). Please verify you invoked Maven from the correct directory. -> [Help 1]
+\end{lstlisting}
+
+You can start the container at the last successful intermediate image like this: 
+
+\begin{lstlisting}
+docker image ls 
+    REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+    <none>              <none>              16c2728b1c46        About an hour ago   1.1GB
+docker history 16c2728b1c46
+    IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
+    16c2728b1c46        About an hour ago   /bin/sh -c cd geoserver.src/src                 0B
+    63bb6b9446f9        About an hour ago   /bin/sh -c source /etc/profile.d/maven.sh       0B
+    e236f5e2c9bc        About an hour ago   /bin/sh -c ln -s /opt/apache-maven-3.6.1/ /o... 24B
+docker container run -it 16c2728b1c46
+\end{lstlisting}
 
 
 \subsection{Services and docker-compose}

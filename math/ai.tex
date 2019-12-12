@@ -187,64 +187,149 @@ A inference engine can do the following:
 Depending on how much effort you put into the expressions that the engine can understand, we differentiate between different levels of logic: 
 \begin{itemize}
     \item 0th order logic: understands simple facts and chains them using modus ponens
-    \item 1st order logic: understands variables: can interpret the symbols $\forall$ and $\thereis$ and properties
-    \item 2nd order logic: understands relations: can interpret the symbol $\in$ 
+    \item 1st order logic: understands variables: all of naive math can be written in 1st order logic.
     \item higher order logic: is better at inference; can create new if-then-statements as a result of inference or even explore
 \end{itemize}
 
+Popular expert-system-libraries are Prolog, CLIPS and Pyke.
+
+There are many variants to how you can write an expert system. 
+The most important variables are 
+\begin{itemize}
+	\item How are rules parsed? Do we allow for other logical connectives than 'AND'? See \href{this example}{https://medium.com/a-42-journey/expert-systems-how-to-implement-a-backward-chaining-resolver-in-python-bf7d8924f72f}.
+	\item How is inference done? Forward pass on \inlinecode{addFact} or backward pass on \include{eval}, or a mixture? 
+	\item How is pattern-matching done? The Rete-algorithm is very popular for this.
+	\item Are metaheuristics used? 
+		\begin{itemize}
+			\item Does the engine try to infer more general rules while idle? 
+			\item Does the engine keep track if a search down one branch takes very long (needs a watching strategy-module)?
+		\end{itemize}
+\end{itemize}
 
 \begin{lstlisting}[language=python]
-	from typing import Union, Any,Callable
+class InferenceEngine:
+    def __init__(self):
+        self.facts = []
+        self.rules = []
+
+    def addFact(self, *fact):
+        if fact not in self.facts:
+            self.facts.append(fact)  # add the fact
+            print(f"Just learned that {fact}")
+        for arg in fact[1:]:
+            if not self.__isVariable(arg):
+                self.addFact(arg) # add all arguments
+
+    def addRule(self, conditions, consequence):
+        newRule = {'conditions': conditions, 'consequence': consequence}
+        if not newRule in self.rules:
+            self.rules.append(newRule)
+            print(f"Just learned that {newRule}")
+
+    def eval(self, *statement):
+        print(f"Evaluating whether '{statement}' holds true")
+        fact = self.__searchFacts(*statement)
+        if fact:
+            return fact
+        fact = self.__tryToProve(*statement)
+        if fact:
+            return fact
+        print(f"No, '{statement}' holds not true")
+        return False
+
+    def __searchFacts(self, *statement):
+        for fact in self.facts:
+            if self.__statementsMatch(fact, statement):
+                return fact
+        return False
+
+    def __tryToProve(self, *statement):
+        # a professional inference engine would probably use Rete here
+        candidateRules = self.__findCandidateRules(*statement)
+        for candidateRule in candidateRules:
+            substitutedRule = self.__setRuleVariablesByStatement(candidateRule, statement)
+            facts = self.__evalAll(substitutedRule['conditions'])
+            if facts:
+                substitutedRule = self.__setRuleVariablesByStatements(substitutedRule, facts)
+                self.addFact(*substitutedRule['consequence'])
+                return substitutedRule['consequence']
+        return False
+
+    def __evalAll(self, statements):
+        facts = []
+        for statement in statements:
+            fact = self.eval(*statement)
+            if not fact:
+                return False
+            else:
+                facts.append(fact)
+        return facts
+
+    '''
+    -----------------  helpers -------------------------
+    '''
+
+    def __setRuleVariablesByStatements(self, rule, statements):
+        newRule = dict(rule)
+        for statement in statements:
+            newRule = self.__setRuleVariablesByStatement(newRule, statement)
+        return newRule
+
+    def __setRuleVariablesByStatement(self, rule, statement):
+        substitutionDict = {}
+        for ruleArg, stateArg in zip(rule['consequence'][1:], statement[1:]):
+            if self.__isVariable(ruleArg):
+                substitutionDict[ruleArg] = stateArg
+        return self.__setRuleVariablesByDict(rule, substitutionDict)
+
+    def __setRuleVariablesByDict(self, rule, subsDict):
+        newRule = {'conditions': [], 'consequence': None}
+        for condition in rule['conditions']:
+            newCondition = self.__setVariablesByDict(condition, subsDict)
+            newRule['conditions'].append(newCondition)
+        newConsequence = self.__setVariablesByDict(rule['consequence'], subsDict)
+        newRule['consequence'] = newConsequence
+        return newRule
+
+    def __setVariablesByDict(self, statement, subsDict):
+        newStatement = [statement[0]]
+        for arg in statement[1:]:
+            if self.__isVariable(arg) and arg in subsDict:
+                newStatement.append(subsDict[arg])
+            else:
+                newStatement.append(arg)
+        return newStatement
+
+    def __findCandidateRules(self, *statement):
+        candidates = []
+        for rule in self.rules:
+            if self.__statementsMatch(rule['consequence'], statement):
+                candidates.append(rule)
+        return candidates
+
+    def __statementsMatch(self, statementOne, statementTwo):
+        for wordOne, wordTwo in zip(statementOne, statementTwo):
+            oneIsVal = not self.__isVariable(wordOne)
+            twoIsVal = not self.__isVariable(wordTwo)
+            if oneIsVal and twoIsVal: # ? (oneIsVar and twoIsVar) or (not oneIsVar and not twoIsVar):
+                if wordOne != wordTwo:
+                    return False
+        return True
+
+    def __isVariable(self, arg):
+        return isinstance(arg, str) and arg[0].isupper()
 
 
-	class Fact:
-		def __init__(self, statementDescription, truth: bool, *args):
-			self.statementDescription = statementDescription
-			self.truth = truth
-			self.args = args
-	
-		def __str__(self) -> str:
-			if self.truth:
-				return f"{self.statementDescription} holds for {self.args}"
-			else:
-				return f"{self.statementDescription} holds *not* for {self.args}"
-	
-	
-	Predicate = Callable[[Any], Union[bool, None]]
-	Result = Union[Fact, None]
-	
-	
-	class Statement:
-		def __init__(self, description: str, holdsTrueFunc: Predicate = lambda inpt: None):
-			self.description = description
-			self.holdsTrueFunc = holdsTrueFunc
-	
-		def holdsTrueFor(self, *args) -> Result:
-			result = self.holdsTrueFunc(args)
-			if result is None:
-				return None
-			else:
-				return Fact(self.description, result, args)
-			
-	
-	class Rule:
-		def __init__(self, premise: Statement, consequence: Statement):
-			self.premise = premise
-			self.consequence = consequence
-		
-		def deriveFor(self, *args) -> Result:
-			result = self.premise.holdsTrueFor(args)
-			if result is None:
-				return None
-			else:
-				return Fact(self.consequence.description, result, args)
-	
-	
-	
-	socrates = 'Socrates'
-	isMan = Statement('Is a man', lambda someone: True)
-	isMortal = Statement('Is mortal')
-	allMenAreMortal = Rule(isMan, isMortal)
-	derivedFact = allMenAreMortal.deriveFor(socrates)
-	print(derivedFact)
+
+
+
+if __name__ == '__main__':
+    e = InferenceEngine() 
+
+    # Test 0: obligatory Socrates test
+    e.addRule([
+        ['man', 'X']
+    ], ['mortal', 'X'])
+    e.addFact('man', 'socrates')
+    print(e.eval('mortal', 'Y'))
 \end{lstlisting}
