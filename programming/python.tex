@@ -714,27 +714,31 @@ Due to the fact that \inlinecode{display.update()} only updates certain portions
 
 
 
-\subsection{Packages}
-There are two ways of importing other scripts. The first is to just add the script location to the include path and then load the script like this: 
+\subsection{Modules and Packages}
 
+Every python-file is a module. Every folder containing python-files is a package. Packages can additionally have a \inlinecode{__init__.py} file with additional information.
+
+When the interpreter encounters the code ...
 \begin{lstlisting}[language=python]
-import sys
-sys.path.append('dependencies/pybuilder')
-from buildtool import *
+    from ie.engine import InferenceEngine
 \end{lstlisting}
+... in a file \inlinecode{main.py}, it searches for a file \inlinecode{engine.py} in a folder \inlinecode{ie} inside
+\begin{itemize}
+    \item the current directory or the location of the script \inlinecode{main.py},
+        \begin{itemize}
+            \item The location of the \inlinecode{main.py} file will be added if you ran the script with \inlinecode{python somedir/main.py}
+            \item The current directory will be added if you ran the script with \inlinecode{python -m somedir.main}
+        \end{itemize}
+    \item the \inlinecode{PYTHONPATH}. You can append to this path with:
+        \begin{lstlisting}[language=python]
+            import sys
+            sys.path.append('path/to/ie')
+        \end{lstlisting}
+\end{itemize}
 
-This, however, has a few disadvantages. ......................
+If the directory \inlinecode{ie} contains an \inlinecode{__init__.py} file, this file is executed when a module in that dir is loaded for the first time. This way, the \inlinecode{__init__.py} can be used to initialize any global variables or such that the module needs.
 
-So it may be better to instead turn your project into a package. A package is merely a directory that contains the scripts together with a (potentially empty) file named \verb __init__.py . With this, you can go like this:
-\begin{lstlisting}[language=python]
-import sys
-sys.path.append('dependencies')
-import pybuilder.buildtool as bt
 
-help(bt.execute)
-\end{lstlisting}
-
-The init-file may however also contain some additional information. 
 
 
 \subsection{Miniconda}

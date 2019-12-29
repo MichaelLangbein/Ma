@@ -157,6 +157,10 @@ The following theorems all deal with planar, connected graphs, and build up to E
 \end{proof}
 
 
+
+\subsubsection{Trees}
+
+
 Here is a fun little proof.
 
 \begin{proof} In a tree, the mean number of children ($mcc$) is always equal to $1 - 1/N$.
@@ -172,3 +176,19 @@ Here is a fun little proof.
     }
 
 \end{proof}
+
+When training a binary classifier, we usually need a measure of defining which of several trees is a good representation of the data. The number of nodes, however, cannot be used as a measure, because it is always going to be $2n - 1$.
+\begin{proof} In a binary tree, the number of leaves $n$ equals $\frac{N+1}{2}$, regardless of the architecture of the tree.
+
+    \subprf{}{$n = \frac{N+1}{2}$}{
+        We shall use the fact that in any tree, $\sum_{V_G} \indeg(v_n) = \sum_{V_G} \outdeg(v_n)$. \\
+
+        Consider the leaves of the tree. They all have $\indeg(v_n) = 1$ and $\outdeg(v_n) = 0$. Thus $\sum_{\text{leaves}} \indeg(v_n) = n$ and $\sum_{\text{leaves}} \outdeg(v_n) = 0$. \\
+        Now consider the nodes (there are $N-n$ of them). They all have $\outdeg(v_n) = 2$ and $\intdeg(v_n) = 1$, except for the root-node. Thus $\sum_{\text{nodes}} \indeg(v_n) = N - n - 1$ and $\sum_{\text{nodes}} \outdeg(v_n) = 2(N - n)$. \\
+        Equating the in- and out-degrees, we obtain:
+        $$ n + N - n - 1 = 0 + 2(N - n) $$
+        $$ n = \frac{N+1}{2} $$
+    }
+
+\end{proof}
+

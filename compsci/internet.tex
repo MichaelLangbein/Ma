@@ -57,3 +57,11 @@ CORB will block the response of a request if all of the following are true:
 	\item The server responds with an X-Content-Type-Options: nosniff header, or if this header is omitted, Chrome detects the content type is one of HTML, XML, or JSON from inspecting the file
 	\item CORS does not explicitly allow access to the resource
 \end{itemize}
+
+
+\subsection{Authentication with single sign on (SSO)}
+Information from \href{https://www.varonis.com/blog/what-is-oauth/}{here}.
+
+Assume that you want to check the identity of a user. That user is already member of some authentication-service like facebook. You could ask the user for his facebook-password. But authenticating at some place with your password is insecure, because your password needs to make it over the network. Instead, the user can ask facebook for a token, pass it to your site and you then check with facebook if this token is cool. 
+Strictly speaking, OAuth is about authorisation (is the user allowed to use my service?), not about authentication (is the user really Michael?). The common analogy I’ve seen used while researching OAuth is the valet key to your car. The valet key allows the valet to start and move the car but doesn’t give them access to the trunk or the glove box. An OAuth token is like that valet key. As a user, you get to tell the consumers what they can use and what they can’t use from each service provider. You can give each consumer a different valet key. They never have the full key or any of the private data that gives them access to the full key.
+

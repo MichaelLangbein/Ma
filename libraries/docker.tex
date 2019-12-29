@@ -85,6 +85,9 @@ Redis
     \item \inlinecode{sudo docker container rm <containername>}
 \end{itemize}
 
+Note: \inlinecode{docker run -it ...} creates a new container from an image, \inlinecode{docker start -i ...} starts up an existing container. 
+
+
 \subsection{Layers}
 Each directive in a dockerfile creates a new \emph{layer} (aka. \emph{intermediate image}), which is cached in the engine to speed up the build of other dockerfiles. 
 If your build breaks at a certain point in the execution, like this: 
@@ -115,8 +118,17 @@ docker history 16c2728b1c46
     16c2728b1c46        About an hour ago   /bin/sh -c cd geoserver.src/src                 0B
     63bb6b9446f9        About an hour ago   /bin/sh -c source /etc/profile.d/maven.sh       0B
     e236f5e2c9bc        About an hour ago   /bin/sh -c ln -s /opt/apache-maven-3.6.1/ /o... 24B
-docker container run -it 16c2728b1c46
+docker container run --rm -it 16c2728b1c46
 \end{lstlisting}
+
+Note the \inlinecode{--rm} argument. This removes a container again once it has stopt running. You can start a very small container for a single instruction and immediately remove it again like this: 
+
+\begin{lstlisting}
+docker container run --rm alpine:latest bin/sh -c "whoami"
+\end{lstlisting}
+
+\subsection{Volumes}
+
 
 
 \subsection{Services and docker-compose}
