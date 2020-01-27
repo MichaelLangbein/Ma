@@ -115,3 +115,15 @@ Lisps are often used for metaprogramming. For that reason, we need a firm grasp 
   \end{itemize}
   \end{itemize}
 \end{itemize}
+
+
+\subsection{Datastructures}
+On the most basic level, racket knows only one datastructure: the \inlinecode{pair}:
+\begin{lstlisting}
+(cons "a" "b") ;; => ("a" . "b")
+\end{lstlisting}
+A list is a pair whose tail is also a pair:
+\begin{lstlisting}
+(cons "a" (cons "b" '())) ;; => '("a" "b")
+\end{lstlisting}
+

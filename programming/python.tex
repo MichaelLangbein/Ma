@@ -716,6 +716,8 @@ Due to the fact that \inlinecode{display.update()} only updates certain portions
 
 \subsection{Modules and Packages}
 
+In python, it is very important from which directory a script is called, because that determines how \inlinecode{import} statements are resolved. That means that when you write \inlinecode{import} statements, you are forcing the user to call your code from a certain directory.
+
 Every python-file is a module. Every folder containing python-files is a package. Packages can additionally have a \inlinecode{__init__.py} file with additional information.
 
 When the interpreter encounters the code ...
