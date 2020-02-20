@@ -1,0 +1,54 @@
+\section{Legal and opensource}
+
+\subsection{Popular licenses}
+
+All the below licenses are approved by the OSI.
+
+
+\begin{table}[]
+    \begin{tabular}{@{}llllllll@{}}
+    \toprule
+            & Public                         & Downstream license                   & Changes                        & Patented material                                               & Suing                                                        & Where to put license                                      & Promotion for derived products?                                                                                            \\ \midrule
+    GPL3    & Sourcecode must be made public & All modifications must also use GPL3 & All changes must be documented & If the code includes patented material, users may still use it. & If you sue the provider, you can't use the product any more. &                                                           &                                                                                                                            \\
+    GPL2    & "                              & "                                    & "                              & -                                                               & -                                                            &                                                           &                                                                                                                            \\
+    Apache2 & Needs not be made public       & Modificators may use any license     & "                              & Same as GPL3                                                    & Same as GPL3                                                 &                                                           & \begin{tabular}[c]{@{}l@{}}Nobody may use the providers trademarked name\\  to promote their derived products\end{tabular} \\
+    BSD2    & "                              & "                                    & Changes need not be documented & -                                                               &                                                              & License \& copyright in documentation of compiled version &                                                                                                                            \\
+    BSD3    & "                              & "                                    & "                              & -                                                               &                                                              & "                                                         & Nobody may use the providers name to promote their derived products                                                        \\
+    MIT     & "                              & "                                    & "                              & -                                                               &                                                              &                                                           &                                                                                                                            \\ \bottomrule
+    \end{tabular}
+    \caption{Licenses from strict (top) to permissive (bottom)}
+    \end{table}
+
+
+\subsection{Adding 3rd party licenses to your apache2-javascript product}
+
+\begin{table}[]
+    \begin{tabular}{@{}llll@{}}
+    \toprule
+    & Static linking (into an Apache-licensed app)                                                      & Dynamic linking (into an Apache-licensed app)                                                           & Declaration (into an Apache-licensed app)                                                                    \\
+    \midrule
+    Example         & Webapp where all files are bundled and obfuscated.                                 & Node-app: Libraries are included via require(), or Web-app that includes files via 'script' tag          & NPM package: Dependencies are declared via package.json, but not compiled in. This is *not* linking.         \\
+    GPL3            & \xmark                                                                             &                                                                                                          & \checkmark                                                                                    \\
+    GPL2            & \xmark                                                                             &                                                                                                          & \checkmark                                                                                    \\
+    Apache2         & \checkmark, preserve the NOTICE file                                               & \checkmark                                                                                               & \checkmark                                                                                    \\
+    BSD2            & \checkmark, add license and copyright in documentation of compiled product         & \checkmark                                                                                               & \checkmark                                                                                    \\
+    BSD3            & \checkmark, add license and copyright in documentation of compiled product         & \checkmark                                                                                               & \checkmark                                                                                    \\
+    MIT             & \checkmark                                                                         & \checkmark                                                                                               & \checkmark                                                                                    \\ \bottomrule
+    \end{tabular}
+    \caption{Licenses kick in when your code is distributed. Putting files on a webserver counts as distribution, with maybe the exception of code that only serves as a service (depends on the case). Source: https://medium.com/@vovabilonenko/licenses-of-npm-dependencies-bacaa00c8c65}
+\end{table}
+
+
+\subsection{Deutsches/Europäisches Recht}
+
+\subsubsection{Haftung}
+Obwohl Lizenzen üblicherweise sagen, dass der Anbieter nicht haftbar gemacht werden kann für Schäden, gilt das im deutschen Recht nicht. Laut deutschem Recht ist ein Anbeiter nach dem 'Schenkungsrecht' für Schäden durch Fahrlässigkeit haftbar.
+
+\subsubsection{Exportkontrolle}
+Prinzipiell gilt der Grundsatz des freien Warenverkehrs. Aber Exportkontrolle kann greifen, 
+\begin{itemize}
+    \item Wenn Deutsche, Europäische oder Verbündete (sprich: USA) Sicherheit gefährdet ist,
+    \item um Embargos zu erzwingen,
+    \item Um in den einführenden Staaten nicht misbraucht werden zu können.
+\end{itemize}
+Insbesondere gilt hier die Europäische Dual-Use Verordnung.
