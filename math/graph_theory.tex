@@ -184,7 +184,7 @@ When training a binary classifier, we usually need a measure of defining which o
         We shall use the fact that in any tree, $\sum_{V_G} \indeg(v_n) = \sum_{V_G} \outdeg(v_n)$. \\
 
         Consider the leaves of the tree. They all have $\indeg(v_n) = 1$ and $\outdeg(v_n) = 0$. Thus $\sum_{\text{leaves}} \indeg(v_n) = n$ and $\sum_{\text{leaves}} \outdeg(v_n) = 0$. \\
-        Now consider the nodes (there are $N-n$ of them). They all have $\outdeg(v_n) = 2$ and $\intdeg(v_n) = 1$, except for the root-node. Thus $\sum_{\text{nodes}} \indeg(v_n) = N - n - 1$ and $\sum_{\text{nodes}} \outdeg(v_n) = 2(N - n)$. \\
+        Now consider the nodes (there are $N-n$ of them). They all have $\outdeg(v_n) = 2$ and $\indeg(v_n) = 1$, except for the root-node. Thus $\sum_{\text{nodes}} \indeg(v_n) = N - n - 1$ and $\sum_{\text{nodes}} \outdeg(v_n) = 2(N - n)$. \\
         Equating the in- and out-degrees, we obtain:
         $$ n + N - n - 1 = 0 + 2(N - n) $$
         $$ n = \frac{N+1}{2} $$

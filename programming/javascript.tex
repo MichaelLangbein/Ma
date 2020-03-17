@@ -82,6 +82,8 @@ paragraph{General concepts}: Some concepts and nomenclature.
 
 \begin{itemize}
     \item Loaders vs Plugins: loaders work on the individual file-level, plugins work at the bundle- or chunk-level.
+    \item compiling: compiling means transforming (eg.) ts-code to some (older version of) js.
+    \item bundling: bundling takes compiled code and uses the import statements to create one large file.
 \end{itemize}
 
 \paragraph{Module-resolution}: Webpack can work with most module-types that javascript has to offer.
@@ -277,3 +279,40 @@ to this code:
 \end{itemize}
 
 
+\section{CSS}
+
+\subsection{Position}
+\begin{itemize}
+    \item \textbf{static}: the default
+    \item \textbf{relative}: default + allows top, bottom, left and right
+    \item \textbf{fixed}: relative to viewport
+    \item \textbf{absolute}: relative to nearest positioned parent (positioned: anything but static)
+    \item \textbf{sticky}: like fixed, but relative to container instead of viewport.
+\end{itemize}
+
+\subsection{Display}
+Per default, divs are dispayed in blockstyle, while spans are displayed inlinestyle.
+\begin{itemize}
+    \item \textbf{block}
+    \item \textbf{inline}
+    \item \textbf{inline-block}: inline, but allows width, heigth, padding etc.
+    \item \textbf{none}
+    \item \textbf{table}
+    \item \textbf{grid}
+    \item \textbf{flex} see \ref{flexbox}
+\end{itemize}
+
+\subsubsection{Flexbox}\label{flexbox}
+
+\section{Canvas}
+
+\begin{table}[h]
+    \begin{tabular}{@{}llll@{}}
+    \toprule
+    technology & use-case                    & programming style & libraries          \\ 
+    \midrule
+    canvas     & 3d, interactive, many items & procedural        & treejs, processing \\
+    svg + css  & simple 2d graphics          & declarative       & d3                 \\ 
+    \bottomrule
+    \end{tabular}
+    \end{table}
