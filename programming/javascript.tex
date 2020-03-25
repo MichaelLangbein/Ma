@@ -63,17 +63,21 @@ bender.sayHi();
 
 \subsection{Module system}
 
-\begin{table}[ht]
-\begin{tabularx}{1.2\textwidth}{XXXXXX}
-                    & CommonJs                                                            & NodeJs                                                                   & AMD                                                                              & UMD                                                           & ES2015 aka. ES6                                           \\
-    used by         & formerly node                                                       & node                                                                     & requirejs                                                                        &                                                               &                                                           \\
-    module-file     & \inlinecode{exports.area = (r) = PI * r * r;}                       & \inlinecode{module.exports = \{area: (r) = PI * r * r; \}}               & \inlinecode{define}                                                              & First tries AMD, then commonJs, then exports as global.       & \inlinecode{export const sqrt = Math.sqrt;}               \\
-    user-file       & \inlinecode{const module = require('./module.js'); module.area(4);} & \inlinecode{const module = require('./module.js'); module.area(4);}      & \inlinecode{require, import, module}                                             &                                                               & \inlinecode{\{import \{ sqrt \} from 'module';\}}         \\
-    loads modules   & synchronously                                                       & synchronously                                                            & asynchronously                                                                   &                                                               &                                                           \\
-    implementations & webpack, browserify                                                 & node, webpack, browserify                                                & requirejs                                                                        &                                                               & webpack, babel                                            \\
-    Notes           & Used to be a candidate for node, but now abandoned.                 &                                                                          & Does not work well with node (there is amdefine to help, but not ideal, either). &                                                               & Official JS standard, but so far not implemented in any browser or nodejs.
-\end{tabularx}
-\end{table}
+\begin{adjustbox}{width=1.2\linewidth,center} 
+    \begin{table}[ht]
+        \begin{tabularx}{1.2\textwidth}{XXXXXX}
+            & CommonJs                                                            & NodeJs                                                                   & AMD                                                                              & UMD                                                           & ES2015 aka. ES6                                           \\
+            used by         & formerly node                                                       & node                                                                     & requirejs                                                                        &                                                               &                                                           \\
+            module-file     & \inlinecode{exports.area = (r) = PI * r * r;}                       & \inlinecode{module.exports = \{area: (r) = PI * r * r; \}}               & \inlinecode{define}                                                              & First tries AMD, then commonJs, then exports as global.       & \inlinecode{export const sqrt = Math.sqrt;}               \\
+            user-file       & \inlinecode{const module = require('./module.js'); module.area(4);} & \inlinecode{const module = require('./module.js'); module.area(4);}      & \inlinecode{require, import, module}                                             &                                                               & \inlinecode{\{import \{ sqrt \} from 'module';\}}         \\
+            loads modules   & synchronously                                                       & synchronously                                                            & asynchronously                                                                   &                                                               &                                                           \\
+            implementations & webpack, browserify                                                 & node, webpack, browserify                                                & requirejs                                                                        &                                                               & webpack, babel                                            \\
+            Notes           & Used to be a candidate for node, but now abandoned.                 &                                                                          & Does not work well with node (there is amdefine to help, but not ideal, either). &                                                               & Official JS standard, but so far not implemented in any browser or nodejs.
+        \end{tabularx}
+    \end{table}
+\end{adjustbox}
+
+    
 
 \subsubsection{Building with webpack}
 My builder of choice is webpack. Basically, webpack makes ES6-import and -export work. There is some nice documentation \href{https://what-problem-does-it-solve.com/webpack/index.html}{here}.
