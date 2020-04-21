@@ -192,3 +192,93 @@ When training a binary classifier, we usually need a measure of defining which o
 
 \end{proof}
 
+
+\subsection{Stable marriage and Gayle-Shapely}
+In dating, the people doing the active flirting end up with partners higher up their preference-list than the people being flirted with.
+\begin{lstlisting}[language=python]
+    class Person:
+    def __init__(self, name):
+        self.name = name
+        self.prefs = []
+
+    def setPreferences(self, prefs):
+        self.prefs = prefs
+
+    def __repr__(self):
+        return self.name
+
+
+class Woman(Person):
+    def selectBest(self, suitors):
+        for p in self.prefs:
+            if p in suitors:
+                print(f"{self} selected {p}")
+                return p
+
+
+class Man(Person):
+    def getFavorite(self):
+        print(f"{self} fancies {self.prefs[0]}")
+        return self.prefs[0]
+
+    def rejectedBy(self, w):
+        print(f"{w} rejected {self}")
+        self.prefs.remove(w)
+
+
+rachel = Woman('Rachel')
+phoebe = Woman('Phoebe')
+monica = Woman('Monica')
+
+ross = Man('Ross')
+chandler = Man('Chandler')
+joey = Man('Joey')
+
+women = [rachel, phoebe, monica]
+men = [ross, chandler, joey]
+
+rachel.setPreferences([joey, ross, chandler])
+phoebe.setPreferences([ross, chandler, joey])
+monica.setPreferences([joey, chandler, ross])
+
+ross.setPreferences([rachel, phoebe, monica])
+chandler.setPreferences([rachel, monica, phoebe])
+joey.setPreferences([phoebe, rachel, monica])
+
+
+## Gayle - Shapely
+
+flirting = {w: [] for w in women}
+
+def isStable(flirting):
+    for w in flirting:
+        suitors = flirting[w]
+        if len(suitors) != 1:
+            return False
+    return True
+
+
+while not isStable(flirting):
+    print("--- lets go, flirt! ----")
+
+    # men move to their most desired woman
+    for m in men:
+        w = m.getFavorite()
+        flirting[w].append(m)
+
+    # women reject all but best suitor
+    for w in women:
+        suitors = flirting[w]
+        fav = w.selectBest(suitors)
+        for m in suitors:
+            if m is not fav:
+                m.rejectedBy(w)
+        if fav:
+            flirting[w] = [fav]
+
+
+print(" ---- couples have formed: ---- ")
+for w in flirting:
+    m = flirting[w][0]
+    print(f"{w} + {m}")
+\end{lstlisting}

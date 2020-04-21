@@ -24,7 +24,9 @@
 \usepackage{tabularx} % for tables with automatic linebreaks
 \usepackage[toc,page]{appendix}
 \usepackage{titlesec} % for numbers on subsubsection
-\usepackage{tikz} % for \checkmark and \xmark
+\usepackage{pifont}% http://ctan.org/pkg/pifontn for \checkmark and \xmark
+\usepackage{adjustbox} % to shrink very wide tables
+
 
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
@@ -168,6 +170,9 @@
 % economics
 \newcommand{\preferred}{\ensuremath{\succsim}}
 \newcommand{\nonpreferred}{\ensuremath{\precsim}}
+%legal
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
 
 
 
