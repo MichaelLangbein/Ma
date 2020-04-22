@@ -525,7 +525,40 @@ These subtle differences yield different use-cases:
 \paragraph{Observables and threading} do not cover the same usecases. On the contrary, they can be used together very nicely. Threads are there to do things on the side. Observables are there to handle the case where a requested thing might not be available on time. So if your thread might still be hard at work when the main-thread tries to access its results, it might make sense to have the thread return an observable. 
 
 
-\subsection{Internals}
-In a way, it feels wrong to understand the internals of angular. Angular is supposed to do its thing invisibly, you should not need to know anything about it. What's more, understanding the internals of angular does not provide you with some technological insight - you'll merely understand the more or less arbitrary and insignificant design decisions the angular team took. It's like learning law when you're a physicist: You're used to working to understand deeper truths, and now you have to work to memorize the irrational, inconsistent, ephemeral and sometimes plain stupid decisions some politician once made to gain votes. Why would you bother soiling your brain with such trivial cargo?
-The right mindset to study angular internals is not that of a physicist studying black holes. It is that of a hacker or forensic scientist: you know your subject is deeply flawed. You don't study it to marvel in its beauty, but to exploit it for your purposes. Your intention is not to discover the beauty in the angular teams work, but to conquer their stuff to use it to construct your own, beautiful applications. 
+\subsection{Change Detection}
 
+\paragraph{Views} are the basic building blocks of angular internally.
+For each component, there is one view. 
+A view consists of: 
+\begin{itemize}
+  \item a component instance
+  \item the components vdom
+  \item a list of bindings
+  \item a list of old binding values
+\end{itemize}
+
+\paragraph{Bindings} are angulars html-markup special-thingies - everything between brackets. 
+A binding consists of 
+\begin{itemize}
+  \item a name
+  \item an expression
+  \item a reference to the component
+\end{itemize}
+
+\paragraph{Dirty-checking}: This is how angular does change detection:
+\begin{lstlisting}
+// dirtychecking: this is inside `checkAndUpdateView`
+for (const view in views) {
+  for (const binding in view.bindings) {
+    const newVal = binding.expression()
+    const oldVal = view.oldValues[i]
+    if (newVal != oldVal) {
+      updateDomDownFrom(view)
+    }
+  }
+}
+\end{lstlisting}
+
+\paragraph{Triggering changedetection} can happen by two types of events: user-interaction (\inlinecode{(click)="..."}) or async-events caugth by ngZone.
+
+\paragraph{ngZone} is the one and only zone of angular. Any other (non-child?) zone will not notify angular of changes. 
