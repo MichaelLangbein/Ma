@@ -560,11 +560,12 @@ function checkAndUpdateView(view) {
     }
     
     // callLifecyclehooksChildrenFirst(view, AfterContentChecked)
-    childView.onInit()
-    childView.onChange()
+    if (changedBindings.length) childView.onChanges(changedBindings)
+    childView.onInit() // <- called only *once*, after first onChanges
     childView.doCheck() // <- to let view notify angular of changes that it could not detect from bindings allone
   }
 
+  view.afterContentChecked()
   // Services.updateRenderer(view)
   view.renderUpdatedDom()
 
@@ -581,5 +582,12 @@ function checkAndUpdateView(view) {
 \end{lstlisting}
 
 \paragraph{Triggering changedetection} can happen by two types of events: user-interaction (\inlinecode{(click)="..."}) or async-events caugth by ngZone.
+
+\paragraph{OnPush} protects a subtree from change detection. Changedetection always trickles down from the root component. But you can protect a subtree (a comp and all its children) by setting its \inlinecode{changeDetectionStrategy} to \inlinecode{onPush}.
+This means that the subtree will not be checked, except if
+\begin{itemize}
+  \item an \inlinecode{@Input} binding of the subtree-root changes value
+  \item any element in the subtree sees an event (like \inlinecode{(click)} ) or an asynchronous response (\inlinecode{setTimeout} or \inlinecode{...\$ | async})
+\end{itemize}
 
 \paragraph{ngZone} is the one and only zone of angular. Any other (non-child?) zone will not notify angular of changes. 
