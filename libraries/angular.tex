@@ -545,16 +545,37 @@ A binding consists of
   \item a reference to the component
 \end{itemize}
 
-\paragraph{Dirty-checking}: This is how angular does change detection:
+\paragraph{Dirty-checking}: This is how angular does change detection - it also nicely illustrates when certain lifecycle hooks are called:
 \begin{lstlisting}
-// dirtychecking: this is inside `checkAndUpdateView`
-for (const view in views) {
-  for (const binding in view.bindings) {
-    const newVal = binding.expression()
-    const oldVal = view.oldValues[i]
-    if (newVal != oldVal) {
-      updateDomDownFrom(view)
+function checkAndUpdateView(view) {
+
+  for (const viewChild of view.children) {
+    
+    // Services.updateDirectives(view, CheckAndUpdate)
+    for (const binding of viewChild.bindings) {
+      const oldVal = binding.val
+      const newVal = binding.expression()
+      childView.oldVals.push(oldVal)
+      if (oldVal != newVal) viewChild.bindingsChanged = true
     }
+    
+    // callLifecyclehooksChildrenFirst(view, AfterContentChecked)
+    childView.onInit()
+    childView.onChange()
+    childView.doCheck() // <- to let view notify angular of changes that it could not detect from bindings allone
+  }
+
+  // Services.updateRenderer(view)
+  view.renderUpdatedDom()
+
+  for (const viewChild of view.children) {
+    if (viewChild.cdStrategy == 'default' || viewChild.bindingsChanged) {
+      checkAndUpdateView(viewChild)
+    }
+
+    // callLifecycleHooksChildrenFirst(view, AfterViewChecked)
+    viewChild.afterViewChecked()
+    viewChild.afterViewInit()
   }
 }
 \end{lstlisting}
