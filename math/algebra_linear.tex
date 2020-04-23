@@ -53,29 +53,40 @@ Here is a method to prove that two matrices are identical.
 
 \subsection{Spaces}
 
-\begin{definition}[Nullspace]:
+\begin{definition}[Nullspace]
      $0_A$ is the nullspace of $A$. It is defined as $0_A = \{ x | Ax = 0 \}$
 \end{definition}
 
-\begin{definition}[Columnspace]:
+\begin{definition}[Columnspace]
      $C_A$ is the collumnspace of $A$. It is defined as $C_A = \{ y | Ax = y \}$
 \end{definition}
 
-\begin{definition}[Rowspace]:
+\begin{definition}[Rowspace]
      $R_A$ is the rowspace of $A$. It is defined as $R_A = \{ y | A^Tx = y \}$
 \end{definition}
 
-\begin{definition}[Rank]:
-     $r_A$ is the rank of $A$. It is defined as the dimension of $C_A$
+\begin{definition}[Rank]
+     $r_A$ is the rank of $A$. It is defined as the dimension of $C_A$, $dim_{C_A}$
 \end{definition}
+
+\begin{definition}[Nullity]
+    $n_A$ is the nullity of $A$. It is defined as the dimension of $0_A$, $dim_{0_A}$
+\end{definition}
+
+\begin{proof}
+    Rank nullity: this is a fundamental theorem of linear algebra.
+    Let $A$ be of dimension $r \times c$ and full rank.
+    Then: 
+    $$ r_A + n_A = c $$
+\end{proof}
 
 
 \begin{proof}
-$r_A = dim_{C_A} = dim_{R_A}$
+    $$ r_A = dim_{C_A} = dim_{R_A} $$
 \end{proof}
 
 \begin{proof}
-$A:basis_{C_A} \then r_A = n$
+    $$ A:basis_{C_A} \then r_A = n $$
 \end{proof}
 
 
@@ -95,7 +106,15 @@ For $C^{-1}$ to exist, we require $C$ to be full-rank, which means that $A$ must
 If $A^{RI}$ exists, then $A^{LI}$ does not
 \end{proof}
 
-
+\begin{proof}
+    $A^{RI}$ is not unique.
+    Let $A$ be of dimension $r \times c$ and full rank, with $r < c$. By rank nullity we have
+    $$ n_A = c - r > 0 $$
+    That is, the nullspace is nonempty. Thus $\thereis x : Ax = 0$
+    Now try $B' = B + x$
+    We get 
+    $$ AB' = AB + Ax = I + 0$$
+\end{proof}
 
 
 \subsection{Change of basis}\label{changeOfBasis}
