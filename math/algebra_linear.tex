@@ -26,8 +26,6 @@ In the previous section on general algebra we dealt with vector spaces (subspace
 \end{proof}
 
 
-\paragraph{Properties of matrices} will be proven here. 
-
 Here is a little exercise to get you warmed up. 
 
 \begin{proof}[If $\mtrx{A}\vec{x}$ is zero for any $\vec{x}$, then $\mtrx{A}$ must be the zero matrix.]
@@ -53,10 +51,51 @@ Here is a method to prove that two matrices are identical.
 \end{proof}
 
 
-\paragraph{Matrix inverse and transpose} will be handled here. 
+\subsection{Spaces}
+
+\begin{definition}[Nullspace]:
+     $0_A$ is the nullspace of $A$. It is defined as $0_A = \{ x | Ax = 0 \}$
+\end{definition}
+
+\begin{definition}[Columnspace]:
+     $C_A$ is the collumnspace of $A$. It is defined as $C_A = \{ y | Ax = y \}$
+\end{definition}
+
+\begin{definition}[Rowspace]:
+     $R_A$ is the rowspace of $A$. It is defined as $R_A = \{ y | A^Tx = y \}$
+\end{definition}
+
+\begin{definition}[Rank]:
+     $r_A$ is the rank of $A$. It is defined as the dimension of $C_A$
+\end{definition}
 
 
-\subsection{Important \emph{non}properties}
+\begin{proof}
+$r_A = dim_{C_A} = dim_{R_A}$
+\end{proof}
+
+\begin{proof}
+$A:basis_{C_A} \then r_A = n$
+\end{proof}
+
+
+\subsection{Inverses}
+If $A$ has dimensions $n \times n$, then the inverse $A^{-1}$ such that
+$$ A A^{-1} = A^{-1} A = I $$
+exists iff $det_A \neq 0$.
+
+\paragraph{Nonsqare} matrices do not have an inverse, but they might have a right- or left-inverse.
+Consider $C = A A^T$. This is a square matrix, so it might have an inverse:
+$$ A A^T (A A^T)^{-1} = I $$
+Calling $A^T (A A^T)^{-1} = A^{RI}$ the right inverse:
+$$ A A^{RI} = I $$
+For $C^{-1}$ to exist, we require $C$ to be full-rank, which means that $A$ must be full row rank. This  requires $r \leq c$, in other words, $A$ being a broad matrix.
+
+\begin{proof}
+If $A^{RI}$ exists, then $A^{LI}$ does not
+\end{proof}
+
+
 
 
 \subsection{Change of basis}\label{changeOfBasis}
