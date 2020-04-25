@@ -79,6 +79,7 @@ $$ \rops(A) = \rops(I) A = R A$$
 $$ \cops(A) = A \cops(I) = A C$$
 
 \subsubsection{rops don't change \nullspace{A}}
+Row- and column-operations (rops and cops) seem somewhat trivial at first and not worth any proof writing efforts. However, many theorems of linear algebra are much easier proved if we first reduce the matrices to their RRLE (reduced row linear echelon) form.
 
 \begin{theorem}
   Row-operations on $A$ don't change \nullspace{A}. 
@@ -159,7 +160,7 @@ Therefore, when searching for the special solutions to a problem $Ab = 0$, we ca
 
 We can now print an overview of the different spaces that are associated with a matrix $A$ of dimension $m \cdot n$ and rank $r$.
 
-\includegraphics[width=0.8\linewidth]{images/four_spaces.png}
+\includegraphics[width=0.7\linewidth]{images/four_spaces.png}
 
 The rowspace of $A$ can be visualized using the line-intersection view of matrix-equations: it contains all the points that lie in the intersection of all the lines that make up the matrix. The columspace of A can be visulaized using the vector-image of A: it contains all the points that are spanned by A. 
 Notice how we included the previous theorem: any combination $x$ of a particular sollution $x_r$ and any vector in the nullspace $x_n$ is also a solution.
@@ -197,7 +198,16 @@ Let $W$ be a space. Then $V \subseteq W$ is a subspace, if:
 
 \subsection{Rank nullity Theorem}
 
-\includegraphics[width=0.8\linewidth]{images/A_from_X_to_Y.png}
+\begin{proof}
+    $$ \nullspace{A} = \left{0\right} \then \det{A} \neq 0 $$
+\end{proof}
+
+\begin{proof}
+    Let $A: X \to Y$. Then:
+    $$ \nullspace{A} = \left{0\right} \then \collspace{A} = Y $$
+\end{proof}
+
+\includegraphics[width=0.4\linewidth]{images/A_from_X_to_Y.png}
 
 \begin{proof}
     Rank nullity: this is a fundamental theorem of linear algebra.
@@ -218,7 +228,7 @@ Let $W$ be a space. Then $V \subseteq W$ is a subspace, if:
 
 \subsection{Inverses and determinant}
 
-\includegraphics[width=0.8\linewidth]{images/determinant.png}
+\includegraphics[width=0.4\linewidth]{images/determinant.png}
 
 If $A$ has dimensions $n \times n$, then the inverse $A^{-1}$ such that
 $$ A A^{-1} = A^{-1} A = I $$
