@@ -327,3 +327,37 @@ Let $W$ be a space. Then $V \subseteq W$ is a subspace, if:
     Let $V$ be a subspace. $B \subseteq V$ is a basis for $V$ if $B$ is linearly independent and $\forall v \in V: v = \sum r_n b_n$, with $b_n \in B$
 \end{definition}
 
+
+TODO: definition and deduction eigenvalues
+
+\subsubsection{Orthogonal matrices}
+TODO: definition orthogonal
+
+\begin{theorem}
+    If $A$ is orthogonal, than $A^{-1} = A^T$.
+\end{theorem}
+
+
+\subsubsection{Matrix factorisation}
+
+\paragraph{Eigenvalue decomposition}
+
+$$ A = V \Lambda V^{-1} $$
+
+\paragraph{Singular value decomposition} is eigenvalue decomposition, generalized to non-square matrices.
+
+$$ A = U \Sigma V^T $$
+
+SVD is related to EVD like this: 
+
+\begin{equation}
+    A^T A &= V \Sigma^T U^T U \Sigma V^T \\
+          &= V \Sigma^T \Sigma V^T
+\end{equation}
+
+This makes the entries of $\Sigma$ the squares of the eigenvalues of the matrix $A$.
+
+\paragraph{Nonnegative matrix factorisation}: Consider a dataset $A$, mapping people (rows) to properties (columns). You are looking for some hidden, small set of features, that groups of people have in common. 
+In neural networks we can reconstruct images from a minimal amount of hidden features by funnelling the image through a very small hidden layer out to a large output layer. We can do the very same thing here!
+$$ A = U V $$
+Where $A$ has dimension $r \cross c$, $U$ associates people with their hidden features/groups $r \cross f$ and $V$ associates features/groups with the properties $f \cross c$.
