@@ -226,9 +226,43 @@ Let $W$ be a space. Then $V \subseteq W$ is a subspace, if:
 \end{proof}
 
 
-\subsection{Inverses and determinant}
+\subsection{Determinant}
 
 \includegraphics[width=0.4\linewidth]{images/determinant.png}
+
+
+\paragraph{Definition} \dots
+
+\begin{proof} \label{det_0}
+    Let $ A x = 0 $ and $ a \neq 0$. Then it must hold that $\det{A} = 0$.
+\end{proof}
+
+\paragraph{The size of the determinant} can be seen as the scaling-factor of the transformation described by the matrix $A$.
+
+\paragraph{The size of the determinant} is a measure of how much linearly independent the rows/cols of $A$ are. The size of the determinant equals the size of the (hyper-)parallelogram spanned by the columns. If two vectors are almost linearly dependent, they will be almost parallel, leading to a very small area of the parallelogram. So if you have a small determinant, your columns are almost dependent. If you have a large one, your colums are very orthogonal. 
+
+
+
+
+\subsection{Eigenvalues}
+
+\begin{equation}
+    A x &= \lambda x \\
+    ( A - \lambda I ) x &= 0 \\
+    \det{A - \lambda I} &= 0 \text{ using eq. \ref{det_0}}
+\end{equation}
+
+
+\subsection{Orthogonal matrices}
+TODO: definition orthogonal
+
+\begin{theorem}
+    If $A$ is orthogonal, than $A^{-1} = A^T$.
+\end{theorem}
+
+
+
+\subsection{Inverse}
 
 If $A$ has dimensions $n \times n$, then the inverse $A^{-1}$ such that
 $$ A A^{-1} = A^{-1} A = I $$
@@ -448,5 +482,28 @@ However, there are \emph{non}linear objects in $\reals^3$ that require more than
 \end{table}
 
 
-\subsection{Singular Value Decomposition}
+
+\subsection{Matrix factorisation}
+
+\paragraph{Eigenvalue decomposition}
+
+$$ A = V \Lambda V^{-1} $$
+
+\paragraph{Singular value decomposition} is eigenvalue decomposition, generalized to non-square matrices.
 Getting the basis for $\nullspace{A}$ becomes numerically feasible using singular value decomposition.
+
+$$ A = U \Sigma V^T $$
+
+SVD is related to EVD like this: 
+
+\begin{equation}
+    A^T A &= V \Sigma^T U^T U \Sigma V^T \\
+          &= V \Sigma^T \Sigma V^T
+\end{equation}
+
+This makes the entries of $\Sigma$ the squares of the eigenvalues of the matrix $A$.
+
+\paragraph{Nonnegative matrix factorisation}: Consider a dataset $A$, mapping people (rows) to properties (columns). You are looking for some hidden, small set of features, that groups of people have in common. 
+In neural networks we can reconstruct images from a minimal amount of hidden features by funnelling the image through a very small hidden layer out to a large output layer. We can do the very same thing here!
+$$ A = U V $$
+Where $A$ has dimension $r \cross c$, $U$ associates people with their hidden features/groups $r \cross f$ and $V$ associates features/groups with the properties $f \cross c$.
