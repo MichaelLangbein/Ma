@@ -52,23 +52,23 @@ Here is a little exercise to get you warmed up.
     
 
 \begin{definition}[Nullspace]
-     $0_A$ is the nullspace of $A$. It is defined as $0_A = \{ x | Ax = 0 \}$
+     $\nullspace{A}$ is the nullspace of $A$. It is defined as $\nullspace{A} = \{ x | Ax = 0 \}$
 \end{definition}
 
 \begin{definition}[Columnspace]
-     $C_A$ is the collumnspace of $A$. It is defined as $C_A = \{ y | Ax = y \}$
+     $\collspace{A}$ is the collumnspace of $A$. It is defined as $\collspace{A} = \{ y | Ax = y \}$
 \end{definition}
 
 \begin{definition}[Rowspace]
-     $R_A$ is the rowspace of $A$. It is defined as $R_A = \{ y | A^Tx = y \}$
+     $\rowspace{A}$ is the rowspace of $A$. It is defined as $\rowspace{A} = \{ y | A^Tx = y \}$
 \end{definition}
 
 \begin{definition}[Rank]
-     $r_A$ is the rank of $A$. It is defined as the dimension of $C_A$, $dim_{C_A}$
+     $r_A$ is the rank of $A$. It is defined as the dimension of $\collspace{A}$, $\dimension{\collspace{A}}$
 \end{definition}
 
 \begin{definition}[Nullity]
-    $n_A$ is the nullity of $A$. It is defined as the dimension of $0_A$, $dim_{0_A}$
+    $n_A$ is the nullity of $A$. It is defined as the dimension of $\nullspace{A}$, $\dimension{\nullspace{A}}$
 \end{definition}
 
 
@@ -106,6 +106,22 @@ Therefore, when searching for the special solutions to a problem $Ab = 0$, we ca
 
 \paragraph{rops don't change C(A) if A is invertible }...
 
+We can now print an overview of the different spaces that are associated with a matrix $A$ of dimension $m \cdot n$ and rank $r$.
+
+\includegraphics[width=0.7\linewidth]{images/four_spaces.png}
+
+The rowspace of $A$ can be visualized using the line-intersection view of matrix-equations: it contains all the points that lie in the intersection of all the lines that make up the matrix. The columspace of A can be visulaized using the vector-image of A: it contains all the points that are spanned by A. 
+Notice how we included the previous theorem: any combination $x$ of a particular sollution $x_r$ and any vector in the nullspace $x_n$ is also a solution.
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -121,8 +137,26 @@ Therefore, when searching for the special solutions to a problem $Ab = 0$, we ca
 \end{theorem}
 
 \begin{proof}
-    \subprf{}{$( Bx = 0 \leftrightarrow \forall x_n = 0 ) \leftrightarrow (\forall b \in B: b \neq \sum r_n b_n, b_n \in B/b)$}{
-        todo.
+    \subprf{Suppose $\forall \vec{b} \in \mtrx{B}: \vec{b} \neq \sum_{B/b} \alpha_i \vec{b}_i$}{$\mtrx{B}\vec{x} = \vec{0} \then \vec{x} = \vec{0}$}{
+        \subprf{Suppose $\mtrx{B} \vec{x} = \vec{0}$}{$\vec{x} = \vec{0}$}{
+            \subprf{By contradiction. Assume $\vec{x} \neq \vec{0}$}{there is a contradiction.}{
+                We have $\mtrx{B}\vec{x} = \vec{0}$ \\
+                Consider the vector $\vec{b}_3$. \\
+                Thus: $\sum_{B/b_3} x_i \vec{b}_i = -x_3 \vec{b}_3$ \\
+                Or: $\sum_{B/b_3} \frac{- x_i}{x_3} \vec{b}_i = -x_3 \vec{b}_3$ \\
+                This contradicts the statement that $\forall \vec{b} \in \mtrx{B}: \vec{b} \neq \sum_{B/b} \alpha_i \vec{b}_i$
+            }
+        }
+    }
+    \subprf{Suppose $\mtrx{B}\vec{x} = \vec{0} \then \vec{x} = \vec{0}$}{$\forall \vec{b} \in \mtrx{B}: \vec{b} \neq \sum_{B/b} \alpha_i \vec{b}_i$}{
+        \subprf{Let $\vec{b_0} \in \mtrx{B}$}{$\vec{b}_0 \neq \sum_{B/b_0} \alpha_i \vec{b}_i$}{
+            \subprf{By contradiction. Assume $\vec{b}_0 = \sum_{B/b_0} \alpha_i \vec{b}_i$}{there is a contradiction.}{
+                Since $\vec{b}_0 = \sum_{B/b_0} \alpha_i \vec{b}_i$ \\
+                we get $\vec{0} = \sum_B \alpha_i \vec{b}_i$, where $\alpha_0 = -1$ \\
+                In matrix notation: $\vec{0} = \mtrx{B} \vec{\alpha}$, with a non-zero $\vec{\alpha}$. \\
+                This contradicts our assumption that $\mtrx{B}\vec{x} = \vec{0} \then \vec{x} = \vec{0}$
+            }
+        }
     }
 \end{proof}
 
@@ -144,18 +178,44 @@ Therefore, when searching for the special solutions to a problem $Ab = 0$, we ca
 \includegraphics[width=0.4\linewidth]{images/determinant.png}
 
 
-\paragraph{Definition} \dots
+\paragraph{Definition} Consider a $2 \times 2$ matrix $\mtrx{A}$ 
+$$
+\mtrx{A} = 
+\begin{bmatrix}
+    a_{11} & a_{12} \\
+    a_{21} & a_{22}
+\end{bmatrix}
+$$
+$\det{\mtrx{A}}$ is defined as $a_{11}a_{22} - a_{12}a_{21}$. The definitions for higher order matrix-determinants are similar, but so extremely tedious that we just ignore them here. 
 
 \begin{proof} \label{det_0}
-    Let $ A x = 0 $ and $ a \neq 0$. Then it must hold that $\det{A} = 0$.
+    Let $ \mtrx{A} \vec{x} = 0 $ and $ \vec{x} \neq \vec{0}$. Then it must hold that $\det{\mtrx{A}} = 0$.
+    In fact, this holds in two directions:
+
+    $$ \thereis \vec{x} \neq \vec{0}: \mtrx{A} \vec{x} = 0  \iff \det{\mtrx{A}} = 0 $$
+
+    We can prove this making use of theorem \ref{lin_indep_if_no_bx0}. From the given it follows that $\mtrx{A}$ is linearly dependent. 
+    Thus $\thereis \vec{a} \in \mtrx{A}: \vec{a} = \sum_{A/a} \alpha_i \vec{a}_i$. In the case of a $2 \times 2$ matrix this expression becomes very simple: $\vec{a}_1 = \alpha \vec{a}_2$. 
+    Breaking $\vec{a}_1$ into its components
+    \begin{itemize}
+        \item $a_{11} = \alpha a_{12}$
+        \item $a_{21} = \alpha a_{22}$
+    \end{itemize}
+    Putting this into the definition of a determinant we get:
+    \begin{equation}
+        \begin{aligned}
+            \det{\mtrx{A}}  &= a_{11}a_{22} - a_{12}a_{21} \\
+                            &= \alpha a_{12} a_{22} - \alpha a_{12} a_{22} \\
+                            &= 0
+        \end{aligned}
+    \end{equation}
+    For higher order matrices, the proof follows from induction or something like that.
 \end{proof}
-We can prove this making use of eq. \ref{lin_indep_if_no_bx0}.
-
-\paragraph{The size of the determinant} can be seen as the scaling-factor of the transformation described by the matrix $A$.
-
-\paragraph{The size of the determinant} is a measure of how much linearly independent the rows/cols of $A$ are. The size of the determinant equals the size of the (hyper-)parallelogram spanned by the columns. If two vectors are almost linearly dependent, they will be almost parallel, leading to a very small area of the parallelogram. So if you have a small determinant, your columns are almost dependent. If you have a large one, your colums are very orthogonal. 
 
 
+
+\paragraph{Interpretation} The size of the determinant can be seen as the scaling-factor of the transformation described by the matrix $A$.
+It is also a measure of how much linearly independent the rows/cols of $A$ are. The size of the determinant equals the size of the (hyper-)parallelogram spanned by the columns. If two vectors are almost linearly dependent, they will be almost parallel, leading to a very small area of the parallelogram. So if you have a small determinant, your columns are almost dependent. If you have a large one, your colums are very orthogonal. 
 
 
 
@@ -165,47 +225,45 @@ We can prove this making use of eq. \ref{lin_indep_if_no_bx0}.
 
 
 
-
-
-\subsection{The four fundamental subspaces of linear algebra}
-
-We can now print an overview of the different spaces that are associated with a matrix $A$ of dimension $m \cdot n$ and rank $r$.
-
-\includegraphics[width=0.7\linewidth]{images/four_spaces.png}
-
-The rowspace of $A$ can be visualized using the line-intersection view of matrix-equations: it contains all the points that lie in the intersection of all the lines that make up the matrix. The columspace of A can be visulaized using the vector-image of A: it contains all the points that are spanned by A. 
-Notice how we included the previous theorem: any combination $x$ of a particular sollution $x_r$ and any vector in the nullspace $x_n$ is also a solution.
 
 
 
 \subsection{Rank nullity Theorem}
 
+
+\begin{theorem}
+    $ \nullspace{A} = \{ 0 \} \then \det{A} \neq 0 $
+\end{theorem}
 \begin{proof}
-    $$ \nullspace{A} = \{ 0 \} \then \det{A} \neq 0 $$
+    This is almost self-proving. 
+    $\nullspace{A} = \{ 0 \}$ is equivalent to writing $\mtrx{A} \vec{x} = \vec{0} \then \vec{x} = \vec{0}$.
+    By theorem \ref{lin_indep_if_no_bx0} this means that $\mtrx{A}$ is linearly independent.
+    And by theorem \ref{det_0} this means that $ \det{A} \neq 0 $.
 \end{proof}
 
-\begin{proof}
+
+\begin{theorem}
     Let $A: X \to Y$. Then:
     $$ \nullspace{A} = \{ 0 \} \then \collspace{A} = Y $$
-\end{proof}
+\end{theorem}
 
 \includegraphics[width=0.4\linewidth]{images/A_from_X_to_Y.png}
 
-\begin{proof}
+\begin{theorem}
     Rank nullity: this is a fundamental theorem of linear algebra.
     Let $A$ be of dimension $r \times c$ and full rank.
     Then: 
     $$ r_A + n_A = c $$
-\end{proof}
+\end{theorem}
 
 
-\begin{proof}
-    $$ r_A = dim_{C_A} = dim_{R_A} $$
-\end{proof}
+\begin{theorem}
+    $$ r_A = \dimension{\collspace{A}} = \dimension{\rowspace{A}} $$
+\end{theorem}
 
-\begin{proof}
-    $$ A:basis_{C_A} \then r_A = n $$
-\end{proof}
+\begin{theorem}
+    $$ A:basis_{\collspace{A}} \then r_A = n $$
+\end{theorem}
 
 
 
