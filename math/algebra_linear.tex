@@ -40,17 +40,6 @@ Here is a little exercise to get you warmed up.
 \end{proof}
 
 
-Here is a method to prove that two matrices are identical. 
-
-\begin{proof}
-    \subprf{}{$\forall \vec{x}: \mtrx{A}\vec{x} = \mtrx{B}\vec{x} \then \mtrx{A} = \mtrx{B}$}{
-        \subprf{Let $\vec{x}$ be chosen. Suppose $\mtrx{A}\vec{x} = \mtrx{B}\vec{x}$}{$\mtrx{A} = \mtrx{B}$}{
-            
-        }
-    }
-\end{proof}
-
-
 \subsection{Spaces}
 
 \begin{definition}[Nullspace]
@@ -74,7 +63,7 @@ Here is a method to prove that two matrices are identical.
 \end{definition}
 
 
-\subsubsection  {rops and cops as matrix multiplication}
+\subsubsection{rops and cops as matrix multiplication}
 $$ \rops(A) = \rops(I) A = R A$$
 $$ \cops(A) = A \cops(I) = A C$$
 
@@ -93,11 +82,11 @@ Row- and column-operations (rops and cops) seem somewhat trivial at first and no
             }
         } \\
         \subprf {Let $y_0: A'y_0 = 0$} {$\exists x_0: Ax_0 = 0$} {
-            \subprf {} {$\exists x_0: R^{-1} A' x_0 = 0$} {
-                \subprf {Try $x_0 = y_0$} {$R^{-1} A' x_0 = 0$} {
-                    $R^{-1} A' x_0 = 0$
-                }
+            This is equivalent to stating that $\exists x_0: R^{-1} A' x_0 = 0$ \\
+            \subprf {Try $x_0 = y_0$} {$R^{-1} A' x_0 = 0$} {
+                $R^{-1} A' x_0 = 0$
             }
+            
         }
     } 
 \end{proof}
@@ -107,52 +96,6 @@ Therefore, when searching for the special solutions to a problem $Ab = 0$, we ca
 \subsubsection {cops don't change C(A)}
 
 \subsubsection {rops don't change C(A) if A is invertible }
-
-\subsubsection {Ax = b reduces to A'x' = 0}
-
-\begin{theorem}
-  A problem of the form $Ax = b$ can be re-expressed as $A'x' = 0$, where $A' = [A, -b]$ 
-\end{theorem}
-
-\begin{proof}
-    \subprf {} {$A x = b$ can be re-expressed as $A'x' = 0$} {
-        $ A x = b $ \\
-        $ A x -b = 0 $ \\
-        $ A_1 x_1 + A_2 x_2 + ... -b = 0 $ \\
-        Let $A' = [A, b]$ and $x_{n+1} = -1$. Then: \\
-        $ A' x' = 0 $ \\
-        Now we can use the nullspace of $A'$ to find the solutionspace of $A$. \\
-        $ \nullspace{[A b]} = \{x' | [A b]x' = 0\} $ \\
-        $ = \{x' | A x'_{1:m} = -b x'_{m+1}\} $ \\
-        A subset of that nullspace equals the solutionset for $A x = b$: \\
-        $ \nullspace{[A b]}_{[x'_{m+1} = -1]} = \{x'| A x'_{1:m} = b \} $ 
-    }   
-\end{proof}
-
-
-\subsubsection{Solving Ax = b}
-
-\begin{theorem}
-  If we can only find any one particular solution $x_p$ such that $A x_p = b$, then we get the whole solutionspace as $\nullspace{A} + x_p$.
-\end{theorem}
-
-\begin{proof}
-    \subprf{Let $x_p: A x_p = b$.}{$\solspace{A x = b} = \nullspace{A} + x_p$}{
-        We'll make use of the fact that $\nullspace{A} + x_p = \{ x + x_p | A x = 0 \} = \{ x | A x = A x_p \}$ \\
-        \subprf{Let $x_0 \in \nullspace{A} + x_p $.}{$x_0 \in \solspace{A x = b}$, i.o.w. $A x_0 = b$}{
-            $ x_0 \in \nullspace{A} + x_p $ \\
-            $ x_0 \in \{ x + x_p | A x = 0 \} $ \\
-            $ x_0 \in \{ x | A (x - x_p) = 0 \} $ \\
-            Thus $ A x_0 = A x_p $ \\
-            Since $A x_p = b$, it must be that $ A x_0 = b $.
-        }
-        \subprf{Let $x_0 \in \solspace{A x = b}$.}{$x_0 \in \nullspace{A} + x_p$, i.o.w. $A x_0 = A x_p$}{
-            Because $x_0 \in \solspace{A x = b}$, we have $A x_0 = b$. \\
-            Also, it was given that $A x_p = b$.
-        }
-    }
-\end{proof}
-
 
 
 
@@ -247,9 +190,11 @@ Let $W$ be a space. Then $V \subseteq W$ is a subspace, if:
 \subsection{Eigenvalues}
 
 \begin{equation}
-    A x &= \lambda x \\
-    ( A - \lambda I ) x &= 0 \\
-    \det{A - \lambda I} &= 0 \text{ using eq. \ref{det_0}}
+    \begin{aligned}
+        A x &= \lambda x \\
+        ( A - \lambda I ) x &= 0 \\
+        \det{A - \lambda I} &= 0 \text{ using eq. \ref{det_0}}
+    \end{aligned}
 \end{equation}
 
 
@@ -481,6 +426,51 @@ However, there are \emph{non}linear objects in $\reals^3$ that require more than
 \end{tabular}
 \end{table}
 
+\subsubsection {Ax = b reduces to A'x' = 0}
+
+\begin{theorem}
+  A problem of the form $Ax = b$ can be re-expressed as $A'x' = 0$, where $A' = [A, -b]$ 
+\end{theorem}
+
+\begin{proof}
+    \subprf {} {$A x = b$ can be re-expressed as $A'x' = 0$} {
+        $ A x = b $ \\
+        $ A x -b = 0 $ \\
+        $ A_1 x_1 + A_2 x_2 + ... -b = 0 $ \\
+        Let $A' = [A, b]$ and $x_{n+1} = -1$. Then: \\
+        $ A' x' = 0 $ \\
+        Now we can use the nullspace of $A'$ to find the solutionspace of $A$. \\
+        $ \nullspace{[A b]} = \{x' | [A b]x' = 0\} $ \\
+        $ = \{x' | A x'_{1:m} = -b x'_{m+1}\} $ \\
+        A subset of that nullspace equals the solutionset for $A x = b$: \\
+        $ \nullspace{[A b]}_{[x'_{m+1} = -1]} = \{x'| A x'_{1:m} = b \} $ 
+    }   
+\end{proof}
+
+
+\subsubsection{Solving Ax = b}
+
+\begin{theorem}
+  If we can only find any one particular solution $x_p$ such that $A x_p = b$, then we get the whole solutionspace as $\nullspace{A} + x_p$.
+\end{theorem}
+
+\begin{proof}
+    \subprf{Let $x_p: A x_p = b$.}{$\solspace{A x = b} = \nullspace{A} + x_p$}{
+        We'll make use of the fact that $\nullspace{A} + x_p = \{ x + x_p | A x = 0 \} = \{ x | A x = A x_p \}$ \\
+        \subprf{Let $x_0 \in \nullspace{A} + x_p $.}{$x_0 \in \solspace{A x = b}$, i.o.w. $A x_0 = b$}{
+            $ x_0 \in \nullspace{A} + x_p $ \\
+            $ x_0 \in \{ x + x_p | A x = 0 \} $ \\
+            $ x_0 \in \{ x | A (x - x_p) = 0 \} $ \\
+            Thus $ A x_0 = A x_p $ \\
+            Since $A x_p = b$, it must be that $ A x_0 = b $.
+        }
+        \subprf{Let $x_0 \in \solspace{A x = b}$.}{$x_0 \in \nullspace{A} + x_p$, i.o.w. $A x_0 = A x_p$}{
+            Because $x_0 \in \solspace{A x = b}$, we have $A x_0 = b$. \\
+            Also, it was given that $A x_p = b$.
+        }
+    }
+\end{proof}
+
 
 
 \subsection{Matrix factorisation}
@@ -497,8 +487,10 @@ $$ A = U \Sigma V^T $$
 SVD is related to EVD like this: 
 
 \begin{equation}
-    A^T A &= V \Sigma^T U^T U \Sigma V^T \\
-          &= V \Sigma^T \Sigma V^T
+    \begin{aligned} 
+        A^T A &= V \Sigma^T U^T U \Sigma V^T \\
+              &= V \Sigma^T \Sigma V^T
+    \end{aligned}
 \end{equation}
 
 This makes the entries of $\Sigma$ the squares of the eigenvalues of the matrix $A$.
@@ -506,4 +498,4 @@ This makes the entries of $\Sigma$ the squares of the eigenvalues of the matrix 
 \paragraph{Nonnegative matrix factorisation}: Consider a dataset $A$, mapping people (rows) to properties (columns). You are looking for some hidden, small set of features, that groups of people have in common. 
 In neural networks we can reconstruct images from a minimal amount of hidden features by funnelling the image through a very small hidden layer out to a large output layer. We can do the very same thing here!
 $$ A = U V $$
-Where $A$ has dimension $r \cross c$, $U$ associates people with their hidden features/groups $r \cross f$ and $V$ associates features/groups with the properties $f \cross c$.
+Where $A$ has dimension $r \times c$, $U$ associates people with their hidden features/groups $r \times f$ and $V$ associates features/groups with the properties $f \times c$.
