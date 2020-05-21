@@ -60,8 +60,10 @@ A set $B$ is a base to a vectorspace $V$ iff $ B \subseteq V \land  \forall v \i
 $ B:baseV \iff ( B:li \land B:spanV ) $. 
 
 
-
-The dimension of a vecotrspace $S$ is defined as the size of its base $B$. That means to get a base for $\reals^2$, we never need more than two vectors. We'll prove this for the example of $S = \reals^2$:
+\begin{definition}[The dimension of a vectorspace $S$]
+    is defined as the size of its base $B_S$: $dim_S = |B_S|$. 
+\end{definition}
+That means to get a base for $\reals^2$, we never need more than two vectors. We'll prove this for the example of $S = \reals^2$:
 
 \begin{proof} \label{proofBaseSizeEqualsSpaceDimension}
 For any three vectors chosen from $\reals^2$, at least one must be a linear combination of the others. \\
@@ -75,6 +77,13 @@ For any three vectors chosen from $\reals^2$, at least one must be a linear comb
     }
 \end{proof}
 
+\begin{theorem}
+    [Every vectorspace has a basis]
+\end{theorem}
+
+\begin{theorem}
+    [All bases of a vectorspace $S$ have the same size]
+\end{theorem}
 
 
 

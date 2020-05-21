@@ -1,46 +1,14 @@
 \section{Linear algebra}
 
-In the previous section on general algebra we dealt with vector spaces (subspaces, linear independence, bases) and inner product spaces (norms, orthogonality). Here, we'll take a step back and only consider vector spaces, not requireing them to also be equipped with an inner product. 
+In the previous section on general algebra we dealt with vector spaces (subspaces, linear independence, bases) and inner product spaces (norms, orthogonality). 
+Here we'll mostly deal with the inner-product space of vectors and occasionally with the vector-space of matrices (but really, almost exclusively with the former ... ).
 
 
-\subsection{Basic matrix properties}
-
-\paragraph{Matrices form a vector space} This can be easily proven.
-
-\begin{proof}[The set of all $n \times m$ matrices $M$ is a vector space.] For this, we just need to go through the seven properties from the previous chapter. 
-
-    \subprf{}{scalar multiplication properties hold}{
-    
-        \subprf{}{$M$ is closed under scalar multiplication}{}
-        \subprf{}{$a(b \mtrx{m}) = (ab)\mtrx{m}$}{}
-        
-    }
-    
-    \subprf{}{vector addition properties hold}{
-    
-    }
-    
-    \subprf{}{vector addition and scalar multiplication are distributive}{
-    
-    }
-\end{proof}
-
-
-Here is a little exercise to get you warmed up. 
-
-\begin{proof}[If $\mtrx{A}\vec{x}$ is zero for any $\vec{x}$, then $\mtrx{A}$ must be the zero matrix.]
-
-    \subprf{}{$\forall \vec{x} : \mtrx{A}\vec{x} = \vec{0} \then \mtrx{A} = \mtrx{0} $}{
-        \subprf{Let $\vec{x}_0$ be chosen. Suppose $\mtrx{A}\vec{x}_0 = \vec{0}$.}{$\mtrx{A} = \mtrx{0} $}{
-        
-        
-        }
-    }
-
-\end{proof}
 
 
 \subsection{Spaces}
+
+We'll work a lot with a few vector-spaces and transfromations from and to those spaces. 
 
 \begin{definition}
     Let $W$ be a space. Then $V \subseteq W$ is a subspace, if: 
@@ -112,6 +80,154 @@ We can now print an overview of the different spaces that are associated with a 
 
 The rowspace of $A$ can be visualized using the line-intersection view of matrix-equations: it contains all the points that lie in the intersection of all the lines that make up the matrix. The columspace of A can be visulaized using the vector-image of A: it contains all the points that are spanned by A. 
 Notice how we included the previous theorem: any combination $x$ of a particular sollution $x_r$ and any vector in the nullspace $x_n$ is also a solution.
+
+
+We should look in more detail at this graphic. Note, for example, that \nullspace{A} and \collspace{A^T} seem to be orthogonal. Indeed:
+\begin{theorem}
+    [$\forall v \in \nullspace{A}, w \in \collspace{A^T}: v \orth w$]
+\end{theorem}
+\begin{proof}
+    \begin{equation}
+        \begin{aligned}
+            w^T v &= 0  & \text{ with } \thereis u: \mtrx{A}^T u = w \\
+            u^T \mtrx{A} v &= 0 & \text{ with } \mtrx{A}v = 0 \\
+            u^T 0 &= 0 & \text{ which is trivially true.}
+        \end{aligned}
+    \end{equation}
+    Thus, \nullspace{A} and \collspace{A^T} only intersect in $\vec{0}$.
+\end{proof}
+
+However, note that $V \geq \nullspace{A} \union \collspace{A^T}$. As an example, consider $\mtrx{A} = \begin{bmatrix}
+    1 & 0 \\
+    0 & 0
+\end{bmatrix}$. We get $\nullspace{A} = \begin{bmatrix}
+    0 \\ x
+\end{bmatrix}$ and $\collspace{A^T} = \begin{bmatrix}
+    x \\ 0
+\end{bmatrix}$. Now consider $\vec{v} = \begin{bmatrix}
+    1 \\ 1
+\end{bmatrix}$, which is neither in \nullspace{A} nor in \collspace{A^T}.
+
+
+
+
+
+
+
+
+\subsection{Change of basis}\label{changeOfBasis}
+
+Let $V$ be a vector space. Let $0$ be the canonical basis for that vector space. Let $A = \{\vec{a}_1, ..., \vec{a}_N \}$ and $B = \{\vec{b}_1, ..., \vec{b}_N\}$ be two other basis for that vectorspace. Let $\mtrx{A}$ be the matrix $[\vec{a}_1  ...  \vec{a}_N]$ and $\mtrx{B} = [\vec{b}_1 ... \vec{b}_N]$
+
+Every vector $\vec{v}$ can be expressed as a linear sum of the basisvectors in $A$, that is $\vec{v} = \sum_n \alpha_n \vec{a}_n$. That same thing in matrix notation: $\vec{v} = \mtrx{A}(\vec{v})_A$, where $(\vec{v})_A$ is the coordinates $\alpha$ of $\vec{v}$ with respect to the basis $A$. Correspondingly, for $B$ we have $\vec{v} = \sum_n \beta_n \vec{b}_n = \mtrx{B}(\vec{v})_B$.
+
+Note that within $A$ and $B$, we express the basevectors with respect to the canonical basis $0$, that is, we should really write $\mtrx{A} = [(\vec{a}_1)_0  ...  (\vec{a}_N)_0]$. Note also that $[(\vec{a}_1)_A  ...  (\vec{a}_N)_A] = \mtrx{I}$, the identity matrix. 
+
+We can use this to obtain a simple formula for the change of basis. 
+$$ \vec{v} = \mtrx{A} (\vec{v})_A $$
+$$ \vec{v} = \mtrx{B} (\vec{v})_B $$
+$$ (\vec{v})_B = \mtrx{B}^{-1} \mtrx{A} (\vec{v})_A $$
+
+But inverses are notoriously hard to calculate. Fortunately, there is another approach. Call $\mtrx{T}_{BA} = [(\vec{a}_1)_B ... (\vec{a}_N)_B]$ the \emph{transition matrix}. We can prove that $\mtrx{B}^{-1} \mtrx{A} = \mtrx{T}_{BA}$:
+
+\begin{equation}
+\begin{aligned}
+\mtrx{B}^{-1} \mtrx{A} (\vec{v})_A &= \mtrx{T}_{BA}  (\vec{v})_A \\
+                                   &= \sum_n (v_n)_A (\vec{a}_n)_B \\
+                                   &= \sum_n (v_n)_A \mtrx{B}^{-1} \mtrx{A} (\vec{a}_n)_A \\
+                                   &= \mtrx{B}^{-1} \mtrx{A} \sum_n (v_n)_A (\vec{a}_n)_A \\
+                                   &= \mtrx{B}^{-1} \mtrx{A} \text{  } \mtrx{I} (\vec{v})_A \\
+                    (\vec{v})_A &=  (\vec{v})_A         
+\end{aligned}
+\end{equation}
+
+Using $\mtrx{T}_{BA} = \mtrx{B}^{-1}\mtrx{A}$, a lot of statements are trivial to prove:
+\begin{itemize}
+    \item $\mtrx{T}_{BA} = \mtrx{T}_{AB}^{-1}$
+    \item $\mtrx{T}_{CA} = \mtrx{T}_{CB} \mtrx{T}_{BA}$
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Linear transformations}
+
+\begin{definition}
+Let $U$ and $V$ be two vector spaces and $f:U \to V$. Then $f$ is a \emph{linear transform} if
+\begin{itemize}
+    \item $f$ preserves scalar multiplication: $f(\alpha \vec{u}) = \alpha f(\vec{u})$
+    \item $f$ preserves vector addition: $f(\vec{u}_1 + \vec{u}_2) = f(\vec{u}_1) + f(\vec{u}_2)$
+\end{itemize}
+\end{definition}
+
+There are a bunch of properties to linear transformations that can be useful to us. 
+
+\begin{proof}[There is a unique linear transform from the basis of $U$ to any set of vectors in $V$ that we want.] In other words, any linear transform $f$ is completely deterimed by the matrix $[ f(\vec{b}_1) ... f(\vec{b}_N) ] = [\vec{v}_1 ... \vec{v}_N]$. That means if we dont know the transform, but we do know the results of the transform on a basis, then we can reconstruct the transform with certainty.  \\
+
+    \subprf{Let $B = \{ \vec{b}_1, ..., \vec{b}_N \}$ be a basis for $U$. Let $\{ \vec{v}_1, ..., \vec{v}_N \}$ be any vectors in $V$ that we may chose. }
+    { there is a unique function $f:U \to V$ such that $f(\vec{b}_i) = \vec{v}_i$ }{
+    
+        \subprf{Try $f(\vec{x}) = \mtrx{V} (\vec{x})_B$}
+        {$f(\vec{b}_i) = \vec{v}_i$ and $f$ is a linear transform.}{
+        
+            \subprf{Part 1: }
+            {$f(\vec{b}_i) = \vec{v}_i$}{
+                
+                $ f(\vec{b}_i) = \mtrx{V} (\vec{b}_i)_B = \mtrx{V} \vec{e}_i = \vec{v}_i $
+                
+            }
+            
+            \subprf{Part 2: }{$f$ is unique}{
+                
+                We could not have obtained any other form of $f$ than $f(\vec{x}) = \mtrx{V} (\vec{x})_B$. This is because for \emph{any} linear transform from $U \to V$ we have: 
+                
+                $ f(\vec{x}) = f(\mtrx{B}(\vec{x})_B) = f(\sum_n (x_n)_B \vec{b}_n) = \sum_n (x_n)_B f(\vec{b}_n)  $
+                
+                Using the result from part 1, this cannot be any other function than: 
+                
+                $ \sum_n (x_n)_B f(\vec{b}_n) = \sum_n (x_n)_B \vec{v}_n = \mtrx{V} (\vec{x})_B $ 
+                
+            }
+            
+            \subprf{Part 3: }
+            {$f$ is a linear tansform}{
+            
+            }
+        }
+    }
+\end{proof}
+
+A whole bunch of other properties are now easily proved. Let $f$ and $g$ be linear transforms from $U$ to $V$. The following are also linear transforms: 
+\begin{itemize}
+    \item $\alpha f$
+    \item $f + g$
+    \item $f^{-1}$ ( if it exists )
+    \item $fg$ ( here $g: V \to W$ )
+\end{itemize}
+
+Let $f: U \to V$ be a linear transform. Then the following are equivalent: 
+\begin{itemize}
+    \item If $f(\vec{u}) = \vec{0}$, then $\vec{u} = \vec{0}$
+    \item $f$ is one-to-one
+    \item $f$ maps linearly independent vectors to linearly independent vectors. 
+\end{itemize}
+
+
+Prove that a transform can be split up into mulitple transforms on the basis vectors. 
+As an examle, consider the case of a rotation. A diagonal rotation can be reproduced by a rotation first around one, then around another axis. 
+
+
+\paragraph{A linear transformation can also be a change of basis} when it is on a vectorspace and invertible.
+
 
 
 
@@ -270,13 +386,53 @@ It is also a measure of how much linearly independent the rows/cols of $A$ are. 
 
 
 
+\subsection{Special matrices}
+
+\paragraph{Symmetric matrices} are simple but very useful.
+\begin{definition}
+    [A matrix $\mtrx{A}$ is symmetric] iff $\mtrx{A} = \mtrx{A}^T$
+\end{definition}
+
+
+\paragraph{Positive (semi-)definite matrix} are a special case of symmetric matrices.
+\begin{definition}
+    [$\mtrx{A}: \PSD \iff \mtrx{A}: \symm \land \forall z: z^T \mtrx{A} z \geq 0$]
+    From the first condition, $\mtrx{A}: \symm$, it follows that the eigenvectors are orthogonal (see eq. \ref{symm_then_orth}), 
+    from the second one, $\forall z: z^T \mtrx{A} z \geq 0$, it follows that the eigenvalues are all greater or equal than $0$ (see eq. \dots).
+\end{definition}
+
+
+\paragraph{Gram matrices} appear often in important theorems. They turn out to be PSD.
+\begin{definition}
+    [A Gram matrix] is a matrix $\mtrx{A} = \mtrx{B}^T \mtrx{B}$
+\end{definition}
+
+\begin{theorem}
+    [$\rank{A} = \rank{A^T A}$]
+\end{theorem}
+
+\begin{theorem}
+    [$A^T A: \PSD$]
+\end{theorem}
+
+
+\paragraph{Orthogonal matrices} make tons of calculations simpler.
+\begin{definition}[A matrix $\mtrx{A}$ is orthogonal] iff $\forall x_1, x_2 \in \mtrx{A}, x_1 \neq x_2: x_1 \orth x_2$
+\end{definition}
+
+\begin{theorem}
+    [If $A$ is orthogonal, than $A^{-1} = A^T$.]
+    This is trivially proven. By the definition of orthogonality we have $\mtrx{A}^T \mtrx{A} = \mtrx{I}$
+\end{theorem}
 
 
 
 
 
 
-\subsection{Eigenvalues}
+
+
+\subsection{Eigenvalues and eigenvectors}
 
 \begin{equation}
     \begin{aligned}
@@ -286,26 +442,71 @@ It is also a measure of how much linearly independent the rows/cols of $A$ are. 
     \end{aligned}
 \end{equation}
 
+Any \emph{square} matrix can be eigenvector (aka. spectrally) decomposed: $\mtrx{A} = \mtrx{X} \mtrx{\Lambda}\mtrx{X}^{-1}$.
 
-
-
-
-
-
-
-
-
-
-
-\subsection{Orthogonal matrices}
-TODO: definition orthogonal
+\begin{theorem} \label{symm_then_orth}
+    [$\mtrx{A}: \symm \then \mtrx{X}: \orth$]
+    \begin{equation}
+        \begin{aligned}
+                                                                & <Ax, y> &= <x, A^Ty> \\
+            \text{Since } A:\symm:                              & <Ax, y> &= <x, Ay> \\
+            \text{Since } x, y \text{ are eigenvalues of } A:   & <\lambda_x x, y> &= <x, \lambda_y y> \\
+                                                                & \lambda_x <x, y> &= \lambda_y <x, y>
+        \end{aligned}
+    \end{equation}
+    Thus, either $\lambda_x = \lambda_y$ or $x \orth y$ 
+\end{theorem}
 
 \begin{theorem}
-    If $A$ is orthogonal, than $A^{-1} = A^T$.
+    [As a corollary, the eigenvalue decomposition can be simplified]: $\mtrx{A}: \symm \then \mtrx{A} = \mtrx{X} \mtrx{\Lambda} \mtrx{X}^{-1} = \mtrx{X} \mtrx{\Lambda} \mtrx{X}^T$
 \end{theorem}
 
 
 
+
+
+
+
+
+\subsection{Singular value decomposition}
+Square matrices may be decomposed to $\mtrx{A} = \mtrx{X} \mtrx{\Lambda} \mtrx{X}^{-1}$.
+More generally, any matrix may be decomposed to $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$.
+Before proving this, lets first interpret that statement from a matrix point of view.
+
+Consider some basis $B_{\collspace{A^T}}$. Through the transformation $\mtrx{A}: \reals^n \then \reals^m$ that basis $B_{\collspace{A^T}}$ is transformed into \collspace{A}.
+So far so easy - but we have an additional requirement: we want that transformed basis to be a basis itself: $ \mtrx{A} B_{\collspace{A^T}} = B_{\collspace{A}}$.
+
+There may be many bases $B_{\collspace{A^T}}$, but with that additional requirement, it must truely be a spetial basis. Let's call it $\mtrx{V}$, and the resulting new basis $\mtrx{A} \mtrx{V} = \mtrx{U}$.
+Also, we want $\mtrx{U}$ not only to be a basis, but also normal; so let's normalize it to $\mtrx{U}\mtrx{\Sigma}$. With all that we get: $\mtrx{A} \mtrx{V} = \mtrx{U} \mtrx{\Sigma}$.
+
+So these are our requirements. Let's jump into a proof. \\
+
+
+Consider $\mtrx{A}^T \mtrx{A}$. It is a Gram-matrix, and as such PSD. We have: 
+$$ \mtrx{A}^T \mtrx{A} v_i = \lambda_i v_i $$
+by eigenvalue decomposition. Define $\sigma_i = \sqrt{\lambda_i}$. This exists, because $\mtrx{A}^T \mtrx{A}: \PSD$.
+$$ \mtrx{A}^T \mtrx{A} v_i = \sigma_i^2 v_i $$
+
+\paragraph{Case 1}: Assume that $\mtrx{A}$ is full rank; i.e. $\forall i: \sigma_i > 0$.
+Let $u_i = \frac{1}{\sigma_i} \mtrx{A} v_i$. 
+Expressed in matrix-form this gives us
+\begin{equation}
+    \begin{aligned}
+        \mtrx{U}                            &= \mtrx{A} \mtrx{V} \mtrx{\Sigma}^{-1} \\
+        \mtrx{U} \mtrx{\Sigma}              &= \mtrx{A} \mtrx{V} \\
+        \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T   &= \mtrx{A}
+    \end{aligned}
+\end{equation}
+
+Note that $u_i$ is, by construction, an eigenvector of $\mtrx{A} \mtrx{A}^T$:
+\begin{equation}
+    \begin{aligned}
+        A A^T u_i   &= A A^T A v_i \frac{1}{\sigma_i} \\
+                    &= A \sigma_i^2 v_i \frac{1}{\sigma_i} \\
+                    &= \sigma_i^2 A v_i \frac{1}{\sigma_i}\\
+                    &= \sigma_i^2 u_i
+    \end{aligned}
+\end{equation}
 
 
 
@@ -346,126 +547,6 @@ If $A^{RI}$ exists, then $A^{LI}$ does not
 
 
 
-
-
-
-
-
-
-
-
-\subsection{Change of basis}\label{changeOfBasis}
-
-Let $V$ be a vector space. Let $0$ be the canonical basis for that vector space. Let $A = \{\vec{a}_1, ..., \vec{a}_N \}$ and $B = \{\vec{b}_1, ..., \vec{b}_N\}$ be two other basis for that vectorspace. Let $\mtrx{A}$ be the matrix $[\vec{a}_1  ...  \vec{a}_N]$ and $\mtrx{B} = [\vec{b}_1 ... \vec{b}_N]$
-
-Every vector $\vec{v}$ can be expressed as a linear sum of the basisvectors in $A$, that is $\vec{v} = \sum_n \alpha_n \vec{a}_n$. That same thing in matrix notation: $\vec{v} = \mtrx{A}(\vec{v})_A$, where $(\vec{v})_A$ is the coordinates $\alpha$ of $\vec{v}$ with respect to the basis $A$. Correspondingly, for $B$ we have $\vec{v} = \sum_n \beta_n \vec{b}_n = \mtrx{B}(\vec{v})_B$.
-
-Note that within $A$ and $B$, we express the basevectors with respect to the canonical basis $0$, that is, we should really write $\mtrx{A} = [(\vec{a}_1)_0  ...  (\vec{a}_N)_0]$. Note also that $[(\vec{a}_1)_A  ...  (\vec{a}_N)_A] = \mtrx{I}$, the identity matrix. 
-
-We can use this to obtain a simple formula for the change of basis. 
-$$ \vec{v} = \mtrx{A} (\vec{v})_A $$
-$$ \vec{v} = \mtrx{B} (\vec{v})_B $$
-$$ (\vec{v})_B = \mtrx{B}^{-1} \mtrx{A} (\vec{v})_A $$
-
-But inverses are notoriously hard to calculate. Fortunately, there is another approach. Call $\mtrx{T}_{BA} = [(\vec{a}_1)_B ... (\vec{a}_N)_B]$ the \emph{transition matrix}. We can prove that $\mtrx{B}^{-1} \mtrx{A} = \mtrx{T}_{BA}$:
-
-\begin{equation}
-\begin{aligned}
-\mtrx{B}^{-1} \mtrx{A} (\vec{v})_A &= \mtrx{T}_{BA}  (\vec{v})_A \\
-                                   &= \sum_n (v_n)_A (\vec{a}_n)_B \\
-                                   &= \sum_n (v_n)_A \mtrx{B}^{-1} \mtrx{A} (\vec{a}_n)_A \\
-                                   &= \mtrx{B}^{-1} \mtrx{A} \sum_n (v_n)_A (\vec{a}_n)_A \\
-                                   &= \mtrx{B}^{-1} \mtrx{A} \text{  } \mtrx{I} (\vec{v})_A \\
-                    (\vec{v})_A &=  (\vec{v})_A         
-\end{aligned}
-\end{equation}
-
-Using $\mtrx{T}_{BA} = \mtrx{B}^{-1}\mtrx{A}$, a lot of statements are trivial to prove:
-\begin{itemize}
-    \item $\mtrx{T}_{BA} = \mtrx{T}_{AB}^{-1}$
-    \item $\mtrx{T}_{CA} = \mtrx{T}_{CB} \mtrx{T}_{BA}$
-\end{itemize}
-
-
-
-
-
-
-
-
-
-
-
-
-
-\subsection{Linear transformations}
-
-\begin{definition}
-Let $U$ and $V$ be two vector spaces and $f:U \to V$. Then $f$ is a \emph{linear transform} if
-\begin{itemize}
-    \item $f$ preserves scalar multiplication: $f(\alpha \vec{u}) = \alpha f(\vec{u})$
-    \item $f$ preserves vector addition: $f(\vec{u}_1 + \vec{u}_2) = f(\vec{u}_1) + f(\vec{u}_2)$
-\end{itemize}
-\end{definition}
-
-There are a bunch of properties to linear transformations that can be useful to us. 
-
-\begin{proof}[There is a unique linear transform from the basis of $U$ to any set of vectors in $V$ that we want.] In other words, any linear transform $f$ is completely deterimed by the matrix $[ f(\vec{b}_1) ... f(\vec{b}_N) ] = [\vec{v}_1 ... \vec{v}_N]$. That means if we dont know the transform, but we do know the results of the transform on a basis, then we can reconstruct the transform with certainty.  \\
-
-    \subprf{Let $B = \{ \vec{b}_1, ..., \vec{b}_N \}$ be a basis for $U$. Let $\{ \vec{v}_1, ..., \vec{v}_N \}$ be any vectors in $V$ that we may chose. }
-    { there is a unique function $f:U \to V$ such that $f(\vec{b}_i) = \vec{v}_i$ }{
-    
-        \subprf{Try $f(\vec{x}) = \mtrx{V} (\vec{x})_B$}
-        {$f(\vec{b}_i) = \vec{v}_i$ and $f$ is a linear transform.}{
-        
-            \subprf{Part 1: }
-            {$f(\vec{b}_i) = \vec{v}_i$}{
-                
-                $ f(\vec{b}_i) = \mtrx{V} (\vec{b}_i)_B = \mtrx{V} \vec{e}_i = \vec{v}_i $
-                
-            }
-            
-            \subprf{Part 2: }{$f$ is unique}{
-                
-                We could not have obtained any other form of $f$ than $f(\vec{x}) = \mtrx{V} (\vec{x})_B$. This is because for \emph{any} linear transform from $U \to V$ we have: 
-                
-                $ f(\vec{x}) = f(\mtrx{B}(\vec{x})_B) = f(\sum_n (x_n)_B \vec{b}_n) = \sum_n (x_n)_B f(\vec{b}_n)  $
-                
-                Using the result from part 1, this cannot be any other function than: 
-                
-                $ \sum_n (x_n)_B f(\vec{b}_n) = \sum_n (x_n)_B \vec{v}_n = \mtrx{V} (\vec{x})_B $ 
-                
-            }
-            
-            \subprf{Part 3: }
-            {$f$ is a linear tansform}{
-            
-            }
-        }
-    }
-\end{proof}
-
-A whole bunch of other properties are now easily proved. Let $f$ and $g$ be linear transforms from $U$ to $V$. The following are also linear transforms: 
-\begin{itemize}
-    \item $\alpha f$
-    \item $f + g$
-    \item $f^{-1}$ ( if it exists )
-    \item $fg$ ( here $g: V \to W$ )
-\end{itemize}
-
-Let $f: U \to V$ be a linear transform. Then the following are equivalent: 
-\begin{itemize}
-    \item If $f(\vec{u}) = \vec{0}$, then $\vec{u} = \vec{0}$
-    \item $f$ is one-to-one
-    \item $f$ maps linearly independent vectors to linearly independent vectors. 
-\end{itemize}
-
-
-Prove that a transform can be split up into mulitple transforms on the basis vectors. 
-As an examle, consider the case of a rotation. A diagonal rotation can be reproduced by a rotation first around one, then around another axis. 
-
-
-\paragraph{A linear transformation can also be a change of basis} when it is on a vectorspace and invertible.
 
 
 
@@ -591,7 +672,7 @@ However, there are \emph{non}linear objects in $\reals^3$ that require more than
         $ \nullspace{[A b]} = \{x' | [A b]x' = 0\} $ \\
         $ = \{x' | A x'_{1:m} = -b x'_{m+1}\} $ \\
         A subset of that nullspace equals the solutionset for $A x = b$: \\
-        $ \nullspace{[A b]}_{[x'_{m+1} = -1]} = \{x'| A x'_{1:m} = b \} $ 
+        $ \nullspace{[A b]} \text{ where } [x'_{m+1} = -1] = \{x'| A x'_{1:m} = b \} $ 
     }   
 \end{proof}
 
@@ -626,24 +707,10 @@ However, there are \emph{non}linear objects in $\reals^3$ that require more than
 \subsubsection{Matrix factorisation}
 
 \paragraph{Eigenvalue decomposition}
-
 $$ A = V \Lambda V^{-1} $$
 
 \paragraph{Singular value decomposition} is eigenvalue decomposition, generalized to non-square matrices.
-Getting the basis for $\nullspace{A}$ becomes numerically feasible using singular value decomposition.
-
 $$ A = U \Sigma V^T $$
-
-SVD is related to EVD like this: 
-
-\begin{equation}
-    \begin{aligned} 
-        A^T A &= V \Sigma^T U^T U \Sigma V^T \\
-              &= V \Sigma^T \Sigma V^T
-    \end{aligned}
-\end{equation}
-
-This makes the entries of $\Sigma$ the squares of the eigenvalues of the matrix $A$.
 
 \paragraph{Nonnegative matrix factorisation}: Consider a dataset $A$, mapping people (rows) to properties (columns). You are looking for some hidden, small set of features, that groups of people have in common. 
 In neural networks we can reconstruct images from a minimal amount of hidden features by funnelling the image through a very small hidden layer out to a large output layer. We can do the very same thing here!

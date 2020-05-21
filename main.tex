@@ -79,17 +79,20 @@
 %linalg
 % \let\vec\mathbf %\renewcommand{\vec}[1]{\ensuremath{\mathbf{#1}}}
 \newcommand{\mtrx}[1]{\ensuremath{\mathbf{#1}}}
-\newcommand{\nullspace}[1]{\ensuremath{\mathcal{N}(#1)}}
-\newcommand{\collspace}[1]{\ensuremath{\mathcal{C}(#1)}}
-\newcommand{\rowspace}[1]{\ensuremath{\mathcal{R}(#1)}}
-\newcommand{\solspace}[1]{\ensuremath{\mathcal{S}(#1)}}
+\newcommand{\nullspace}[1]{\ensuremath{\mathcal{N}_{#1}}}
+\newcommand{\collspace}[1]{\ensuremath{\mathcal{C}_{#1}}}
+\newcommand{\rowspace}[1]{\ensuremath{\mathcal{R}_{#1}}}
+\newcommand{\solspace}[1]{\ensuremath{\mathcal{S}_{#1}}}
 \newcommand{\dimension}[1]{\ensuremath{\text{dim}_{#1}}}
+\newcommand{\rank}[1]{\ensuremath{\text{rank}_{#1}}}
+\newcommand{\symm}{\ensuremath{\text{sym}}}
+\newcommand{\orthtxt}{\ensuremath{\text{orth}}}
+\newcommand{\PSD}{\ensuremath{\text{PSD}}}
 %algebraic geometry
 \newcommand{\innerprod}{\ensuremath{\cdot}}
 \newcommand{\innerprodbr}[2]{\ensuremath{< #1 , #2 >}}
 \newcommand{\outerprod}{\ensuremath{\wedge}}
 \newcommand{\orth}{\ensuremath{\perp}}
-\newcommand{\rank}[1]{\ensuremath{\text{rank}(#1)}}
 %analysis
 \newcommand{\diff}[1]{\ensuremath{\mathop{d#1}}}
 \newcommand{\partDiff}[2]{\ensuremath{ \frac{ \mathop{d#1} }{ \mathop{d#2} } }}
