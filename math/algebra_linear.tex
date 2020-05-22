@@ -97,7 +97,7 @@ We should look in more detail at this graphic. Note, for example, that \nullspac
     Thus, \nullspace{A} and \collspace{A^T} only intersect in $\vec{0}$.
 \end{proof}
 
-However, note that $V \geq \nullspace{A} \union \collspace{A^T}$. As an example, consider $\mtrx{A} = \begin{bmatrix}
+However, note that $\reals^n \geq \nullspace{A} \union \collspace{A^T}$. As an example, consider $\mtrx{A} = \begin{bmatrix}
     1 & 0 \\
     0 & 0
 \end{bmatrix}$. We get $\nullspace{A} = \begin{bmatrix}
@@ -108,8 +108,11 @@ However, note that $V \geq \nullspace{A} \union \collspace{A^T}$. As an example,
     1 \\ 1
 \end{bmatrix}$, which is neither in \nullspace{A} nor in \collspace{A^T}.
 
-
-
+\begin{figure}
+    \caption{When $A$ is not full rank, there are infinitely many vectors $v$ that are neither in \rowspace{A} nor in \nullspace{A}. When it comes to spatial dimensions, $1 + 1 \neq 2$!}
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/nullspace_rowspace_lowrank.png}
+\end{figure}
 
 
 
