@@ -36,6 +36,10 @@ However, some sites depend on CORS.
 \end{itemize}
 Note that there is no way that www.mysite.com can deactivate CORS-blocking; it \emph{must} be allowed by www.puppyimagehost.org. An individual person might deactivate the browsers CORS-settings (if the browser allows you to do that), but the common user will never do that. 
 
+\paragraph{CORS when applied to an OL-canvas} Really, using 3rd party data is a bit like a one-night-stand: you need consent from both sides. The server gives consent to the usage of its images by setting \inlinecode{Access-Control-Allow-Origin}, the client does so by setting \inlinecode{crossorigin="Anonymous"} (or \inlinecode{crossorigin="use-credentials"}). 
+Now a canvas is a special case. For one, often we load images from more than one external source, so we need to get two-way-consent with a whole series of services. On the other hand: even if we don't actively set \inlinecode{crossorigin}, data is displayed - errors only start to occur once we want to call \inlinecode{canvas.toDataUrl(...)}. Why is that? Well, canvases load \inlinecode{img}'s, and those are, as mentioned above, exempt from CORS-restrictions by default. However once we want to do any manipulations on that data, CORS kicks in again.
+That is why you can show any layer on a canvas, but cannot export it to pdf as long as it displays any layer that does not have two-way-consent.
+
 \paragraph{CORB} (cross origin read blocking) is when your browser deletes a request's response body before it can be red by your site. This is to prevent www.puppyimagehost.org from accidentially leaking sensitive information.
 Even with CORS, an attacker might use html tags like \inlinecode{img} to circumvent CORS-blocking. This is not a case of cross-site scripting, but rather of building a malicious website from scratch just to sneakily access data.
 \begin{itemize}
