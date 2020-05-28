@@ -60,7 +60,11 @@ bender.sayHi();
 \end{lstlisting}
 
 \subsection{The js-runtime}
-\includegraphics[width=0.75\textwidth]{images/js_event_loop.png}
+\begin{figure}[H] \label{js-runtime}
+    \caption{\emph{Stack}: Todo's in the current frame. Makes calls to the \emph{Web-API}s. \emph{Queue}: From another thread the browser sends messages onto the queue. Some of these messages may have been triggered by the JS-stack calling for example a \inlinecode{setTimeout} Web-API call. They're handled FIFO.}
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/js_event_loop.png}
+\end{figure}
 
 \subsection{Asynchronous programming}
 
