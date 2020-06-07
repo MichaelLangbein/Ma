@@ -277,10 +277,17 @@ Speed: up to 16 Mbit/s, but only 1-2 Mbit/s in rural areas where IP-Stations are
 
 \subsection{WiFi (really only those few meters up to your wired router)}
 WiFi really uses the same "everyone-shout-first-gets-served" protocol as MAC does. That means that every device has to wait its turn to use the router. 
-There are two frequencies at which devices may communicate:
+There are two frequency-ranges at which devices may communicate. Within each range there are sub-areas known as \emph{channels}. Parallelism is obtained by different devices using different channels. 
 \begin{itemize}
-    \item 2.4 GHz: slower, further reach
-    \item 5.0 Ghz: faster, but only at shorter distance
+    \item 2.4 GHz: slower, further reach. 14 channels, but only 1, 6 and 11 don't overlap. Interferes with microwaves and bluetooth.
+    \item 5.0 Ghz: faster, but only at shorter distance. Many channels.
+\end{itemize}
+Factors to consider with wifi:
+\begin{itemize}
+    \item Overloading: when all channels are busy, new devices will have to share channels that are already in use. Wifi allows connections under that regime, but speed goes down (wifi favors connectivity over speed). 
+    \item Channel width: may be broad (=40MHz) if there are no other routers around. Otherwise should be narrow (=20MHz), so as to avoid interference.
+    \item Channel assignment: usually, routers chose a channel for you upon first handshake. Check if the router provides too few channels, or if the chosen channels are already in use by neighboring routers (good routers will automatically chose channels based on usage). 
+    \item Copper: wifi-connectivity is an important issue, but once at the router, all packages are funneled through one copper (or fibre) thread. So even with 5G, many devices may experience low performance because the \emph{wired} connection is not fast enough.
 \end{itemize}
 
 

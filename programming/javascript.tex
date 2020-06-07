@@ -1,7 +1,12 @@
 \section{Javascript}
 At its heart, javascript is a simple language. Its has however two very unconventional features that are not used in any other languages: \emph{this} and \emph{prototpye}s.  
 
- \paragraph{this}: every function implicity gets a parameters named \inlinecode{this}, containing the context. 
+\begin{itemize}
+    \item Javascript does not have methods. It has properties that refer to functions.
+    \item A function is an object. (Thats why every function has a \inlinecode{this}). Note that this means that there are executable objects.
+\end{itemize}
+
+ \paragraph{this}: every function implicitly gets a parameters named \inlinecode{this}, containing the context. 
 \begin{lstlisting}
     function add (x, y) {
         console.log(this);
