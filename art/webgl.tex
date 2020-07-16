@@ -1,5 +1,18 @@
 \section{WebGL}
 
+\subsection{Rendering in the browser}
+\begin{table}[h]
+    \begin{tabular}{@{}llll@{}}
+    \toprule
+    technology   & use-case                    & programming style &                  & libraries          \\ 
+    \midrule       
+    canvas/2d    &                             &                   & single-buffering to bitmap. paintbrush-statemachine. &                    \\
+    canvas/webgl & 3d, interactive, many items & procedural        & double-buffering to bitmap & treejs, processing \\
+    svg + css    & simple 2d graphics          & declarative       & no bitmap, but \inlinecode{<svg>}. has concept of layers, browser-native event-handling. Cannot easily export to image. & d3, raphael              \\ 
+    \bottomrule
+    \end{tabular}
+\end{table}
+
 \subsection{Pipeline}
 \includegraphics[width=0.9\textwidth]{images/graphicPipeline.jpg}
 
