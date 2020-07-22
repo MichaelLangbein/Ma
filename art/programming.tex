@@ -2,18 +2,15 @@
 
 
 \subsection{Rendering in the browser}
-\begin{table}[h]
-    \begin{tabular}{@{}llll@{}}
-    \toprule
-    technology   & use-case                    & programming style &                  & libraries          \\ 
-    \midrule       
-    canvas/2d    &                             &                   & single-buffering to bitmap. paintbrush-statemachine. &                    \\
-    canvas/webgl & 3d, interactive, many items & procedural        & double-buffering to bitmap & threejs, processing \\
-    svg + css    & simple 2d graphics          & declarative       & no bitmap, but \inlinecode{<svg>}. has concept of layers, browser-native event-handling. Cannot easily export to image. & d3, raphael              \\ 
-    \bottomrule
+\begin{table}[]
+    \begin{tabular}{lllll}
+        \hline
+        technology   & use-case                    & programming style &                                                                                                                                                                 & libraries           \\ \hline
+        canvas/2d    &                             &                   & single-buffering to bitmap. paintbrush-statemachine.                                                                                                            &                     \\
+        canvas/webgl & 3d, interactive, many items & procedural        & double-buffering to bitmap                                                                                                                                      & threejs, processing \\
+        svg + css    & simple 2d graphics          & declarative       & no bitmap, but \textbackslash{}inlinecode\{\textless{}svg\textgreater{}\}. has concept of layers, browser-native event-handling. Cannot easily export to image. & d3, raphael         \\ \hline
     \end{tabular}
 \end{table}
-
 
 
 \subsection{SVG}
