@@ -1,0 +1,64 @@
+\section{Programming}
+
+
+\subsection{Rendering in the browser}
+\begin{table}[h]
+    \begin{tabular}{@{}llll@{}}
+    \toprule
+    technology   & use-case                    & programming style &                  & libraries          \\ 
+    \midrule       
+    canvas/2d    &                             &                   & single-buffering to bitmap. paintbrush-statemachine. &                    \\
+    canvas/webgl & 3d, interactive, many items & procedural        & double-buffering to bitmap & threejs, processing \\
+    svg + css    & simple 2d graphics          & declarative       & no bitmap, but \inlinecode{<svg>}. has concept of layers, browser-native event-handling. Cannot easily export to image. & d3, raphael              \\ 
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+\subsection{SVG}
+
+SVG consists of 
+\begin{itemize}
+    \item Objects
+    \item Groups. Groups have ...
+        \begin{itemize}
+            \item a transform
+            \item a style
+            \item Notably, they don't have a x, y, width or height attribute! If you need those, use SVG's instead
+        \end{itemize}
+    \item SVG's. 
+        \begin{itemize}
+            \item x, y width, height
+        \end{itemize}
+\end{itemize}
+
+Objects have a nice, simple hierarchy.
+\begin{itemize}
+    \item Objects: each object is a ...
+        \begin{itemize}
+            \item Path: the most basic object: a Bezier-curve. Each of the following subtypes can be downgraded to a path again in inkscape.
+                \begin{itemize}
+                    \item rect, star, ellipse, text
+                \end{itemize}
+        \end{itemize}
+    \item Each object has a ... 
+        \begin{itemize}
+            \item fill, stroke, opacity
+        \end{itemize}
+\end{itemize}
+
+A bunch of software helps with SVG's:
+\begin{itemize}
+    \item Inkscape: ideal for creating SVG logos
+    \item d3: Data-driven, animated SVG's
+    \item Raphael: animated SVG's; imperative, \emph{not} data-driven
+\end{itemize}
+
+
+\subsection{Webgl}
+
+
+\subsubsection{Shader gallery}
+
+
