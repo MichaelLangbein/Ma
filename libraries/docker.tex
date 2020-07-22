@@ -1,15 +1,36 @@
 \section{Docker}
 
-\subsection{When would you want to use docker?}
-When you have one host that hosts many processes that are all linux-based, but for the rest should be isolated. 
-
-\subsection{Containers}
-
 \begin{itemize}
     \item an \emph{image} is an executable package that includes everything needed to run an application--the code, a runtime, libraries, environment variables, and configuration files. Includes execution of all \inlinecode{RUN} statements
     \item a \emph{container} is a runtime instance of an image - what the image becomes in memory when executed (that is, an image with state, or a user process). On startup, the \inlinecode{CMD} directive is executed.
 \end{itemize}
 
+
+\subsection{Command overview}
+
+\begin{itemize}
+    \item \inlinecode{docker} \begin{itemize}
+        \item \inlinecode{image} \begin{itemize}
+            \item \inlinecode{pull}
+            \item \inlinecode{rm <imagename>}
+            \item \inlinecode{build --tag=<nameofappalllowercase> .}: package your app and send it to \inlinecode{/var/lib/docker/images}
+        \end{itemize}
+        \item \inlinecode{container} \begin{itemize}
+            \item \inlinecode{run -p 4000:80 -d --name=<nameofyourcontaineralllowercase> <nameofyourappalllowercase>}execute that package (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000} and \inlinecode{-d} stands for \emph{detached}, i.e. get back control of your command-line after starting the container).
+            \item \inlinecode{run -it ...} creates a new container from an image
+            \item \inlinecode{docker start -i ...} starts up an existing container
+            \item \inlinecode{logs --tail 100 --since <minutes> --timestamps --follow <containerid>}: All \inlinecode{stdout} and \inlinecode{stderr} (?) goes to this log
+            \item \inlinecode{cp}
+            \item \inlinecode{exec}
+            \item \inlinecode{inspect --format={{.LogPath}} <containerid>}: Hardware-info
+            \item \inlinecode{rm <containername>}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+
+
+\subsection{Containers}
 
 Containers and virtual machines.
 \begin{itemize}
@@ -43,52 +64,11 @@ ENV NAME World
 CMD ["python", "app.py"]
 \end{lstlisting}
 
-You then write your app. 
-\begin{lstlisting}[caption=requirements.txt]
-Flask
-Redis
-\end{lstlisting}
-
-\begin{lstlisting}[language=python, caption=main.py]
-    from flask import Flask
-    from redis import Redis, RedisError
-    import os
-    import socket
-    
-    # Connect to Redis
-    redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
-    
-    app = Flask(__name__)
-    
-    @app.route("/")
-    def hello():
-        try:
-            visits = redis.incr("counter")
-        except RedisError:
-            visits = "<i>cannot connect to Redis, counter disabled</i>"
-    
-        html = "<h3>Hello {name}!</h3>" \
-               "<b>Hostname:</b> {hostname}<br/>" \
-               "<b>Visits:</b> {visits}"
-        return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname(), visits=visits)
-    
-    if __name__ == "__main__":
-        app.run(host='0.0.0.0', port=80)
-\end{lstlisting}
-
-\begin{itemize}
-    \item  \inlinecode{sudo docker image build --tag=<nameofyourappalllowercase> .}: package your app and send it to \inlinecode{/var/lib/docker/images}
-    \item \inlinecode{sudo docker container run -p 4000:80 -d --name=<nameofyourcontaineralllowercase> <nameofyourappalllowercase>}: execute that package (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000} and \inlinecode{-d} stands for \emph{detached}, i.e. get back control of your command-line after starting the container).
-    \item \inlinecode{sudo docker image ls}
-    \item \inlinecode{sudo docker container ls -a}
-    \item \inlinecode{sudo docker image rm <imagename>}
-    \item \inlinecode{sudo docker container rm <containername>}
-\end{itemize}
-
-Note: \inlinecode{docker run -it ...} creates a new container from an image, \inlinecode{docker start -i ...} starts up an existing container. 
 
 
-\subsection{Layers}
+
+\subsection{Layers and continuing failed builds}
+
 Each directive in a dockerfile creates a new \emph{layer} (aka. \emph{intermediate image}), which is cached in the engine to speed up the build of other dockerfiles. 
 If your build breaks at a certain point in the execution, like this: 
 
