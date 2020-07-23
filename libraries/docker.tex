@@ -1,5 +1,13 @@
 \section{Docker}
 
+Containers and virtual machines.
+\begin{itemize}
+    \item A container runs natively on Linux and shares the kernel of the host machine with other containers. It runs a discrete process, taking no more memory than any other executable, making it lightweight.
+    \item By contrast, a virtual machine (VM) runs a full-blown “guest” operating system with virtual access to host resources through a hypervisor. In general, VMs provide an environment with more resources than most applications need.
+\end{itemize}
+
+Images are described by \emph{Dockerfiles} that list all the contents of an image. These image files can be downloaded from a central repository called \emph{docker hub}.
+Usually, you write your own dockerfile that specifies as a dependency a more general dockerfile as your base. 
 \begin{itemize}
     \item an \emph{image} is an executable package that includes everything needed to run an application--the code, a runtime, libraries, environment variables, and configuration files. Includes execution of all \inlinecode{RUN} statements
     \item a \emph{container} is a runtime instance of an image - what the image becomes in memory when executed (that is, an image with state, or a user process). On startup, the \inlinecode{CMD} directive is executed.
@@ -11,57 +19,75 @@
 \begin{itemize}
     \item \inlinecode{docker} \begin{itemize}
         \item \inlinecode{image} \begin{itemize}
-            \item \inlinecode{pull}
-            \item \inlinecode{rm <imagename>}
-            \item \inlinecode{build --tag=<nameofappalllowercase> .}: package your app and send it to \inlinecode{/var/lib/docker/images}
-        \end{itemize}
+                \item \inlinecode{pull}
+                \item \inlinecode{rm <imagename>}
+                \item \inlinecode{build --tag=<nameofappalllowercase> .}: package your app and send it to \inlinecode{/var/lib/docker/images}
+            \end{itemize}
         \item \inlinecode{container} \begin{itemize}
-            \item \inlinecode{run -p 4000:80 -d --name=<nameofyourcontaineralllowercase> <nameofyourappalllowercase>}execute that package (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000} and \inlinecode{-d} stands for \emph{detached}, i.e. get back control of your command-line after starting the container).
-            \item \inlinecode{run -it ...} creates a new container from an image
-            \item \inlinecode{docker start -i ...} starts up an existing container
-            \item \inlinecode{logs --tail 100 --since <minutes> --timestamps --follow <containerid>}: All \inlinecode{stdout} and \inlinecode{stderr} (?) goes to this log
-            \item \inlinecode{cp}
-            \item \inlinecode{exec}
-            \item \inlinecode{inspect --format=\{\{.LogPath\}\} <containerid>}: Hardware-info
-            \item \inlinecode{rm <containername>}
-        \end{itemize}
+                \item \inlinecode{run -p 4000:80 -d --name=<nameofyourcontaineralllowercase> <nameofyourappalllowercase>}execute that package (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000} and \inlinecode{-d} stands for \emph{detached}, i.e. get back control of your command-line after starting the container).
+                \item \inlinecode{run -it ...} creates a new container from an image
+                \item \inlinecode{start -i ...} starts up an existing container
+                \item \inlinecode{logs --tail 100 --since <minutes> --timestamps --follow <containerid>}: All \inlinecode{stdout} and \inlinecode{stderr} (?) goes to this log
+                \item \inlinecode{cp}
+                \item \inlinecode{exec}
+                \item \inlinecode{inspect --format=\{\{.LogPath\}\} <containerid>}: Hardware-info
+                \item \inlinecode{rm <containername>}
+            \end{itemize}
+        \item \inlinecode{volume} \begin{itemize}
+                \item \inlinecode{ls}
+                \item \inlinecode{rm}
+                \item \inlinecode{create --name <volumename>}
+                \item To be used with \inlinecode{docker container run -v <volumename>:/container/fs/path <imagename>}
+            \end{itemize}
     \end{itemize}
+    \item \inlinecode{docker-compose} \begin{itemize}
+            \item \inlinecode{up -d}
+            \item \inlinecode{build}: like \inlinecode{up}, but rebuilds when a dockerfile changes.
+            \item \inlinecode{start}: starts a \inlinecode{stop}'ed set of containers.
+            \item \inlinecode{stop}: stops the containers.
+            \item \inlinecode{down}: stops the containers and deletes them (but leaves the images intact).
+        \end{itemize}
 \end{itemize}
 
+\subsection{Dockerfile syntax}
+\begin{lstlisting}[title=Dockerfile]
+    # Parent image
+    FROM python:2.7-slim
+    # All subsequent commands are executed here. May be called mutliple times.
+    WORKDIR /app
+    # Copy the current directory contents into the container at /app
+    COPY . /app
+    # Every run command creates another layer
+    RUN pip install --trusted-host pypi.python.org -r requirements.txt
+    # Make port 80 available to the world outside this container
+    EXPOSE 80
+    # Define environment variable
+    ENV NAME World
+    # Cmd is called when the container launches. This command's stout goes directly into the docker logs.
+    CMD ["python", "app.py"]
+\end{lstlisting}
 
 
-\subsection{Containers}
-
-Containers and virtual machines.
-\begin{itemize}
-    \item A container runs natively on Linux and shares the kernel of the host machine with other containers. It runs a discrete process, taking no more memory than any other executable, making it lightweight.
-    \item By contrast, a virtual machine (VM) runs a full-blown “guest” operating system with virtual access to host resources through a hypervisor. In general, VMs provide an environment with more resources than most applications need.
-\end{itemize}
-
-Images are described by \emph{Dockerfiles} that list all the contents of an image. These image files can be downloaded from a central repository called \emph{docker hub}.
-Usually, you write your own dockerfile that specifies as a dependency a more general dockerfile as your base. 
-
-\begin{lstlisting}[language=bash]
-# Use an official Python runtime as a parent image
-FROM python:2.7-slim
-
-# Set the working directory to /app
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY . /app
-
-# Install any needed packages specified in requirements.txt
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
-
-# Make port 80 available to the world outside this container
-EXPOSE 80
-
-# Define environment variable
-ENV NAME World
-
-# Run app.py when the container launches
-CMD ["python", "app.py"]
+\subsection{Composefile syntax}
+\begin{lstlisting}[title=docker-compose.yml]
+    version: "3"
+    volumes:
+        my-datavolume:
+    services: 
+        mysql: 
+            image: mysql:latest  // like build, but pulls from dockerhub
+            ports: 
+                - "3306:3306"
+            volumes:
+                - my-datavolume:/var/lib/mysql
+            container-name: "database"
+        php:
+            build: ./php  // like image, but uses a local dockerfile
+            container-name: "app"
+            depends_on:
+                - mysql
+            ports:
+                - "8080:80"
 \end{lstlisting}
 
 
@@ -107,32 +133,6 @@ Note the \inlinecode{--rm} argument. This removes a container again once it has 
 docker container run --rm alpine:latest bin/sh -c "whoami"
 \end{lstlisting}
 
-\subsection{Volumes}
 
 
 
-\subsection{Services and docker-compose}
-While \inlinecode{docker} is the basic CLI to control docker, it is more practical to use docker's equivalent of a makefile: a \inlinecode{docker-compose.yml}. In such a file, you
-\begin{itemize}
-    \item specify a list of \emph{services}. A service is a set of one or more container-instances of one root image. Each service can be configured as follows:
-    \begin{itemize}
-        \item \inlinecode{build}: path to dockerfile
-        \item \inlinecode{ports}: list of portmappings
-    \end{itemize}
-\end{itemize}
-
-
-\begin{lstlisting}
-version: "3"
-services: 
-    <imagetag>: 
-        build: .
-        ports: 
-            - "4000:80"
-\end{lstlisting}
-
-\begin{itemize}
-    \item \inlinecode{sudo docker-compose up -d} (builds and) runs the container(s)
-    \item \inlinecode{sudo docker-compose up -d --build} forces a rebuild of all images and runs the containers
-    \item \inlinecode{sudo docker-compose down} stops the containers and deletes them (but leaves the images intact)
-\end{itemize}
