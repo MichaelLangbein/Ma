@@ -104,9 +104,9 @@ Strictly speaking, OAuth is about authorisation (is the user allowed to use my s
 \begin{table}[H]
      \begin{tabular}{@{}lll@{}}
      \toprule
-                                             & Centralized                                                                                                                                                                          & Decentralized                                                                                                                                                                                                                                 \\ \midrule
-     \multicolumn{1}{|l|}{Authorization}  & \multicolumn{1}{l|}{CAS has an extension for authorization.}                                                                                                                            & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}OAuth2:\\ The user tells your app and a second app\\ what your app may do on second app on his behalf\end{tabular}}                                                                            \\ \midrule
-     \multicolumn{1}{|l|}{Authentication} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}CAS:\\ your backend verifies that the user is really him\\ \\ (backend may be one of Kerberos, LDAP or ActiveDirectory)\end{tabular}}    & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}OpenId:\\ A usage of OAuth2 for authentication.\\ The user tells your app on which second app you can get proof \\ that the user is really him\\ \\ Example: Sign-in-with-github\end{tabular}} \\ \bottomrule
+                                                & Centralized                                                                                                                                                                          & Decentralized                                                                                                                                                                                                                                 \\ \midrule
+     \multicolumn{1}{|l|}{Authorization (403)}  & \multicolumn{1}{l|}{CAS has an extension for authorization.}                                                                                                                            & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}OAuth2:\\ The user tells your app and a second app\\ what your app may do on second app on his behalf\end{tabular}}                                                                            \\ \midrule
+     \multicolumn{1}{|l|}{Authentication(401)}  & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}CAS:\\ your backend verifies that the user is really him\\ \\ (backend may be one of Kerberos, LDAP or ActiveDirectory)\end{tabular}}    & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}OpenId:\\ A usage of OAuth2 for authentication.\\ The user tells your app on which second app you can get proof \\ that the user is really him\\ \\ Example: Sign-in-with-github\end{tabular}} \\ \bottomrule
      \end{tabular}
 \end{table}
 To confuse things a little, some CAS Implementations also support OAuth.
@@ -190,3 +190,5 @@ CORB will block the response of a request if all of the following are true:
 
 CORB protects neither against XSS nor XSRF. Instead, it prevents one mechanism of side-channel-attacks.
 
+\subsection{Status codes}
+\includegraphics[width=0.8\textwidth]{images/http_statuscode_chain.jpg}
