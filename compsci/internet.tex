@@ -12,15 +12,118 @@ While the important theoretical aspects of the internet have been discussed in t
 \end{itemize}
 
 
-\subsection{Cookies}
-
-Since http is a stateless protocol, we need some helper to store state over several page-visists. 
-
-\paragraph{Cookie-domain}: A cookie is stored on the browser and only passed allong to the server with an http-request if the requested url matches the cookie-domain. 
 
 
+\subsection{Session basics}
 
-\subsection{Security}
+software:
+     node: client-sessions (good crypto)
+     bcryptjs for hashing
+     csurf for CSRF
+
+
+http session
+    http: Since http is a stateless protocol, we need some helper to store state over several page-visists
+    session: webserver tells browser to remember the user
+           http-response-header: "Set-Cookie": "session=12345"
+           cookies:  server stores information here
+                          that info is sent with every http-request's header
+                          "Cookie": "session=12345"
+                         Cookies are stored in the browser in a secret spot (not the usual browser-cache or db). They are only sent to a site if the sites url matches the cookie-domain. This means that sites cannot see cookies from other sites.
+                   client-sessions has some very recomended headers for cookies:
+                        httpOnly: true // dont let js access cookies
+                        secure: true // only set cookies over https
+                        ephemeral: true // destroy cookies when browser closes
+
+storing passwords:
+    passwords must be hashed.
+
+
+SSL/TLS
+     Those cookies are just strings in the HTTP-header! They can be stolen! So they need to be encrypted.
+     What is not encrypted by ssl?
+           SSL does encrypt everything, except ...
+                       the initial handshake target (ie your banks url)
+                       every requests url 
+             but it *does* encrypt all headers (hence cookies), and post- *and* get parameters.
+      
+
+
+
+Tokens:(more specifically, JWT, OR, a bit more extensive, OAuth2. Not to be confused with USB-stick tokens)
+     Originally, tokens were designed as an alternative to cookies that would also work in apps.
+     Based on this, however, two protocols (JWT and OAuth) grew, that go beyond what you could do with cookies. 
+    Here's what you cannot do with cookies. They are a two-party thing. 
+       - they are bound to a single domain. but your app might have multiple backend-services.
+     OAuth/JWT is for multi-party things.
+     JWTs are like a Vollmacht: 
+        -  your app (tinder) wants to access your facebook photos
+        - you login at facebook to tell it that tinder may use those photos
+        - facebook gives you a token that reads: {"photoPermission": "1234!"§$"}
+        - you pass that token to tinder
+        - tinder sends the token to facebook
+        - facebook verifies that you have indeed given that permission
+        - facebook gives tinder the photos
+     Technically, they are commonly implemented as a special type of cookie.
+            But they could be implemented as Post-Header + localStorage, too. 
+            (more-often so, actually, because contrary to browsers, mobile-apps don't know about cookies)
+     Some more stuff:
+           cookies usually contain any information that some programmer deemed necessary.
+           tokens follow strict standards (JWT or OAuth)
+           Tokens usually don't require tinder to maintain a session in its database (though they might)
+                But does facebook still need to maintain a session?
+           Tokens don't require a remote-session because the token contains user-data. 
+
+
+\subsection{Authentication, SSO, and authorization}
+Information from \href{https://www.varonis.com/blog/what-is-oauth/}{here}.
+Assume that you want to check the identity of a user. That user is already member of some authentication-service like facebook. You could ask the user for his facebook-password. But authenticating at some place with your password is insecure, because your password needs to make it over the network. Instead, the user can ask facebook for a token, pass it to your site and you then check with facebook if this token is cool. 
+Strictly speaking, OAuth is about authorisation (is the user allowed to use my service?), not about authentication (is the user really Michael?). The common analogy I’ve seen used while researching OAuth is the valet key to your car. The valet key allows the valet to start and move the car but doesn’t give them access to the trunk or the glove box. An OAuth token is like that valet key. As a user, you get to tell the consumers what they can use and what they can’t use from each service provider. You can give each consumer a different valet key. They never have the full key or any of the private data that gives them access to the full key.
+           
+           
+
+\begin{table}[]
+     \begin{tabular}{@{}lll@{}}
+     \toprule
+                                             & Centralized                                                                                                                                                                          & Decentralized                                                                                                                                                                                                                                 \\ \midrule
+     \multicolumn{1}{|l|}{Authorization}  & \multicolumn{1}{l|}{CAS has an extension for authorization.}                                                                                                                            & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}OAuth2:\\ The user tells your app and a second app\\ what your app may do on second app on his behalf\end{tabular}}                                                                            \\ \midrule
+     \multicolumn{1}{|l|}{Authentication} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}CAS:\\ your backend verifies that the user is really him\\ \\ (backend may be one of Kerberos, LDAP or ActiveDirectory)\end{tabular}}    & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}OpenId:\\ A usage of OAuth2 for authentication.\\ The user tells your app on which second app you can get proof \\ that the user is really him\\ \\ Example: Sign-in-with-github\end{tabular}} \\ \bottomrule
+     \end{tabular}
+\end{table}
+To confuse things a little, some CAS Implementations also support OAuth.
+
+
+\subsection{Security threats}
+
+
+CSRF
+    someone makes you click a link that is actually a form-post.
+    Counter meassures:
+       additionally to the session-cookie, we create a token for every page-load.
+       token provided by server
+       token added to form (as hidden field)
+       token sent back with form when user hits submit
+       server compares form-token with given token
+        if not identical, then 
+            some bad guy sent us a link that we didn't
+
+
+XSS
+
+
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+\begin{table}[]
+     \begin{tabular}{@{}lll@{}}
+     \toprule
+               & XSS: evil code being sneaked into frontend                                                              & XSRF: evil request being sneaked into backend                                                                                                                                                                     \\ \midrule
+     Roles     & User trusts compromised site                                                                            & Site trusts mislead user                                                                                                                                                                                          \\
+     Mechanism & Attacker injects script into site                                                                       & Attacker tricks user into issuing request                                                                                                                                                                         \\
+     Method    & Attacker posted a comment that was not properly validated and now displays evil scripts to another user & Attacker made user click on something that causes a request to the backend                                                                                                                                        \\
+     Counters  & Form validation: don't allow script tags and similar in posts.                                          & \begin{tabular}[c]{@{}l@{}}Form-tokens: a form-post must have been expected by backend (prevents evil email-links)\\ Cors: a form-post can only come from backend's own domain (prevents evil twins)\end{tabular} \\ \bottomrule
+     \end{tabular}
+\end{table}
+
 
 \paragraph{CORS} (cross origin resource sharing) is the act of one site (www.mysite.com) requesting data from another, third-party site (www.puppyimagehost.org?img=3241). Doing so is forbidden by default, and browsers will block such requests. The reason is that a hacker could use his browser to do something malicious. This here is a perfectly fine request: 
 \includegraphics[width=0.7\textwidth]{images/cookie_3.jpg}
@@ -62,10 +165,5 @@ CORB will block the response of a request if all of the following are true:
 	\item CORS does not explicitly allow access to the resource
 \end{itemize}
 
-
-\subsection{Authentication with single sign on (SSO)}
-Information from \href{https://www.varonis.com/blog/what-is-oauth/}{here}.
-
-Assume that you want to check the identity of a user. That user is already member of some authentication-service like facebook. You could ask the user for his facebook-password. But authenticating at some place with your password is insecure, because your password needs to make it over the network. Instead, the user can ask facebook for a token, pass it to your site and you then check with facebook if this token is cool. 
-Strictly speaking, OAuth is about authorisation (is the user allowed to use my service?), not about authentication (is the user really Michael?). The common analogy I’ve seen used while researching OAuth is the valet key to your car. The valet key allows the valet to start and move the car but doesn’t give them access to the trunk or the glove box. An OAuth token is like that valet key. As a user, you get to tell the consumers what they can use and what they can’t use from each service provider. You can give each consumer a different valet key. They never have the full key or any of the private data that gives them access to the full key.
+CORB protects neither against XSS nor XSRF. Instead, it prevents one mechanism of side-channel-attacks.
 

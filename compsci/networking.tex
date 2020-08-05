@@ -45,11 +45,11 @@ When traversing through the net, routers change the destination-mac to that of t
 
 \paragraph{IP} 
 
-IP is being sent in packages. Each contains the source- and destination-IP and the payload.
+IP is being sent in packages. Each contains the source- and destination-IP and the payload. Stateless.
 
 Ip packages are routed by routers. A router looks at the destination-ip and finds the next router that is closer to the ip. Then it changes the destination-mac to that of the next router and sends the package on its way.
 
-IP doesn't have a notion of a connection. You can blindly send thousends of IP-packages into the ether and never know if they arrived. 
+IP doesn't have a notion of a connection. You can blindly send thousands of IP-packages into the ether and never know if they arrived. 
 
 \paragraph{Discovering a router and obtaining an ip} The computer uses DHCP to find a router: it requests an IP address by broadcasting a DHCPDiscover message to the local subnet. The router hosts a DHCP server that then sends the computer an answer containing the computers new ip-adress and the default-gateway that it should use. 
 
@@ -130,8 +130,8 @@ There, it must fist pass the firewall. Then, the server decides what application
 
 \paragraph{TCP} 
 
-Continuous connection. The recipient regularly sends the sender an ACK with the last received package number. 
-If the sender receives ACKs of the last sent package, it gradually increases the ammount of packages it sends in a batch before waiting for another ACK. 
+Continuous connection, stateful. The recipient regularly sends the sender an ACK with the last received package number. 
+If the sender receives ACKs of the last sent package, it gradually increases the amount of packages it sends in a batch before waiting for another ACK. 
 If the sender receives an ACK of the same package number multiple times, it assumes that all the following packages have been lost and retransmits them from there. Also, the batch-size is temporarily reduced. 
 
 \paragraph{UDP}
