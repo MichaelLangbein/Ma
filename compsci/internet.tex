@@ -16,64 +16,83 @@ While the important theoretical aspects of the internet have been discussed in t
 
 \subsection{Session basics}
 
-software:
-     node: client-sessions (good crypto)
-     bcryptjs for hashing
-     csurf for CSRF
+\paragraph{software}:
+\begin{itemize}
+     \item node: client-sessions (good crypto)
+     \item bcryptjs for hashing
+     \item csurf for CSRF
+\end{itemize}
 
 
-http session
-    http: Since http is a stateless protocol, we need some helper to store state over several page-visists
-    session: webserver tells browser to remember the user
-           http-response-header: "Set-Cookie": "session=12345"
-           cookies:  server stores information here
-                          that info is sent with every http-request's header
-                          "Cookie": "session=12345"
-                         Cookies are stored in the browser in a secret spot (not the usual browser-cache or db). They are only sent to a site if the sites url matches the cookie-domain. This means that sites cannot see cookies from other sites.
-                   client-sessions has some very recomended headers for cookies:
-                        httpOnly: true // dont let js access cookies
-                        secure: true // only set cookies over https
-                        ephemeral: true // destroy cookies when browser closes
+\paragraph{http session}:
+\begin{itemize}
+     \item http: Since http is a stateless protocol, we need some helper to store state over several page-visists
+     \item session: webserver tells browser to remember the user \begin{itemize}
+          \item http-response-header: "Set-Cookie": "session=12345"
+          \item cookies:  server stores information here \begin{itemize}
+               \item that info is sent with every http-request's header
+               \item "Cookie": "session=12345"
+               \item Cookies are stored in the browser in a secret spot (not the usual browser-cache or db). They are only sent to a site if the sites url matches the cookie-domain. This means that sites cannot see cookies from other sites.
+          \end{itemize}
+          \item client-sessions has some very recomended headers for cookies: \begin{itemize}
+               \item httpOnly: true // dont let js access cookies
+               \item secure: true // only set cookies over https
+               \item ephemeral: true // destroy cookies when browser closes
+          \end{itemize}
+     \end{itemize}
+\end{itemize}
 
-storing passwords:
+\paragraph{storing passwords}:
     passwords must be hashed.
 
 
-SSL/TLS
-     Those cookies are just strings in the HTTP-header! They can be stolen! So they need to be encrypted.
-     What is not encrypted by ssl?
-           SSL does encrypt everything, except ...
-                       the initial handshake target (ie your banks url)
-                       every requests url 
-             but it *does* encrypt all headers (hence cookies), and post- *and* get parameters.
+\paragraph{SSL/TLS}
+\begin{itemize}
+     \item Those cookies are just strings in the HTTP-header! They can be stolen! So they need to be encrypted.
+     \item What is not encrypted by ssl? \begin{itemize}
+          \item SSL does encrypt everything, except ... \begin{itemize}
+               \item   the initial handshake target (ie your banks url)
+               \item   every request's url 
+          \end{itemize}
+          \item but it *does* encrypt all headers (hence cookies), and post- *and* get parameters.
+     \end{itemize}
+\end{itemize}
       
 
 
 
-Tokens:(more specifically, JWT, OR, a bit more extensive, OAuth2. Not to be confused with USB-stick tokens)
-     Originally, tokens were designed as an alternative to cookies that would also work in apps.
-     Based on this, however, two protocols (JWT and OAuth) grew, that go beyond what you could do with cookies. 
-    Here's what you cannot do with cookies. They are a two-party thing. 
-       - they are bound to a single domain. but your app might have multiple backend-services.
-     OAuth/JWT is for multi-party things.
-     JWTs are like a Vollmacht: 
-        -  your app (tinder) wants to access your facebook photos
-        - you login at facebook to tell it that tinder may use those photos
-        - facebook gives you a token that reads: {"photoPermission": "1234!"§$"}
-        - you pass that token to tinder
-        - tinder sends the token to facebook
-        - facebook verifies that you have indeed given that permission
-        - facebook gives tinder the photos
-     Technically, they are commonly implemented as a special type of cookie.
-            But they could be implemented as Post-Header + localStorage, too. 
-            (more-often so, actually, because contrary to browsers, mobile-apps don't know about cookies)
-     Some more stuff:
-           cookies usually contain any information that some programmer deemed necessary.
-           tokens follow strict standards (JWT or OAuth)
-           Tokens usually don't require tinder to maintain a session in its database (though they might)
-                But does facebook still need to maintain a session?
-           Tokens don't require a remote-session because the token contains user-data. 
-
+\paragraph{Tokens}:(more specifically, JWT, OR, a bit more extensive, OAuth2. Not to be confused with USB-stick tokens)
+\begin{itemize}
+     \item Originally, tokens were designed as an alternative to cookies that would also work in apps.
+     \item Based on this, however, two protocols (JWT and OAuth) grew, that go beyond what you could do with cookies. 
+     \item Here's what you cannot do with cookies. They are a two-party thing. \begin{itemize}
+          \item  they are bound to a single domain. but your app might have multiple backend-services.
+     \end{itemize}
+     \item OAuth/JWT is for multi-party things.
+     \item JWTs are like a Vollmacht: \begin{itemize}
+          \item your app (tinder) wants to access your facebook photos
+          \item you login at facebook to tell it that tinder may use those photos
+          \item facebook gives you a token that reads: {"photoPermission": "1234abcd"}
+          \item you pass that token to tinder
+          \item tinder sends the token to facebook
+          \item facebook verifies that you have indeed given that permission
+          \item facebook gives tinder the photos
+     \end{itemize}
+     \item Technically, ... \begin{itemize}
+          \item ...they are commonly implemented as a special type of cookie.
+          \item But they could be implemented as Post-Header + localStorage, too. 
+          \item (more-often so, actually, because contrary to browsers, mobile-apps don't know about cookies)
+     \end{itemize}
+     \item Some more stuff: \begin{itemize}
+          \item cookies usually contain any information that some programmer deemed necessary.
+          \item tokens follow strict standards (JWT or OAuth)
+          \item Tokens usually don't require tinder to maintain a session in its database (though they might) \begin{itemize}
+               \item But does facebook still need to maintain a session?
+          \end{itemize}
+          \item Tokens don't require a remote-session because the token contains user-data. 
+     \end{itemize}
+          
+\end{itemize}
 
 \subsection{Authentication, SSO, and authorization}
 Information from \href{https://www.varonis.com/blog/what-is-oauth/}{here}.
@@ -82,7 +101,7 @@ Strictly speaking, OAuth is about authorisation (is the user allowed to use my s
            
            
 
-\begin{table}[]
+\begin{table}[H]
      \begin{tabular}{@{}lll@{}}
      \toprule
                                              & Centralized                                                                                                                                                                          & Decentralized                                                                                                                                                                                                                                 \\ \midrule
@@ -96,39 +115,43 @@ To confuse things a little, some CAS Implementations also support OAuth.
 \subsection{Security threats}
 
 
-CSRF
-    someone makes you click a link that is actually a form-post.
-    Counter meassures:
-       additionally to the session-cookie, we create a token for every page-load.
-       token provided by server
-       token added to form (as hidden field)
-       token sent back with form when user hits submit
-       server compares form-token with given token
-        if not identical, then 
-            some bad guy sent us a link that we didn't
+\paragraph{CSRF}:
+\begin{itemize}
+     \item someone makes you click a link that is actually a form-post.
+     \item Counter meassures: \begin{itemize}
+          \item additionally to the session-cookie, we create a token for every page-load.
+          \item token provided by server
+          \item token added to form (as hidden field)
+          \item token sent back with form when user hits submit
+          \item server compares form-token with given token
+          \item if not identical, then 
+          \item some bad guy sent us a link that we didn't
+     \end{itemize}
+\end{itemize}
 
 
-XSS
+\paragraph{XSS}: ...
 
 
-% Please add the following required packages to your document preamble:
-% \usepackage{booktabs}
-\begin{table}[]
+\begin{table}[H]
      \begin{tabular}{@{}lll@{}}
      \toprule
-               & XSS: evil code being sneaked into frontend                                                              & XSRF: evil request being sneaked into backend                                                                                                                                                                     \\ \midrule
-     Roles     & User trusts compromised site                                                                            & Site trusts mislead user                                                                                                                                                                                          \\
-     Mechanism & Attacker injects script into site                                                                       & Attacker tricks user into issuing request                                                                                                                                                                         \\
-     Method    & Attacker posted a comment that was not properly validated and now displays evil scripts to another user & Attacker made user click on something that causes a request to the backend                                                                                                                                        \\
-     Counters  & Form validation: don't allow script tags and similar in posts.                                          & \begin{tabular}[c]{@{}l@{}}Form-tokens: a form-post must have been expected by backend (prevents evil email-links)\\ Cors: a form-post can only come from backend's own domain (prevents evil twins)\end{tabular} \\ \bottomrule
+               & XSS: evil code being sneaked into frontend                                                                                                        & XSRF: evil request being sneaked into backend                                                                                                                                                                     \\ \midrule
+     Roles     & User trusts compromised site                                                                                                                      & Site trusts mislead user                                                                                                                                                                                          \\
+     Mechanism & Attacker injects script into site                                                                                                                 & Attacker tricks user into issuing request                                                                                                                                                                         \\
+     Method    & \begin{tabular}[c]{@{}l@{}}Attacker posted a comment that was not properly validated\\ and now displays evil scripts to another user\end{tabular} & \begin{tabular}[c]{@{}l@{}}Attacker made user click on something that causes \\ a request to the backend\end{tabular}                                                                                          \\
+     Counters  & Form validation: don't allow script tags and similar in posts.                                                                                    & \begin{tabular}[c]{@{}l@{}}Form-tokens: a form-post must have been expected by backend (prevents evil email-links)\\ Cors: a form-post can only come from backend's own domain (prevents evil twins)\end{tabular} \\ \bottomrule
      \end{tabular}
-\end{table}
-
+     \end{table}
 
 \paragraph{CORS} (cross origin resource sharing) is the act of one site (www.mysite.com) requesting data from another, third-party site (www.puppyimagehost.org?img=3241). Doing so is forbidden by default, and browsers will block such requests. The reason is that a hacker could use his browser to do something malicious. This here is a perfectly fine request: 
+
 \includegraphics[width=0.7\textwidth]{images/cookie_3.jpg}
+
 After that request, the \inlinecode{jsessionid} cookie will be stored on the browser. A hacker could now steal that cookie and do this: 
+
 \includegraphics[width=0.7\textwidth]{images/cookie_4.jpg}
+
 This is called Cross-site-request-forgery. Honestly, it seems that this is something that should be fought on the \emph{sever}side, not from the client.
 
 
