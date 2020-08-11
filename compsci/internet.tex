@@ -111,6 +111,31 @@ Strictly speaking, OAuth is about authorisation (is the user allowed to use my s
 \end{table}
 To confuse things a little, some CAS Implementations also support OAuth.
 
+\includegraphics[width=0.8\textwidth]{images/cas_flow_diagram.png}
+
+Both CAS and OAuth are 3rd party authentication-systems. In both cases, the guiding principle is the same; the situation is like a club-owner, a bouncer, and a guest. 
+
+\begin{itemize}
+     \item The guest (user, aka. client) doesn't like the bouncer (CAS-service, aka. cassified app, aka. cas-client) and doesn't trust him with his real name. So instead, he gets a ticket (service-ticket) from the club-owner (CAS-server) to present to the bouncer.
+     \item The bouncer doesn't trust the guest: he checks with the club-owner if that ticket is really valid.
+     \item The club-owner \begin{itemize}
+          \item gives the guest a ticket, but doesn't write on it what the guest is entitled to, so the guest can't mess with his ticket.
+          \item verifies the ticket with the bouncer and tells the bouncer that the ticket is worth entry and a bear, but no VIP-lounge.
+     \end{itemize}
+\end{itemize}
+
+CAS and OAuth both \dots
+\begin{itemize}
+     \item keep guest and bouncer on a need-to-know basis
+     \item it is the bouncer that needs to ensure the proper implementation of \dots \begin{itemize}
+          \item directing the user to the boss (the CAS-server) for login
+          \item verify the ticket (service-ticket) presented by the user with the boss
+     \end{itemize}
+     \item The login-form is provided by the boss, not the bouncer. The bouncer is oblivious to the user's creds or any other details except the privileges communicated by the boss.
+\end{itemize}
+
+That being said, there is a CAS-REST API that you could use to have the user pass his credentials to the app (in the app's own, custom form) so that the app can then post those creds to the CAS-server's REST-endpoint on the users behalf. However, this requires the user to trust the app a lot more: he now gave the app his credentials and must trust it to not abuse them (for example to log in at another service).
+Also note that there is no way to implement CAS in the frontend alone - you need something to protect your backend. Having CAS in the frontend but not protecting your fileserver in the backend is like having a bouncer control the parking lot: people can still sneak in by just walking directly to the club's door.
 
 \subsection{Security threats}
 
