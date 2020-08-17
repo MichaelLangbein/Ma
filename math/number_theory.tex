@@ -33,6 +33,12 @@
     }
 \end{proof}
 
+It is neat how $a|b$ can be read in two ways: 'a divides b', but also 'b is a multiple of a'. This is very nice for interpreting the water-jug problem.
+Let $s = \alpha j_1 +\beta j_2$. If there is an $a$ such that $a|j_1 \land a|j_2$ then, by the above proof, $s$ is a multiple of $a$. 
+
+In more common terms, the above condition could be formulated as 'if the basevectors have a common divisor'. As such, the above proof sheds some light on the relation between divisibility and linear combinations. If base-vectors have a common divisor, then they are linearly dependent (proof this for yourself, it's trivial).
+The inverse is not always true, however. Consider $2$ and $3$: they have no common divisor (other than 1), yet they are linearly dependent: $\frac{-3}{2}2 + 1 \cdot 3 = 0$
+
 \begin{theorem}
 	$ \forall a,b: \thereis ! q, r: a = qb + r \land 0 \leq r \leq q $
 \end{theorem}
