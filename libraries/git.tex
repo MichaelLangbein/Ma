@@ -16,55 +16,13 @@
     
 \end{itemize}
 
-\subsection{Branches}
-
-\paragraph{Creating a new branch} Don't forget to also specify the branches name when you push:
-
-\begin{lstlisting}
-git branch schwebstoff_tabellen
-git branch
-git checkout schwebstoff_tabellen
-
-# ... doing stuff ...
-
-git push -u origin schwebstoff_tabellen
-\end{lstlisting}
-
-\paragraph{Checking out an existing branch} Just first clone the whole repo and then switch to the branch: 
-
-\begin{lstlisting}
-git clone http://hnd-jens.rz-sued.bayern.de:8181/applikation/includes.git
-git branch -a // also shows remote branches
-git fetch origin schwebstoff_tabellen
-git checkout schwebstoff_tabellen
-\end{lstlisting}
-
-
-\paragraph{Merging a branch back into master} On the dev-branch, we first suck in all the changes that might have occured on the master while we were not looking. Once those changes have been properly integrated, we switch to the master and suck in the dev-branch.
-
-\begin{lstlisting}
-// Step 0: safety measure: first get all new stuff from the master into your dev branch
-git merge master 
-
-// Step 1: Go to master and insert all your dev stuff 
-checkout master
-git merge schwebstoff_tabellen
-
-// Step 2: cleanup
-git branch --merged master // see all branches that have already been merged
-git branch -d shwebstoff_tabellen  // don't need this branch any more
-git push origin --delete schwebstoff_tabellen // also remove on remote
-
-// Step 3: push
-git push -u origin master
-\end{lstlisting}
 
 
 \paragraph{Merging remote changes on master into local master} It can happen that somebody else has been messing with the master before you had a chance to commit your own changes. You will notice this by seeing your \inlinecode{git push} fail. In that case, try to first merge the remote changes into your local copy before pushing again. 
 \begin{lstlisting}
 git commit // first saving our latest changes
-git fetch  // geting remote stuff in remote-tracking-branches. Doesn't change our files yet
-git diff master origin/master // compares what you have in master vs. what happend to master remotely
+git fetch  // getting remote stuff in remote-tracking-branches. Doesn't change our files yet
+git diff master origin/master // compares what you have in master vs. what happened to master remotely
 git merge remotes/origin/master
 \end{lstlisting}
 This will try to merge the upstream changes into yours. If it fails, the conflicting file will contain annotations like these: 
@@ -86,36 +44,8 @@ git push origin master
 \end{lstlisting}
 
 
-\paragraph{Comparing branches} Diff can compare any commited branches: 
-\begin{lstlisting}
-// How is your branch different from the master?
-git diff master..schwebstoff_tabellen
-// What have you changed since your last commit?
-git diff HEAD
-\end{lstlisting}
 
-\paragraph{Reverting and resetting} is best explained in this post: \inlinecode{https://stackoverflow.com/questions/4114095/how-to-revert-git-repository-to-a-previous-commit}. Basically, we have these options: 
-
-\begin{itemize}
-    \item \inlinecode{git revert <lastGoodCommitHash>..HEAD} will execute the inverse of all the operations and commit them as a new commit. This way, the old history stays intact.
-    \item \inlinecode{git reset <lastGoodCommitHash>} will delete all the commits from \inlinecode{<firstBadCommitHash>..HEAD}. This way, you're rewriting history, which is really only good if you're working alone on a repo.
-\end{itemize}
-
-
-
-\subsection{Creating your own repository}
-Basically, any git folder can be used as a repository. But you still need to do some work to expose that folder over the web. The easiest way to work is certainly over gitlab. For alternative means if you don't have a hoster, this site lists a few of the possibilities: \inlinecode{http://www.jedi.be/blog/2009/05/06/8-ways-to-share-your-git-repository/}.
-
-
-
-\subsection{Storing credentials}
-It is tedious to always have to type your name and password again. Here's how to avoid that: 
-\begin{lstlisting}
-git config [--global] user.name "Mona Lisa"
-git config [--global] credential.helper "cache --timeout=3600"
-\end{lstlisting}
-
-\paragraph{Changing origin}
+\subsection{Changing origin}
 \begin{lstlisting}
 git remote -v
 git remote set-url origin https://github.com/USERNAME/REPOSITORY.git
@@ -125,3 +55,14 @@ git remote set-url origin https://github.com/USERNAME/REPOSITORY.git
 \subsection{Merge vs. rebase}
 
 \includegraphics[width=0.8\textwidth]{images/merge_vs_rebase.png}
+
+\paragraph{Reverting and resetting} is best explained in this post: \inlinecode{https://stackoverflow.com/questions/4114095/how-to-revert-git-repository-to-a-previous-commit}. Basically, we have these options: 
+
+\begin{itemize}
+    \item \inlinecode{git revert <lastGoodCommitHash>..HEAD} will execute the inverse of all the operations and commit them as a new commit. This way, the old history stays intact.
+    \item \inlinecode{git reset <lastGoodCommitHash>} will unstage all the commits from \inlinecode{<firstBadCommitHash>..HEAD}. This way, you're rewriting history, which is really only good if you're working alone on a repo.
+\end{itemize}
+
+
+\subsection{Creating your own repository}
+Basically, any git folder can be used as a repository. But you still need to do some work to expose that folder over the web. The easiest way to work is certainly over gitlab. For alternative means if you don't have a hoster, this site lists a few of the possibilities: \inlinecode{http://www.jedi.be/blog/2009/05/06/8-ways-to-share-your-git-repository/}.

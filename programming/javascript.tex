@@ -40,7 +40,7 @@ Note that this does not work for arrow-functions, which keep their once assigned
                     \item Even though not all functions are intended as constructors, js expects them to be that. So every function can be called with \inlinecode{new}. Doing this expects the function to do two things:
                         \begin{itemize}
                             \item it expects to have the function assign some things to its internal \inlinecode{this}. These assignments will be instance-properties.
-                            \item it expects \inlinecode{TheFunction.prototype} to have a few props that are to be shared between all instances.
+                            \item it expects \inlinecode{TheFunction.prototype} to have a few props that are to be shared between all instances. In other words: adding a function via \inlinecode{TheFunction.prtotype.myMethod = () => {...}} instead of \inlinecode{function TheFunction () {this.myMethod = () => {...}}} makes the function static. There is only one instance of that function on the heap, not a separate one for each instance.
                         \end{itemize}
                     \item Contrary to \inlinecode{.__proto__}, \inlinecode{.prototype} may and should be modified.
                     \item So, calling \inlinecode{const bender = new Robot('Bender');} will give \inlinecode{bender} these properties: \inlinecode{Robot.prototype};
@@ -585,15 +585,3 @@ Per default, divs are dispayed in blockstyle, while spans are displayed inlinest
 
 \subsubsection{Flexbox}\label{flexbox}
 
-\section{Canvas}
-
-\begin{table}[h]
-    \begin{tabular}{@{}llll@{}}
-    \toprule
-    technology & use-case                    & programming style & libraries          \\ 
-    \midrule
-    canvas     & 3d, interactive, many items & procedural        & threejs, processing \\
-    svg + css  & simple 2d graphics          & declarative       & d3                 \\ 
-    \bottomrule
-    \end{tabular}
-\end{table}
