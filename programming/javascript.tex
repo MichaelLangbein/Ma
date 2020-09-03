@@ -26,6 +26,7 @@ Note that this does not work for arrow-functions, which keep their once assigned
         \begin{itemize}
             \item Every object has a \inlinecode{.__proto__}. 
             \item \inlinecode{.__proto__} contains the list of inherited props and methods and \emph{should} not be modified.
+            \item \inlinecode{bender.prototype} is bender's own prototype, and \inlinecode{bender.__proto__} is a reference to bender's parent's prototype.
         \end{itemize}
     \item Constructing new objects
         \begin{itemize}
