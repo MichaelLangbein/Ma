@@ -281,5 +281,26 @@ if __name__ == "__main__":
 \end{lstlisting}
 
 
+\subsubsection{Indices}
+In a database, you want to put indices on those columns that you are likely to read from / write to the most. 
+
+\subsubsection{Spatial indices}
+For spatial data, the columns that you are likely to access the most are 
+\begin{itemize}
+    \item lon/lat for point-data
+    \item bounding-boxes for polygons
+\end{itemize}
+You can select many types of indices for this kind of data. All of them are good for some operations and bad for others. 
+\begin{table}[]
+    \begin{tabular}{@{}lll@{}}
+    \toprule
+                           & S2                                                                                                                                       & H3                        \\ \midrule
+    info                   & \begin{tabular}[c]{@{}l@{}}Quad-tree with indices (aka. geohash) along Hilbert-curve\\ so that neighbors have similar index\end{tabular} & Nested hexagons           \\
+    computational geometry &                                                                                                                                          & All neighbors equidistant \\
+    shardable              &                                                                                                                                          &                           \\
+    visual aspect          & Squares distort a lot close to poles                                                                                                     & Pretty!                   \\ \bottomrule
+    \end{tabular}
+    \end{table}
+
 
 \subsection{Distributed cache: redis}
