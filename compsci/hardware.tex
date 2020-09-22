@@ -47,10 +47,10 @@ Processors have a cache where they store copies of stuff they recently read form
 A bus is the conductor that leads data from one hardware-component to another, like from the memory to the processor. Busses come in serial and parallel form. 
 
 \begin{itemize}
-    \item PCI
-    \item SATA
-    \item USB
-    \item Firewire
+    \item SATA: Designed for storage-devices. Serial. Carries no power. 1.5 - 6.0 Gbps (Gigabits per second).
+    \item PCI: (or newer, PCIe): parallelized (that is, multiple data-links per lane), fast, specifically designed for graphics-cards and expansion-cards. Can be used bidirectionally. Also carries power. ~ 7 Gbps per lane (usually 2, 4, or up to 32 lanes present.)
+    \item USB: Used in all kinds of devices. Serial. Unidirectional. Also carries power. 5.0 (USB 3.1 Gen 1) - 20.0 (USB 3.2) Gbps.
+    \item Firewire: Common in Apple & media-devices. Designed for large streams of data. Allows direct device-to-device-connection without a computer in between. Can be used bidirectionally. 3.2 - 6.4 Gbps.
 \end{itemize}
 
 

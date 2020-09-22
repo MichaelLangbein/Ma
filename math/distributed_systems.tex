@@ -291,6 +291,8 @@ For spatial data, the columns that you are likely to access the most are
     \item bounding-boxes for polygons
 \end{itemize}
 You can select many types of indices for this kind of data. All of them are good for some operations and bad for others. 
+
+Common choices are S2 and H3. Both of these system provide a way to turn a coordinate on earth into a cell id that maps to a hexagonal or rectangular grid cell at a specific resolution. These cell ids have unique properties such as nearby cells have similar ids and you can find parent cells by truncating their length. These properties make operations such as aggregating data, finding nearby objects, measuring distances very fast.
 \begin{table}[]
     \begin{tabular}{@{}lll@{}}
     \toprule
