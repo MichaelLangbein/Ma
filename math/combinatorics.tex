@@ -25,7 +25,7 @@ It is very important to note that this method only works for calculating \textit
 
 However, we are always allowed to calculate a partial sum by some variant of the perturbation method and then taking the limit of $n \to \infty$.
 
-\subsection{Products of sums and comvolutions}
+\subsection{Products of sums and convolutions}
 
 Let $S_A = \sum_n a_n$ and $S_B = \sum_m b_n$. To calculate $S_A S_B$ we sum all elements in the following table: 
 
@@ -48,17 +48,25 @@ Note that the diagonal from ll to ur in this table is a convolution.
 
 \subsection{Counting}
 
-\paragraph{The combination}, aka. the \emph{binomial coefficient}, for drawing $k$ items out of $n$ items,  is defined as: 
-$$ \binom{n}{k} = \frac{ n! }{ k!(n-k)! }$$
+\paragraph{Permutations} are the number of rearrangements where order matters. Safe-combinations should really be called safe permutations. Permutations of unique items are relatively straightforward, but things get a little involved when we deal with permutations of grouped items. 
 
-\paragraph{Permutations} are the number of rearrangements. Permutations of unique items are relatively straightforeward, but things get a little involved when we deal with permutations of grouped items. 
+\begin{itemize}
+    \item with repetition (\emph{4-slot lock}): $n^4$
+    \item without repetition (\emph{first 3 places in race}): $\frac{n!}{(n-3)!}$
+\end{itemize}
 
 The number of unique permutations of a string consisting of $n_a$ \emph{a}'s, $n_b$ \emph{b}'s, $n_c$ \emph{c}'s, etc. is 
 $$ \frac{( \sum n_i )!}{\prod (n_i !)} $$
 Here, $( \sum n_i )! $ is the number of permutations if every letter in the string was unique, that is, if we could distinguish between two \emph{a}'s. We then reduce this number by the number of duplicates by dividing through $n_a !$, the number of rearrangements of \emph{a}'s.
 
 Note how the binomial coefficient is a special case of our string-permutation: it is the number of unique permutations in a string of length $n$ with only two letters in it. 
-In fact, the number of string-permutations is called the \emph{multi}nomial coefficient. The formula is easily proven by inducion on the number of groups $i$. In the base-case with two groups we trivially get the binomial coefficient. Then do the induction step. 
+In fact, the number of string-permutations is called the \emph{multi}nomial coefficient. The formula is easily proven by induction on the number of groups $i$. In the base-case with two groups we trivially get the binomial coefficient. Then do the induction step. 
+
+\paragraph{Combinations} are sets where the order does \emph{not} matter: $(2, 4, 3) = (2, 3, 4) = (3, 2, 4) = ...$.
+\begin{itemize}
+    \item without repetition (\emph{lottery of 6}): $\frac{n!}{(n-6)!6!} = {n \choose 6}$, aka. the \emph{binomial coefficient}, aka. $n$ choose $k$. Note the term $6!$ in the denominator. $n$ choose $k$ is exactly a permutation without repetition (that is, where order matters), reduced by the different ways to order things ($6!$).
+    \item with repetition (\emph{draw 5 coins out of your pocket}): ${(n - 1 + 5) \choose 5}$, where $n$ is the number of different coin-denominations. Its pretty cool how this formula is obtained: write all coin-denominations in a list. Under that list, write a program, consisting of arrows for moving right and $x$'es for picking once. This is the same as picking 5 slots for $x$'es out of $(n - 1 + 5).
+\end{itemize}
 
 
 
