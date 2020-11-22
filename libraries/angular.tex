@@ -16,7 +16,12 @@
     \item \emph{ViewContainer}: removing html-elements from the DOM is dangerous, because angular will not be aware of that removal - it will keep the node in memory and continue running change detection. So how do you remove elements? That's what ViewContainers are for: wrapping a node in a ViewContainer provides us with an API to add or remove components or templates.
 \end{itemize}
 
+\subsection{Live cycle}
+
 
 \subsection{Change detection}
+Change detection goes top down: if a user-interaction happened on component X, then the whole tree starting at app-root is updated.
+If component X has \inlinecode{changeDetectionStrategy: OnPush}, then X and its children are shielded from updates from outside of X's subtree. But events originating from X or its children still traverse the \emph{whole} tree from app-root down.
 
 \subsection{Service availability}
+Services are by default provided by app-root. The instance is used by every child component - except if that child, lets call it X, has its own provided instance of the service. Then all children of X use X's instance of the service.
