@@ -1,0 +1,22 @@
+\section{Angular}
+
+
+\subsection{Elements}
+
+\begin{itemize}
+    \item \emph{Element}: Wrapper around \inlinecode{nativeElement}. Wrapped so as to abstract away differences between native elements in browser and on mobile.
+    \item \emph{View}: Smallest group of elements that are created and destroyed together.
+        \begin{itemize}
+            \item HostView: A view created by a component
+            \item EmbeddedView: A view created by a template
+        \end{itemize}
+    \item \emph{Component}
+    \item \emph{Directive}: An attribute that may be appended to a component. Like a component, but without an html-file.
+    \item \emph{Template}: Angular-html-files are usually static. The only dynamics that are allowed are via subcomponents or templates \inlinecode{<ng-template>}. Templates are really like simple, inline html-only subcomponents. They are even more like inline-functions in that they have access to their parent-component's template-variables.
+    \item \emph{ViewContainer}: removing html-elements from the DOM is dangerous, because angular will not be aware of that removal - it will keep the node in memory and continue running change detection. So how do you remove elements? That's what ViewContainers are for: wrapping a node in a ViewContainer provides us with an API to add or remove components or templates.
+\end{itemize}
+
+
+\subsection{Change detection}
+
+\subsection{Service availability}
