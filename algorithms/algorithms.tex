@@ -11,7 +11,7 @@ The well ordering principle is a fundamental theorem in discrete mathematics.
 
 $$ \forall S \subset \naturals^+: S \neq \emptyset : \thereis x_0 \in S: \forall x \in S: x_0 \leq x $$
 
-We usually use it in existance proofs, by contradiction. However, there is a nice little template for proofs using the well ordering principle.
+We usually use it in existence proofs, by contradiction. However, there is a nice little template for proofs using the well ordering principle.
 
 To prove that $P(n)$ holds true for $\forall n \in \naturals$:
 
@@ -27,7 +27,7 @@ To prove that $P(n)$ holds true for $\forall n \in \naturals$:
 \end{itemize}
 
 
-\subsection{Programm verification according to Floyd}
+\subsection{Program verification according to Floyd}
 
 If the following properties are given, then an algorithm is be correct. 
 
@@ -46,9 +46,8 @@ Note that there might be correct algorithms that don't have these properties. Fo
 
 \subsubsection{ Proving 'partial correctness' with invariant principle }
 
-
-
 \subsubsection{ Proving 'termination' with well ordering principle }
+
 
 
 \subsection{Notation}
@@ -59,17 +58,34 @@ $$ f \in \BigTheta{g(n)} $$
 where 
 $$ \BigTheta{g(n)} = \{ f(n) | \thereis c_1, c_2, n_0 : \forall n \geq n_0:  0 \leq c_1 g(n) \leq f(n) \leq c_2 g(n) \} $$
 
-Simmilarly, the set \BigOh{g(n)} is defined as: 
+Similarly, the set \BigOh{g(n)} is defined as: 
 $$ \BigOh{g(n)} = \{ f(n) | \thereis c_2, n_0 : \forall n \geq n_0:  0 \leq  f(n) \leq c_2 g(n) \} $$
 
 That is, \BigOh{} only has an upper bound, but no lower bound.
+
 
 \subsection{Order of basic operations}
 
 In the integer ram model of computation, addition, multiplication, remainder and bitwise operations all take O(1).
 
 
-\subsection{Remembering the state in loops}
+
+\subsection{Optimization}
+
+\begin{itemize}
+  \item \emph{Linear programming}: Minimizing $f$ (linear) subject to constraints (linear, inequalities)
+  \item \emph{Lagrange mulitpliers}: Minimizing $f$ (non-linear) subject to constraints (non-linear, equalities)
+  \item \emph{Non-linear programming}: Minimizing $f$ (non-linear) subject to constraints (non-linear, inequalities)
+  \begin{itemize}
+    \item $f$ and constraints are differentiable: use KKT (a generalization of Lagrange)
+    \item $f$ and constraints are convex: use convex optimization
+    \item All other cases: use some form of gradient descent (simulated annealing, MCMC, ...)
+  \end{itemize}
+\end{itemize}
+
+
+
+\subsection{Memoization: Remembering the state in loops}
 Sometimes, operations have to be repeatedly executed in a loop. These operations may take \BigOh{g} time by themselves, but only \BigOh{1} time if the result of the previous execution is already known. 
 
 In such a case it makes sense to keep track of the previous result. StateMachines are a natural vehicle to store such information. 
@@ -107,16 +123,33 @@ for i in range(1, 16):
         print(i)
 \end{lstlisting}
 
-\subsection{Dynamic programming}
-A natural extension to the idea above here is dynamic programming. There we also make use of the fact that some instructions can be simplified if we remember the result of the previous instruction.
+\subsection{Using sub problems: Dynamic programming}
+Solve a multi-step-problem by solving its sub-problems\footnote{Note that the optimal solution to a multi-step-problems is \emph{not always} equal to the sum of the optimal solutions of its sub-problems. Those weird problems are said to \emph{not have optimal substructure}. Example: longest path problem.}. 
+Such problems usually use recursion and memoization.
+
+\paragraph{Example: Towers of Hanoi}: You have three rods $A$, $B$ and $C$. Move a tower of (say) 4 disks from $A$ to $C$ using the rules:
+\begin{itemize}
+  \item move one disk at a time
+  \item no larger disk may be placed on a smaller disk
+\end{itemize}
+
+Solution:
+\begin{lstlisting}[language=python]
+def move([4, 3, 2, 1], from: 'A', to: 'C', via: 'B'):
+  return 
+      move([3, 2, 1], from: 'A', to: 'B', via: 'C')
+    + move([4],       from: 'A', to: 'C', via: 'B')
+    + move([3, 2, 1], from: 'B', to: 'C', via: 'A')
+\end{lstlisting}
 
 
-\subsection{Solving recurrences}
-Sometimes we dont have to do a recursive sollution at all. Many recursive problems can be reshaped into a explicit form (the so called closed form). Think of the Fibonacci-sequence: 
+
+\subsection{Avoiding the need for dynamic programming: Solving recurrences to closed form}
+Sometimes we don't have to do a recursive solution at all. Many recursive problems can be reshaped into a explicit form (the so called closed form). Think of the Fibonacci-sequence: 
 
 $$ fib(n) = fib(n-1) + fib(n-2) = \frac{(1 + \sqrt{5})^n - (1 - \sqrt{5})^n }{2^n \sqrt{5}} $$
 
-This section will examplify some methods for finding the closed form expression.
+This section will exemplify some methods for finding the closed form expression.
 
 \subsubsection{Solving linear recurrences}
 
@@ -129,19 +162,19 @@ We can solve it as follows:
 \begin{enumerate}
     \item Assume $f(n) = x^n$. We now try to find an expression for $x$.
     \item Divide both sides in the hlr by $x^{n-d}$, leaving a (hyper-)quadratic equation. 
-    \item Every root of the quadratic equation is a \textbf{homogeneous sollution}. Also, if a root $r$ occures $v$ times, $r^n, nr^{n-1}, n^2r^n ..., n^{v-1}r^n$ are also sollutions.
-    \item Also, every linear combination of the above is also a sollution. So, a sollution might in general have a form like $a r_1^n + b r_2^n + ...$.
-    \item Finally, choose $a, b, ...$ such that they fulfill the boundary conditions (in Fibonacci those would be $f(0) = f(1) = 1$). This is the \textbf{concrete sollution}.
+    \item Every root of the quadratic equation is a \textbf{homogeneous solution}. Also, if a root $r$ occures $v$ times, $r^n, nr^{n-1}, n^2r^n ..., n^{v-1}r^n$ are also solutions.
+    \item Also, every linear combination of the above is also a solution. So, a solution might in general have a form like $a r_1^n + b r_2^n + ...$.
+    \item Finally, choose $a, b, ...$ such that they fulfill the boundary conditions (in Fibonacci those would be $f(0) = f(1) = 1$). This is the \textbf{concrete solution}.
 \end{enumerate}
 
 We can extend the above schema to also solve (nonhomogeneous) linear recurrences: 
 $$ f(n) = a_1 f(n-1) + a_2 f(n-2) + ... + a_d f(n-d) + g(n)$$
 
 \begin{enumerate}
-    \item Ignore $g(n)$, find the homogeneous sollution from step 4 above.
-    \item Find a \textbf{particular sollution} to the equation including $g(n)$.
-    \item homogeneous solltution + particular sollution = \textbf{general sollution}
-    \item Now for the general sollution, again plug in the boundary conditions as in step 5 above.
+    \item Ignore $g(n)$, find the homogeneous solution from step 4 above.
+    \item Find a \textbf{particular solution} to the equation including $g(n)$.
+    \item homogeneous solution + particular solution = \textbf{general solution}
+    \item Now for the general solution, again plug in the boundary conditions as in step 5 above.
 \end{enumerate}
 
 
@@ -172,12 +205,11 @@ def merge(a, b):
 \subsection{Matrix inverse}
 Gauss Jordan
 
-\subsection{Polynomals}
-
-In this section, we will deal with the polynomal $P_A(x) = 1x^3 + 2x^2 + 3x + 4$. Working with polynomals turns out to be quite important in everyday practice - especially when you're working with generating functions.
+\subsection{Polynomials}
+In this section, we will deal with the polynomials $P_A(x) = 1x^3 + 2x^2 + 3x + 4$. Working with polynomials turns out to be quite important in everyday practice - especially when you're working with generating functions.
 
 \subsubsection{Coefficient-representation of polynomals}
-The most common representation of this polynomal is its coefficient representation $[4, 3, 2, 1]$. This representation is very convenient for fast evaluation at any $x$ using Horner's method: 
+The most common representation of this polynomial is its coefficient representation $[4, 3, 2, 1]$. This representation is very convenient for fast evaluation at any $x$ using Horner's method: 
 
 \begin{lstlisting}[language=c]
 #include "stdio.h"
@@ -378,4 +410,4 @@ Stream algorithms handle the case where a function is not applied once for a sin
   \item The algorithm must use only a constant ammount of storage (because otherwise at some point the disc will be full)
 \end{itemize}
 \href{https://www.americanscientist.org/article/the-britney-spears-problem}{Here} is a good introduction to the toppic. 
-Sidenote: a popular software to provide a stream to (multiple) subscriber(s) would be \href{https://kafka.apache.org/}{Apache kafka}.
+Side note: a popular software to provide a stream to (multiple) subscriber(s) would be \href{https://kafka.apache.org/}{Apache kafka}.
