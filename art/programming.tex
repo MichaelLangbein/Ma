@@ -1,4 +1,4 @@
-\section{Programming}
+\section{Graphics Programming}
 
 
 \subsection{Rendering in the browser}
@@ -53,13 +53,27 @@ A bunch of software helps with SVG's:
 \end{itemize}
 
 
+\subsection{D3}
 
-\subsection{CSS}
+\subsection{WASM}
 
-\subsubsection{Positioning}
-\subsubsection{Events}
-\subsubsection{Animations}
+\begin{itemize}
+    \item Module: compiled WASM. Can be passed around. Stateless.
+    \item Instance: a module + it's state
+    \item State: \begin{itemize}
+        \item Memory: resizable ArrayBuffer
+        \item Table: array of references to functions
+    \end{itemize}
+\end{itemize}
 
+\begin{itemize}
+    \item Calls from js to wasm are synchronous.
+\end{itemize}
+
+\begin{itemize}
+    \item LLVM: compiles C to intermediate (via the Clang-Frontend) and intermediate to WASM (via the WASM-Backend)
+    \item Emscripten: includes LLVM. But also creates custom JS to be used by WASM to emulate \inlinecode{stdio} et.al.
+\end{itemize}
 
 
 \subsection{Webgl}
@@ -1105,4 +1119,10 @@ export class Engine {
 
 \subsubsection{Shader gallery}
 
+
+\subsection{CSS}
+
+\subsubsection{Positioning}
+\subsubsection{Events}
+\subsubsection{Animations}
 
