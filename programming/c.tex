@@ -469,10 +469,10 @@ void encrypt(char * msg) {
 
 
 \subsubsection{Building and Makefiles}
-The building of an executable consists of compuiling and linking. 
+The building of an executable consists of compiling and linking. 
 \begin{itemize}
-    \item \textbf{Compiling your own code} The compiler generates an object file from your sourcecode. An object-file is a compiled piece of code together with some meta-information on what kind of functions and structures it containes. 
-    \item \textbf{Linking in libraries} After that, the include-directories are scanned for libraries that contain implementations of the header-files you included in your sourcecode. This phase is called linking. There are two ways you can link in external libraries.
+    \item \textbf{Compiling your own code} The compiler generates an object file from your source-code. An object-file is a compiled piece of code together with some meta-information on what kind of functions and structures it contains. 
+    \item \textbf{Linking in libraries} After that, the include-directories are scanned for libraries that contain implementations of the header-files you included in your source-code. This phase is called linking. There are two ways you can link in external libraries.
     \begin{itemize}
         \item Static linking means that a copy of the library is added to the final executable at compile time. The executable can then be moved to another machine without worries, because all required libraries are placed inside the executable. Static libraries are usually written like this: \inlinecode{libXXX.a} and created with the \inlinecode{ar} program.
         \item  Alternatively, libraries can be linked in a dynamic way: that means that the executable will search for an appropriate library once it needs to call its functions, that is, at run time.  Shared/dynamic libraries are written like \inlinecode{libYYY.so} and created with \inlinecode{gcc -fPIC -c YYY.c && gcc -shared -o libYYY.so YYY.o}
@@ -480,7 +480,7 @@ The building of an executable consists of compuiling and linking.
     \end{itemize}
 \end{itemize}
 
-Makefiles are how we knot together different parts of a c programm. It's really easiest to look at a specific example:
+Makefiles are how we knot together different parts of a c program. It's really easiest to look at a specific example:
 
 \begin{lstlisting}[language=bash]
 # Includes are header files without a concrete implementation.
@@ -489,7 +489,7 @@ INCLUDES = -I/usr/include/mysql
 LIBS = -L/usr/lib/x86_64-linux-gnu -lmysqlclient -ljansson -pthread
 WARNINGS = -Wall -Wextra
 
-# Compilen
+# Compiling
 #   -c: compile (nur compile, nicht link!)
 #   -g: fuer debugger
 
@@ -502,7 +502,7 @@ jsn.o: jsn.c jsn.h incl.h
 psql.o: psql.c jsn.h
 	gcc -g -c $(WARNINGS) $(INCLUDES) psql.c
 
-# Linken
+# Linking
 # 	-o: object-file: name der fertigen binary
 # 	-g: fuer debugger
 

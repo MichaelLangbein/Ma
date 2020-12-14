@@ -65,7 +65,7 @@ In fact, the number of string-permutations is called the \emph{multi}nomial coef
 \paragraph{Combinations} are sets where the order does \emph{not} matter: $(2, 4, 3) = (2, 3, 4) = (3, 2, 4) = ...$.
 \begin{itemize}
     \item without repetition (\emph{lottery of 6}): $\frac{n!}{(n-6)!6!} = {n \choose 6}$, aka. the \emph{binomial coefficient}, aka. $n$ choose $k$. Note the term $6!$ in the denominator. $n$ choose $k$ is exactly a permutation without repetition (that is, where order matters), reduced by the different ways to order things ($6!$).
-    \item with repetition (\emph{draw 5 coins out of your pocket}): ${(n - 1 + 5) \choose 5}$, where $n$ is the number of different coin-denominations. Its pretty cool how this formula is obtained: write all coin-denominations in a list. Under that list, write a program, consisting of arrows for moving right and $x$'es for picking once. This is the same as picking 5 slots for $x$'es out of $(n - 1 + 5).
+    \item with repetition (\emph{draw 5 coins out of your pocket}): ${(n - 1 + 5) \choose 5}$, where $n$ is the number of different coin-denominations. Its pretty cool how this formula is obtained: write all coin-denominations in a list. Under that list, write a program, consisting of arrows for moving right and $x$'es for picking once. This is the same as picking 5 slots for $x$'es out of $(n - 1 + 5)$.
 \end{itemize}
 
 
