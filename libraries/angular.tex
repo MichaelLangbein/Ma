@@ -24,3 +24,34 @@ If component X has \inlinecode{changeDetectionStrategy: OnPush}, then X and its 
 
 \subsection{Service availability}
 Services are by default provided by app-root. The instance is used by every child component - except if that child, lets call it X, has its own provided instance of the service. Then all children of X use X's instance of the service.
+
+
+\subsection{Building blocks}
+\begin{itemize}
+    \item The \emph{compiler} inspects html-files and writes components, directives and pipes into them
+    \begin{itemize}
+        \item Components, directives and pipes are namespaced in \emph{modules}
+    \end{itemize}
+    \item The \emph{injector} injects services and guards into components
+    \begin{itemize}
+        \item Services and guards are not namespaced - they are always provided in one big pool in app-root.
+        \item If you really need to namespace services, there is the \inlinecode{forRoot()} hack.
+    \end{itemize}
+\end{itemize}
+
+
+\begin{figure}
+    \caption{Angular modules}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/angular_modules.png}
+\end{figure}
+
+\begin{itemize}
+    \item app module: root. \inlinecode{imports} other modules and \inlinecode{bootstrap}'s the root-component.
+    \item core module: exports shared singleton services and guards in its \inlinecode{providers}. Should be imported only in app-module.
+    \item feature module: exports thematic components, directives and pipes in its \inlinecode{declarations} & \inlinecode{exports}. Should be imported only in app-module.
+                If necessary, feature modules may provide services, but then you need to make sure that the module is only imported in one single place (usually the app-module).
+    \item shared module: exports globally used components, directives and pipes in its \inlinecode{declarations} & \inlinecode{exports}. Should be imported into any module that requires it.
+                Shared modules \emph{must not} export services, because they are imported in several other modules. The presence of the same service in multiple modules will have the injector commit harakiri.
+    \item router module: imported into app module. Side-effect-configures the angular-core-router using \inlinecode{forRoot}.
+\end{itemize}
