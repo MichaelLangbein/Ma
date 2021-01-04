@@ -16,8 +16,7 @@
     \item \emph{ViewContainer}: removing html-elements from the DOM is dangerous, because angular will not be aware of that removal - it will keep the node in memory and continue running change detection. So how do you remove elements? That's what ViewContainers are for: wrapping a node in a ViewContainer provides us with an API to add or remove components or templates.
 \end{itemize}
 
-\subsection{Live cycle}
-
+\subsection{Life cycle}
 
 \subsection{Change detection}
 Change detection goes top down: if a user-interaction happened on component X, then the whole tree starting at app-root is updated.
