@@ -27,6 +27,36 @@ Services are by default provided by app-root. The instance is used by every chil
 
 
 \subsection{Building blocks}
+
+\begin{itemize}
+    \item The \emph{compiler} 
+        \begin{itemize}
+            \item Runs offline and is not included in the bundled application (except when in development mode).
+            \item Takes \inlinecode{*.component.ts} and \inlinecode{*.component.html} files and turns them into a \inlinecode{*.ngfactory.ts} file.
+            \item The \inlinecode{*.ngfactory.ts} file contains a \inlinecode{ComponentDef} class with a \inlinecode{factory} method and a \inlinecode{template} method.
+        \end{itemize} 
+    \item The \emph{runtime}: \inlinecode{core.js/tick()} 
+        \begin{itemize}
+            \item Module bootstrap
+            \item View creation
+                \begin{itemize}
+                    \item Instantiates a view by calling \inlinecode{const viewDef = compDef.factory(depInjector)} 
+                        \begin{itemize}
+                            \item A ViewDef has a list of nodes \inlinecode{viewDef.nodes[]}
+                            \item Nodes can be accessed as \inlinecode{ElementRef}, \inlinecode{TemplateRef} or \inlinecode{ViewContainerRef}
+                            \item A ViewDef has a \inlinecode{template()} method that calls render-functions like \inlinecode{text()}, \inlinecode{heading()}, \inlinecode{div}, ...
+                        \end{itemize}
+                    \item Calls the ViewDef's template-function \inlinecode{viewDef.template()}
+                \end{itemize}
+            \item Change detection 
+                \begin{itemize}
+                    \item 
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+
+The different parts of an angular application are namespaced in an interesting way.
 \begin{itemize}
     \item The \emph{compiler} inspects html-files and writes components, directives and pipes into them
     \begin{itemize}

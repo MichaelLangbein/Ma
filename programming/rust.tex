@@ -12,8 +12,21 @@
 \subsection{Macros}
 
 \subsection{Pointers}
-\paragraph{References} \inlinecode{&} borrows a variables value.
+\paragraph{References} \inlinecode{&} borrows a variables value. There may be no more than one mutable reference in the same scope. That is, the following will not compile:
+\begin{lstlisting}[lang=rust]
+fn main() {
+    let mut s = String::from("hello!");
+
+    let mr1 = & mut s;
+    let mr2 = & mut s;
+
+    println!("{}, {}", mr1, mr2);
+}
+\end{lstlisting}
+
 \paragraph{Box}
+
+\paragraph{Lifetimes}
 
 \subsection{Unit tests}
 
