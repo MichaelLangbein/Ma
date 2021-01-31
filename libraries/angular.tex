@@ -79,9 +79,9 @@ The different parts of an angular application are namespaced in an interesting w
 \begin{itemize}
     \item app module: root. \inlinecode{imports} other modules and \inlinecode{bootstrap}'s the root-component.
     \item core module: exports shared singleton services and guards in its \inlinecode{providers}. Should be imported only in app-module.
-    \item feature module: exports thematic components, directives and pipes in its \inlinecode{declarations} & \inlinecode{exports}. Should be imported only in app-module.
+    \item feature module: exports thematic components, directives and pipes in its \inlinecode{declarations} and \inlinecode{exports}. Should be imported only in app-module.
                 If necessary, feature modules may provide services, but then you need to make sure that the module is only imported in one single place (usually the app-module).
-    \item shared module: exports globally used components, directives and pipes in its \inlinecode{declarations} & \inlinecode{exports}. Should be imported into any module that requires it.
+    \item shared module: exports globally used components, directives and pipes in its \inlinecode{declarations} and \inlinecode{exports}. Should be imported into any module that requires it.
                 Shared modules \emph{must not} export services, because they are imported in several other modules. The presence of the same service in multiple modules will have the injector commit harakiri.
     \item router module: imported into app module. Side-effect-configures the angular-core-router using \inlinecode{forRoot}.
 \end{itemize}
