@@ -55,6 +55,52 @@ A bunch of software helps with SVG's:
 
 \subsection{D3}
 
+\includegraphics[width=0.3\textwidth]{d3_enter_update_exit.png}
+
+\begin{lstlisting}
+    <html>
+    <head>
+        <script src="https://d3js.org/d3.v6.js"></script>
+    </head>
+    <body>
+        <h1>Demonstrating the selection, enter & exit flow for animations</h1>
+
+        <ul id="list">
+            <li>one</li>
+            <li>two</li>
+        </ul>
+
+        <p>
+            To explore this behavior, call `displayData` a few times from the web-console.
+        </p>
+    </body>
+    <script>
+        function displayData(data) {
+            // step 1: create element- & data-selections (= the blue and the red cirlce)
+            const elsNdata = d3.select('#list')  // selection of parent element
+                .selectAll('li')  // select all child elements: [li, li]
+                .data(data);
+
+            // step 2: handle li's that already have (possibly old) data on them
+            elsNdata
+                .text(d => d);
+    
+            // step 3: handle new data points coming in
+            elsNdata.enter()  // all data points that have not yet got an associated li
+                    .append('li')
+                    .text(d => d);
+            
+            // step 4: handle old data points going out
+            elsNdata.exit() // all li's that no longer have data on them
+                .remove();
+        }
+
+        displayData([1, 2, 3])
+    </script>
+</html>
+\end{lstlisting}
+
+
 \subsection{WASM}
 
 \begin{itemize}
