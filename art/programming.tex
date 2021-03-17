@@ -84,6 +84,8 @@ A bunch of software helps with SVG's:
             // step 2: handle li's that already have (possibly old) data on them
             elsNdata
                 .text(d => d);
+            // usually, there are initially no pre-defined li's, such that this step is not required.
+            // this is good for performance: not handling old items saves on dom-operations.
     
             // step 3: handle new data points coming in
             elsNdata.enter()  // all data points that have not yet got an associated li
