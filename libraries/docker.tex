@@ -30,8 +30,8 @@ Usually, you write your own dockerfile that specifies as a dependency a more gen
                 \item \inlinecode{run -it ...} creates a new container from an image
                 \item \inlinecode{start -i ...} starts up an existing container
                 \item \inlinecode{logs --tail 100 --since <minutes> --timestamps --follow <containerid>}: All \inlinecode{stdout} and \inlinecode{stderr} (?) goes to this log
-                \item \inlinecode{cp}
-                \item \inlinecode{exec}
+                \item \inlinecode{cp /path/to/local/file.html my-nginx:/var/www/html}
+                \item \inlinecode{exec -it my-nginx /bin/bash}
                 \item \inlinecode{inspect --format=\{\{.LogPath\}\} <containerid>}: Hardware-info
                 \item \inlinecode{rm <containername>}
             \end{itemize}
