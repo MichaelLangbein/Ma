@@ -703,8 +703,9 @@ This is not a very convenient setup. In the spring appendix we'll describe using
 Relations are the most important and most difficult part of JPA.
 
 \begin{itemize}
-	\item One-to-many relations: In the class 'Task': \inlinecode{@OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL) private List<TimeSpan> activePeriods;} and in the class 'TimeSpan': \inlinecode{@ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "parentTask", referencedColumnName = "id") private Task parentTask;} This code yields a foreign-key column named 'parentTask' in the 'TimeSpan' table.
 	\item Element-collections: \inlinecode{@ElementCollection private List<String> attachmentUrls;}. These are for relations with non-entities. This instruction yields a table with attachment-urls and an id.
+	\item One-to-many relations: In the class 'Task': \inlinecode{@OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL) private List<TimeSpan> activePeriods;} and in the class 'TimeSpan': \inlinecode{@ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "parentTask", referencedColumnName = "id") private Task parentTask;} This code yields a foreign-key column named 'parentTask' in the 'TimeSpan' table. (It's a good practice to have the foreign key in the 'Many' table, not the 'One' table).
+	\item Many-to-many relations: creates an intermediate id-mapping table.
 \end{itemize}
 
 \subsection{Swing}
