@@ -142,6 +142,13 @@ def move([4, 3, 2, 1], from: 'A', to: 'C', via: 'B'):
     + move([3, 2, 1], from: 'B', to: 'C', via: 'A')
 \end{lstlisting}
 
+The hardest part in dynamic programming is usually finding the right mental model to approach a problem. Often, there are at least two ways to look at a problem, and the less obvious one is the one that is actually useful.
+Here's a list of ways to think of problems that was useful to me in the past:
+\begin{itemize}
+  \item \textbf{decision-tree} - example: create all subsets of a set
+  \item \textbf{graph} - example: count ways to climb n stairs by using 1, 2, or 3 stairs at a time
+  \item \textbf{binary search} - example: find a magic index (\inlinecode{i = a[i]}) in an ordered array. (Binary search: go to middle, then go to middle of left half, then go to middle of right half, ...)
+\end{itemize}
 
 
 \subsection{Avoiding the need for dynamic programming: Solving recurrences to closed form}
@@ -197,9 +204,39 @@ def merge(a, b):
             ib++
         ic++
     return c
+
+def sort(arr):
+  l = len(arr)
+  if l == 1:
+    return arr
+  sorted1 = sort(arr[:l/2])
+  sorted2 = sort(arr[l/2:])
+  return merge(sorted1, sorted2)
 \end{lstlisting}
 
 \invariant{statement}{sometext}{sometext}{sometext}
+
+The \textbf{runtime} of the algorithm is $\BigOh{n \log n}$.
+
+\subsection{Insertion-sort}
+
+The idea is to go through a list from left to right. Look at all entries left of your current position. Move your current value back down the left list until it is sorted in. Go one step further right.
+\begin{lstlisting}[language=python]
+  def insertionSort(arr):
+    # Traverse through 1 to len(arr)
+    for i in range(1, len(arr)):
+        pivot = arr[i]
+        # Move elements of arr[0..i-1], that are
+        # greater than pivot, to one position ahead
+        # of their current position
+        j = i-1
+        while j >=0 and pivot < arr[j] :
+                arr[j+1] = arr[j]
+                j -= 1
+        arr[j+1] = pivot
+\end{lstlisting}
+
+The \textbf{runtime} of the algorithm is $\BigOh{n^2}$ in the worst case, but $\BigOh{n}$ for almost sorted lists. That makes insertion sort great if you have to apply sort over and over again.
 
 
 \subsection{Matrix inverse}
