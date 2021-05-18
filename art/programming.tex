@@ -188,6 +188,129 @@ A bunch of software helps with SVG's:
     }); 
 \end{lstlisting}
 
+\subsubsection{Updates}
+A \inlinecode{Selection}s groups (update, enter and exit) stay the same, even if the data has already been modified.
+To get the newer entries in the `update` group, you need to make a new \inlinecode{Selection` using \inlinecode{.selectAll('someTag')}.
+
+\subsubsection{Call}
+Call is a synonym to `tap`: it allows you to have a side-effect on a selection without breaking the method chain.
+
+\begin{lstlisting}
+selectAll('circle')
+    .call(doWithSelection, 'red');
+
+function doWithSelection(selection, color) {
+    selection.attr('fill', color);
+}
+\end{lstlisting}
+
+\subsubsection{Join}
+
+
+\subsubsection{Range & scale}
+
+One of the hardest parts of d3 is the usage of force in combination with drag.
+\begin{lstlisting}
+    import { BaseType, forceCenter, forceLink, forceManyBody, select, Selection } from "d3";
+import { forceSimulation, SimulationLinkDatum, SimulationNodeDatum } from "d3-force";
+import { drag } from 'd3-drag';
+
+/**
+Each node must be an object. The following properties are assigned by the simulation:
+
+index - the node’s zero-based index into nodes
+x - the node’s current x-position
+y - the node’s current y-position
+vx - the node’s current x-velocity
+vy - the node’s current y-velocity
+
+The position ⟨x,y⟩ and velocity ⟨vx,vy⟩ may be subsequently modified by forces and by the simulation. 
+If either vx or vy is NaN, the velocity is initialized to ⟨0,0⟩. If either x or y is NaN,
+the position is initialized in a phyllotaxis arrangement, so chosen to ensure a deterministic, uniform distribution.
+
+Each link is an object with the following properties:
+
+source - the link’s source node; see simulation.nodes
+target - the link’s target node; see simulation.nodes
+ */
+
+interface Institute extends SimulationNodeDatum {
+    id: string;
+}
+
+const institutes: Institute[] = [{
+    id: 'finance'
+}, {
+    id: 'spaceflight'
+}, {
+    id: 'research'
+}];
+
+const links: SimulationLinkDatum<Institute>[] = [{
+    source: institutes.find(i => i.id === 'spaceflight'),
+    target: institutes.find(i => i.id === 'finance')
+}, {
+    source: institutes.find(i => i.id === 'spaceflight'),
+    target: institutes.find(i => i.id === 'research')
+}];
+
+
+
+
+const simulation = forceSimulation(institutes)
+    .force("charge", forceManyBody().strength(-30))
+    .force("link", forceLink(links))
+    .force("center", forceCenter().x(150).y(150))
+    .on('tick', simulationTick);
+
+const dragCallback = drag()
+    .on('start', (evt: DragEvent, d: Institute) => {
+        simulation.alphaTarget(0.3).restart(); 
+    })
+    .on('drag', (evt, d: Institute) => {
+        d.fx = evt.x;
+        d.fy = evt.y;
+    })
+    .on('end', (evt: DragEvent, d: Institute) => {
+        simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    });
+
+
+const rootElement = select('#svg')
+    .attr('width', 500)
+    .attr('height', 300)
+    .append('g');
+
+rootElement.selectAll('circle')
+    .data(institutes)
+    .enter()
+        .append('circle')
+        .attr('r', 10)
+        .call(dragCallback);
+
+rootElement.selectAll('line')
+    .data(links)
+    .enter()
+        .append('line')
+        .attr('stroke', 'black')
+        .attr('stroke-width', 2);
+
+function simulationTick() {
+    rootElement.selectAll('circle')
+        .attr('cx', d => (d as Institute).x)
+        .attr('cy', d => (d as Institute).y);
+
+    rootElement.selectAll('line')
+        .attr('x1', d => ((d as SimulationLinkDatum<Institute>).source as Institute).x)
+        .attr('y1', d => ((d as SimulationLinkDatum<Institute>).source as Institute).y)
+        .attr('x2', d => ((d as SimulationLinkDatum<Institute>).target as Institute).x)
+        .attr('y2', d => ((d as SimulationLinkDatum<Institute>).target as Institute).y);
+}
+\end{lstlisting}
+
+
 \subsection{WASM}
 
 \begin{itemize}
