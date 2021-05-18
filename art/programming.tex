@@ -103,6 +103,91 @@ A bunch of software helps with SVG's:
 \end{lstlisting}
 
 
+\begin{lstlisting}
+    import { select, BaseType, EnterElement, Selection } from 'd3';
+
+
+    // https://www.youtube.com/watch?v=IyIAR65G-GQ&t=1841s 
+    
+    interface DataPoint {
+        id: number;
+        value: number;
+    }
+    
+    class Queue<T> {
+        private data: T[];
+        
+        constructor(length: number) {
+            this.data = Array(length);
+        }
+    
+        push(val: T): T {
+            this.data.push(val);
+            return this.data.shift();
+        }
+    
+        getData(): T[] {
+            return this.data;
+        }
+    }
+    
+    const dataQueue = new Queue<DataPoint>(10);
+    
+    let id = 0;
+    function addRandomData(queue: Queue<DataPoint>) {
+        id += 1;
+        queue.push({
+            id: id,
+            value: Math.random() * 10
+        });
+    }
+    
+    for (let i = 0; i < 10; i++) {
+        addRandomData(dataQueue);
+    }
+    
+    const baseElement: Selection<SVGElement, unknown, HTMLElement, any> = select('#svg')
+        .attr('width', 300)
+        .attr('height', 300)
+        .append('g');
+        
+    function update(data: DataPoint[]) {
+        
+        // we need to re-select on every update cycle
+        const circles: Selection<BaseType, unknown, SVGElement, unknown> = baseElement.selectAll('circle');
+        const circlesWithData: Selection<BaseType, DataPoint, SVGElement, unknown> = circles
+            .data(data, 
+                // keyFunction: returns an id for each datum, so that elements know what data they are associated with
+                (d: DataPoint, i: number, g: (SVGElement | BaseType)[]) => d.id
+            );
+        
+        const entering: Selection<EnterElement, DataPoint, SVGElement, unknown> = circlesWithData.enter();
+        const updating: Selection<BaseType, DataPoint, SVGElement, unknown> = circlesWithData;
+        const enteringAndUpdating = updating.merge(entering);
+        const leaving: Selection<BaseType, unknown, SVGElement, unknown> = circlesWithData.exit();
+        console.log(`in: ${entering.size()} - update: ${updating.size()} - out: ${leaving.size()}`)
+        
+        const entered: Selection<SVGCircleElement, DataPoint, SVGElement, unknown> = entering
+            .append('circle')
+            .attr('r', 10)
+            .attr('cx', (d, i) => i * 20)
+            .attr('cy', (d) => 250 - d.value * 10)
+            .attr('fill', 'green');
+    
+        const updated: Selection<BaseType, DataPoint, SVGElement, unknown> = updating
+            .attr('cx', (d, i) => i * 10);
+        
+        const removed: Selection<BaseType, unknown, SVGElement, unknown> = leaving.remove();
+    }
+    
+    const button = document.getElementById('button') as HTMLButtonElement;
+    button.addEventListener('click', () => {
+        addRandomData(dataQueue);
+        const newData = dataQueue.getData();
+        update(newData);
+    }); 
+\end{lstlisting}
+
 \subsection{WASM}
 
 \begin{itemize}
