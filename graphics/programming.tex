@@ -209,6 +209,8 @@ function doWithSelection(selection, color) {
 
 \subsubsection{Range & scale}
 
+
+\subsection{Force}
 One of the hardest parts of d3 is the usage of force in combination with drag.
 \begin{lstlisting}
     import { BaseType, forceCenter, forceLink, forceManyBody, select, Selection } from "d3";
@@ -308,6 +310,189 @@ function simulationTick() {
         .attr('x2', d => ((d as SimulationLinkDatum<Institute>).target as Institute).x)
         .attr('y2', d => ((d as SimulationLinkDatum<Institute>).target as Institute).y);
 }
+\end{lstlisting}
+
+\subsection{Layout}
+Layout is a way how d3 arranges data for you - commonly in a tree, or a circle-diagram or comparable. First you wrap your data in a \inlinecode{hierarchy}, then you call a layout-function (like for example \inlinecode{cluster}) on it.
+\begin{lstlisting}
+    import { select, cluster, curveBundle, lineRadial, dsv, hierarchy } from 'd3';
+
+
+    const width = 700;
+    const height = 500;
+    const circleRadius = 200;
+    
+    
+    function findInTree(name, parentGroupName, tree) {
+        const parentGroup = tree.children.find(e => e.name === parentGroupName);
+        if (parentGroup) {
+            const entry = parentGroup.children.find(e => e.name === name);
+            return entry;
+        }
+    }
+    
+    function addToTree(name, parentGroupName, tree) {
+        const parentGroup = tree.children.find(e => e.name === parentGroupName);
+        parentGroup.children.push({ name });
+    }
+    
+    function parseDataInTree(data) {
+        const base = {
+            name: 'base',
+            children: [{
+                name: 'cluster',
+                children: []
+            }, {
+                name: 'project',
+                children: []
+            }, {
+                name: 'potential',
+                children: []
+            }, {
+                name: 'institute',
+                children: []
+            }]
+        };
+    
+        for (let row of data) {
+            const institute = row['DLR Institut'];
+            if (!findInTree(institute, 'institute', base)) {
+                addToTree(institute, 'institute', base);
+            }
+            const potential = row['Potential'];
+            if (!findInTree(potential, 'potential', base)) {
+                addToTree(potential, 'potential', base);
+            }
+            const project = row['Projekt'];
+            if (!findInTree(project, 'project', base)) {
+                addToTree(project, 'project', base);
+            }
+            const cluster = row['HumTech Cluster (UNHCR)'];
+            if (!findInTree(cluster, 'cluster', base)) {
+                addToTree(cluster, 'cluster', base);
+            }
+        }
+    
+        return hierarchy(base);
+    }
+    
+    function getBubbleColor(d) {
+        if (d.depth === 2) {
+            switch (d.parent.data.name) {
+                case 'cluster':
+                    return 'yellow';
+                case 'project':
+                    return 'blue';
+                case 'institute':
+                    return 'green';
+                case 'potential':
+                    return 'red';
+            }
+        } else if (d.depth === 1) {
+            return 'black';
+        } else {
+            return 'black';
+        }
+    }
+    
+    function findInHierarchy(name, groupName, hierarchy) {
+        const group = hierarchy.children.find(c => c.data.name === groupName);
+        if (group) {
+            const child = group.children.find(c => c.data.name === name);
+            return child;
+        }
+    }
+    
+    function parseDataInRelations(treeData, data) {
+        const paths = [];
+    
+        for (let row of data) {
+            const institute = row['DLR Institut'];
+            const potential = row['Potential'];
+            const project = row['Projekt'];
+            const cluster = row['HumTech Cluster (UNHCR)'];
+    
+            if (institute && potential) {
+                const startNode = findInHierarchy(institute, 'institute', treeData);
+                const targetNode = findInHierarchy(potential, 'potential', treeData);
+                const path = startNode.path(targetNode);
+                paths.push(path);
+            }
+    
+            if (institute && project) {
+                const startNode = findInHierarchy(institute, 'institute', treeData);
+                const targetNode = findInHierarchy(project, 'project', treeData);
+                const path = startNode.path(targetNode);
+                paths.push(path);
+            }
+    
+            if (project && cluster) {
+                const startNode = findInHierarchy(project, 'project', treeData);
+                const targetNode = findInHierarchy(cluster, 'cluster', treeData);
+                const path = startNode.path(targetNode);
+                paths.push(path);
+            }
+    
+            if (potential && cluster) {
+                const startNode = findInHierarchy(potential, 'potential', treeData);
+                const targetNode = findInHierarchy(cluster, 'cluster', treeData);
+                const path = startNode.path(targetNode);
+                paths.push(path);
+            }
+        }
+    
+        return paths;
+    }
+    
+    
+    async function main() {
+        const data = await dsv('|', './data2.csv');
+    
+        const treeData = parseDataInTree(data);
+        const relationData = parseDataInRelations(treeData, data);
+    
+        const baseElement = select('#graphic')
+            .attr('width', width)
+            .attr('height', height)
+            .append('g')
+            .attr('transform', `translate(${ width / 2 } ${ height / 2 })`);
+    
+        const circlePositioningFunction = cluster()
+            .size([360, circleRadius]);
+        const treeDataWithPositions = circlePositioningFunction(treeData);
+        const leaveDataWithPositions = treeDataWithPositions.leaves();
+    
+        const circles = baseElement
+            .selectAll('.bubble')
+            .data(leaveDataWithPositions)
+            .enter()
+            .append('circle')
+            .attr('class', 'bubble')
+            .attr('r', 10)
+            .attr('fill', d => getBubbleColor(d))
+            .attr('stroke', 'black')
+            .attr('transform', d => `rotate(${d.x}) translate(${d.y}, 0)`);
+            // .attr('cx', d => d.x)
+            // .attr('cy', d => d.y);
+    
+        const connectionPathFunction = lineRadial()
+            .curve(curveBundle.beta(0.7))
+            .radius(d => d.y)
+            .angle(d => d.x / 180 * Math.PI );
+    
+        const connections = baseElement
+            .selectAll('.connection')
+            .data(relationData)
+            .enter()
+            .append('path')
+            .attr('class', 'connection')
+            .attr('d', connectionPathFunction)
+            .attr('stroke', 'gray')
+            .attr('fill', 'none');
+    
+    }
+    
+    main(); 
 \end{lstlisting}
 
 
