@@ -1,16 +1,30 @@
 \section{Remote sensing}
 
 
-
 \subsection{Electromagnetic radiation}
-Satellites all work the same way: they are fyling machines that carry a camara. The camara has one or more sensors, each of which can observe some part of the electromagnetic spectrum.
+Satellites all work the same way: they are flying machines that carry a camera. The camera has one or more sensors, each of which can observe some part of the electromagnetic spectrum.
 Radar satellites (usually) additionally have their own 'light' source: they actively send out radio-radiation and collect the reflection.
 
+\begin{itemize}
+    \item Optical
+    \item Radar: not hindered by clouds. Good for flood-detection
+\end{itemize}
 
-\subsection{Orbital periods and aquisition}
-Satellites usually have an orbital period of 1 - 2 hours. They revisit the same spot on earth every 2-3 weeks. (This example data is taken from landsat: an orbit takes 99 minutes, and it visits the same spot every 16 days. Note that landsat always stays on the sunny side of earth - most visible-light satellites do this.)
-Commonly, satellite series have offset periods so one machine of the same series visits the same spot every nth of a full orbital period. However, some satellites can narrow or broaden their sensors, so even if a satellite visits the same spot again, it might not make the same snapshot again.
-To handle the high demand and low availability of satellite images, aquisition plans are being made. Usually, these take into account sesional effects, water vapor, and also a ranking of requests from different scientific institutions.
+
+
+
+
+\subsection{Orbital periods and acquisition}
+Satellites usually have an orbital period of 1 - 2 hours. They revisit the same spot on earth every 2-3 weeks.
+(This example data is taken from landsat: an orbit takes 99 minutes, and it visits the same spot every 16 days.
+Note that landsat always stays on the sunny side of earth - most visible-light satellites do this.)
+Commonly, satellite series have offset periods so one machine of the same series visits the same spot every nth of a full orbital period.
+However, some satellites can narrow or broaden their sensors, so even if a satellite visits the same spot again, it might not make the same snapshot again.
+To handle the high demand and low availability of satellite images, acquisition plans are being made. Usually, these take into account seasonal effects,
+water vapor, and also a ranking of requests from different scientific institutions.
+
+
+
 
 
 \subsection{Important satellites and service providers}
@@ -18,14 +32,17 @@ To handle the high demand and low availability of satellite images, aquisition p
 \begin{table}[]
     \begin{tabular}{@{}llllll@{}}
     \toprule
-    Satellite  & Bands & Data available at & Orbit & Data frequency & Description \\ \midrule
-    Landsat    &       &                   &       &                &             \\
-    Modis      &       &                   &       &                &             \\
-    Copernicus &       &                   &       &                &             \\
-    Sentinel   &       &                   &       &                &             \\
-    TerraSarX  &       &                   &       &                &             \\
-    RapidEye   &       &                   &       &                &             \\
-    Ikonos     &       &                   &       &                &             \\ \bottomrule
+    Satellite     & Owner & Bands & Data available at                    & Started    & Orbit                                                          & Resolution & Description                                   \\ \midrule
+    Landsat       & NASA  &       & USGS Earth explorer / AWS-S2 as COGs &            &                                                                &            & US optical, very long running                           \\
+    Modis         & NASA  &       &                                      &            &                                                                &            & Optical (but very coarse) / Temperature & water-vapor   \\
+    Copernicus    & ESA   &       &                                      &            &                                                                &            &                                                         \\
+    Sentinel 1    & ESA   &       & Sentinel-hub EO-browser              & 03.04.2014 & Near-polar, sun-sync, 1.5h, 6-day world coverage (using both)  & 5m * 5m    &  Radar                                                  \\
+    Sentinel 2    & ESA   &       & Sentinel-hub EO-browser              &            &                                                                &            &  Optical                                                \\
+    Sentinel 3    & ESA   &       & Sentinel-hub EO-browser              &            &                                                                &            &  Sea surface topography & temperature (also fire detection) \\
+    Sentinel 5p   & ESA   &       & Sentinel-hub EO-browser              &            &                                                                & 6km * 4km  &  Atmospheric gasses                                     \\
+    TerraSarX     & DLR   &       &                                      & 15.06.2007 &                                                                & 1m/3m/16m  &  Radar, very high resolution, commercial/scientific coop \\
+    RapidEye      &       &       &                                      &            &                                                                &            &                                                         \\
+    Ikonos        &       &       &                                      &            &                                                                &            &                                                         \\ \bottomrule
     \end{tabular}
 \end{table}
 
@@ -49,9 +66,13 @@ To handle the high demand and low availability of satellite images, aquisition p
 
 
 
+
+
+
 \subsection{Datatypes, protocols and libraries}
 
-Remote sensing data is usually massive in size and requires some special software to parse. This section is intended to give an overview of the different datatypes out there and the tools for reading them. 
+Remote sensing data is usually massive in size and requires some special software to parse.
+This section is intended to give an overview of the different data-types out there and the tools for reading them. 
 
 \paragraph{Datacubes} are tensors of (usually very large) (geo-)data.
 
@@ -59,7 +80,10 @@ Remote sensing data is usually massive in size and requires some special softwar
 
 \paragraph{Open-EO} ia an API to speak to different geo-processing services like GEE. Unfortunately, open-EO stands in concurrence to WCPS. 
 
-\paragraph{geoTiff} files are geo-referenced images. They contain different bands. Every band is a 2d-array of 16-bit numbers, representing the image at one frequency-band. Usually, you'll have one band around the green color, one arount the red, and one around the blue (plus many more bands at non-visible frequencies). When you color these three bands and put them together as an rgb-image, you can usually obtain a quite decent color-photo. 
+\paragraph{geoTiff} files are geo-referenced images. They contain different bands.
+Every band is a 2d-array of 16-bit numbers, representing the image at one frequency-band.
+Usually, you'll have one band around the green color, one around the red, and one around the blue (plus many more bands at non-visible frequencies).
+When you color these three bands and put them together as an rgb-image, you can usually obtain a quite decent color-photo. 
 Every geoTiff has an associated \include{transform} attribute. This attribute is an affine transformation matrix and maps pixel-locations (row,col) to (x,y) spatial positions.
 \begin{lstlisting}[language=python]
 import rasterio
@@ -71,7 +95,15 @@ with rasterio.open("example.tif") as dataset:
     print(dataset.transform * (dataset.width, dataset.height))
 \end{lstlisting}
 
-\paragraph{GeoPackage} (GPKG) is an open, non-proprietary, platform-independent and standards-based data format for geographic information system implemented as a SQLite database container. Defined by the Open Geospatial Consortium (OGC)[1] with the backing of the US military[2] and published in 2014, GeoPackage has seen wide widespread support from various government, commercial, and open source organizations[3].
+\paragraph{GeoPackage} (GPKG) is an open, non-proprietary, platform-independent and standards-based data format for geographic information system implemented as a SQLite database container.
+Defined by the Open Geospatial Consortium (OGC)[1] with the backing of the US military[2] and published in 2014, GeoPackage has seen wide widespread support from various government,
+commercial, and open source organizations[3].
+
+
+
+
+
+
 
 
 \subsection{Projections}
@@ -79,6 +111,11 @@ with rasterio.open("example.tif") as dataset:
 \paragraph{Wgs84 aka. Epsg4326} is a global spherical (aka non-projected, using lat/lon) CRS and the stuff that comes from GPS-satellites. GeoJson should by now only  use Wgs84 in its data (it used to be allowed to add a field named "crs"). 
 \paragraph{UTM aka. Epsg20**} is a projected CRS using a  two-dimensional cartesian grid in meters. Projections needs to be done on individual areas, which is why there several Epsg-codes for this projection.
 \paragraph{Web Merkator aka. EPSG:900913 aka. Epsg3857} is the google projection and a variant of UTM.
+
+
+
+
+
 
 \subsection{NDVI}
 The normalized difference vegetation index (NDVI) is used to assess the state of vegetation. In living plants chlorophyll-A, from the photosynthetic machinery, strongly absorbs red color; on the other hand, near-infrared light is strongly reflected. Live, healthy vegetation reflects around 8% of red light and 50% of near-infrared light. Dead, unhealthy, or sparse vegetation reflects approximately 30% of red light and 40% of near-infrared light.
