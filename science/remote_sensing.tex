@@ -29,20 +29,24 @@ water vapor, and also a ranking of requests from different scientific institutio
 
 \subsection{Important satellites and service providers}
 
-\begin{table}[]
-    \begin{tabular}{@{}llllll@{}}
-    \toprule
-    Satellite     & Owner & Bands & Data available at                    & Started    & Orbit                                                          & Resolution & Description                                   \\ \midrule
-    Landsat       & NASA  &       & USGS Earth explorer / AWS-S2 as COGs &            &                                                                &            & US optical, very long running                           \\
-    Modis         & NASA  &       &                                      &            &                                                                &            & Optical (but very coarse) / Temperature & water-vapor   \\
-    Copernicus    & ESA   &       &                                      &            &                                                                &            &                                                         \\
-    Sentinel 1    & ESA   &       & Sentinel-hub EO-browser              & 03.04.2014 & Near-polar, sun-sync, 1.5h, 6-day world coverage (using both)  & 5m * 5m    &  Radar                                                  \\
-    Sentinel 2    & ESA   &       & Sentinel-hub EO-browser              &            &                                                                &            &  Optical                                                \\
-    Sentinel 3    & ESA   &       & Sentinel-hub EO-browser              &            &                                                                &            &  Sea surface topography & temperature (also fire detection) \\
-    Sentinel 5p   & ESA   &       & Sentinel-hub EO-browser              &            &                                                                & 6km * 4km  &  Atmospheric gasses                                     \\
-    TerraSarX     & DLR   &       &                                      & 15.06.2007 &                                                                & 1m/3m/16m  &  Radar, very high resolution, commercial/scientific coop \\
-    RapidEye      &       &       &                                      &            &                                                                &            &                                                         \\
-    Ikonos        &       &       &                                      &            &                                                                &            &                                                         \\ \bottomrule
+
+\begin{table}
+    \centering
+    \begin{tabular}{llllllll}
+        \toprule
+        Satellite   & Owner & Bands & Data available at                    & Started    & Orbit                                                         & Resolution & Description                                               \\
+        \midrule
+        Landsat     & NASA  &       & USGS Earth explorer / AWS-S2 as COGs &            &                                                               &            & US optical, very long running                             \\
+        Modis       & NASA  &       &                                      &            &                                                               &            & Optical (but very coarse) / Temperature, water-vapor      \\
+        Copernicus  & ESA   &       &                                      &            &                                                               &            &                                                           \\
+        Sentinel 1  & ESA   &       & Sentinel-hub EO-browser              & 03.04.2014 & Near-polar, sun-sync, 1.5h, 6-day world coverage (using both) & 5m * 5m    & Radar                                                     \\
+        Sentinel 2  & ESA   &       & Sentinel-hub EO-browser              &            &                                                               &            & Optical                                                   \\
+        Sentinel 3  & ESA   &       & Sentinel-hub EO-browser              &            &                                                               &            & Sea surface topography, temperature (also fire detection) \\
+        Sentinel 5p & ESA   &       & Sentinel-hub EO-browser              &            &                                                               & 6km * 4km  & Atmospheric gasses                                        \\
+        TerraSarX   & DLR   &       &                                      & 15.06.2007 &                                                               & 1m/3m/16m  & Radar, very high resolution, commercial/scientific coop   \\
+        RapidEye    &       &       &                                      &            &                                                               &            &                                                           \\
+        Ikonos      &       &       &                                      &            &                                                               &            &                                                           \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
@@ -72,18 +76,18 @@ water vapor, and also a ranking of requests from different scientific institutio
 \subsection{Datatypes, protocols and libraries}
 
 Remote sensing data is usually massive in size and requires some special software to parse.
-This section is intended to give an overview of the different data-types out there and the tools for reading them. 
+This section is intended to give an overview of the different data-types out there and the tools for reading them.
 
 \paragraph{Datacubes} are tensors of (usually very large) (geo-)data.
 
-\paragraph{OGC-WCPS: OGC's Web Coverage Processing Service} is a language for filtering and processing multi-dimensional raster coverages. 
+\paragraph{OGC-WCPS: OGC's Web Coverage Processing Service} is a language for filtering and processing multi-dimensional raster coverages.
 
-\paragraph{Open-EO} ia an API to speak to different geo-processing services like GEE. Unfortunately, open-EO stands in concurrence to WCPS. 
+\paragraph{Open-EO} ia an API to speak to different geo-processing services like GEE. Unfortunately, open-EO stands in concurrence to WCPS.
 
 \paragraph{geoTiff} files are geo-referenced images. They contain different bands.
 Every band is a 2d-array of 16-bit numbers, representing the image at one frequency-band.
 Usually, you'll have one band around the green color, one around the red, and one around the blue (plus many more bands at non-visible frequencies).
-When you color these three bands and put them together as an rgb-image, you can usually obtain a quite decent color-photo. 
+When you color these three bands and put them together as an rgb-image, you can usually obtain a quite decent color-photo.
 Every geoTiff has an associated \include{transform} attribute. This attribute is an affine transformation matrix and maps pixel-locations (row,col) to (x,y) spatial positions.
 \begin{lstlisting}[language=python]
 import rasterio
@@ -108,7 +112,7 @@ commercial, and open source organizations[3].
 
 \subsection{Projections}
 
-\paragraph{Wgs84 aka. Epsg4326} is a global spherical (aka non-projected, using lat/lon) CRS and the stuff that comes from GPS-satellites. GeoJson should by now only  use Wgs84 in its data (it used to be allowed to add a field named "crs"). 
+\paragraph{Wgs84 aka. Epsg4326} is a global spherical (aka non-projected, using lat/lon) CRS and the stuff that comes from GPS-satellites. GeoJson should by now only  use Wgs84 in its data (it used to be allowed to add a field named "crs").
 \paragraph{UTM aka. Epsg20**} is a projected CRS using a  two-dimensional cartesian grid in meters. Projections needs to be done on individual areas, which is why there several Epsg-codes for this projection.
 \paragraph{Web Merkator aka. EPSG:900913 aka. Epsg3857} is the google projection and a variant of UTM.
 
@@ -141,7 +145,7 @@ Calculation of the NDVI is sensitive to to a few factors:
 Image registration is the process of transforming different sets of data into one coordinate system.
 
 \begin{figure}[H]
-\centering
-\includegraphics[width=0.5\textwidth]{images/imageRegistration.png}
-\caption{Registering and summing multiple exposures of the same scene improve signal to noise ratio, allowing one to see things previously impossible to see. In this picture, the distant Alps are made visible, although they are tens of kilometers into the haze.}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/imageRegistration.png}
+    \caption{Registering and summing multiple exposures of the same scene improve signal to noise ratio, allowing one to see things previously impossible to see. In this picture, the distant Alps are made visible, although they are tens of kilometers into the haze.}
 \end{figure}

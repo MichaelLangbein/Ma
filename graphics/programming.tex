@@ -190,7 +190,7 @@ A bunch of software helps with SVG's:
 
 \subsubsection{Updates}
 A \inlinecode{Selection}s groups (update, enter and exit) stay the same, even if the data has already been modified.
-To get the newer entries in the `update` group, you need to make a new \inlinecode{Selection` using \inlinecode{.selectAll('someTag')}.
+To get the newer entries in the `update` group, you need to make a new \inlinecode{Selection} using \inlinecode{.selectAll('someTag')}.
 
 \subsubsection{Call}
 Call is a synonym to `tap`: it allows you to have a side-effect on a selection without breaking the method chain.
@@ -207,7 +207,7 @@ function doWithSelection(selection, color) {
 \subsubsection{Join}
 
 
-\subsubsection{Range & scale}
+\subsubsection{Range \& scale}
 
 
 \subsection{Force}
@@ -220,20 +220,20 @@ import { drag } from 'd3-drag';
 /**
 Each node must be an object. The following properties are assigned by the simulation:
 
-index - the node’s zero-based index into nodes
-x - the node’s current x-position
-y - the node’s current y-position
-vx - the node’s current x-velocity
-vy - the node’s current y-velocity
+index: the node's zero-based index into nodes
+x - the node's current x-position
+y - the node's current y-position
+vx - the node's current x-velocity
+vy - the node's current y-velocity
 
-The position ⟨x,y⟩ and velocity ⟨vx,vy⟩ may be subsequently modified by forces and by the simulation. 
-If either vx or vy is NaN, the velocity is initialized to ⟨0,0⟩. If either x or y is NaN,
+The position (x, y) and velocity (vx, vy) may be subsequently modified by forces and by the simulation.
+If either vx or vy is NaN, the velocity is initialized to (0, 0). If either x or y is NaN,
 the position is initialized in a phyllotaxis arrangement, so chosen to ensure a deterministic, uniform distribution.
 
 Each link is an object with the following properties:
 
-source - the link’s source node; see simulation.nodes
-target - the link’s target node; see simulation.nodes
+source - the link's source node; see simulation.nodes
+target - the link's target node; see simulation.nodes
  */
 
 interface Institute extends SimulationNodeDatum {
