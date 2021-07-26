@@ -466,11 +466,6 @@ Any \emph{square} matrix can be eigenvector (aka. spectrally) decomposed: $\mtrx
 
 
 
-
-
-
-
-
 \subsection{Singular value decomposition}
 Square matrices may be decomposed to $\mtrx{A} = \mtrx{X} \mtrx{\Lambda} \mtrx{X}^{-1}$.
 More generally, any matrix may be decomposed to $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$.
@@ -556,28 +551,36 @@ U @ (np.eye(2) * S) @ VT
 SVD is often used for image compression, too. Just leave out some lower $\sigma_i$'s, then you can also leave out equally many columns / rows of $U$ and $V^T$, respectively.
 
 
-
 \subsubsection{Principal component analysis}
-A common application of SVA is PCA.
+A common application of eigenvector-decomposition/SVA is PCA.
 Assume $A$ has had it's mean subtracted.
 Then the covariance-matrix $Cov_A = A^TA$. (Ordinarily, we calculate the covariance matrix with $\frac{1}{n-1} \sum_i (X_i - \hat{X}) (X_i - \hat{X})^T $).
 
-Thus the eigenvector-matrix of $Cov_A$ is $E_{Cov_A} = E_{A^T A} = V$ and writing out the full eigenvector-formula we get 
+$Cov_A$ is square and symmetric, and so we can do an eigenvector-decomposition on it: The eigenvector-matrix of $Cov_A$ is $E_{Cov_A} = E_{A^T A}$.
+Also note that in terms of a singular-value-decomposition, $E_{Cov_A} = E_{A^T A} = V$.
+Writing out the full eigenvector-formula we get 
 $$ Cov_A E_{Cov_A} = E_{Cov_A} \Lambda_{Cov_A} $$
 
-Define the principal component matrix $P$ as 
+
+Define the principal component matrix $P$ as $P  &= A E_{Cov_A}$.
+$A$ isn't square, so there's no eigenvalue-decomposition, but there is a singular-value decomposition. So:
 \begin{equation}
     \begin{aligned}
-         P  &= X E_{Cov_A} \\
+         P  &= A E_{Cov_A} \\
             &= V \Sigma E_{A A^T} E_{Cov_A} \\
             &= V \Sigma E_{A A^T} E_{A^T A} \\
             &= V \Sigma \\
             &= E_{Cov_A} \Lambda_{Cov_A}
     \end{aligned}
 \end{equation}
+Note that the principal components are a basis for $A$. They are always orthogonal.
 
 Usually, $A$ has many more rows than columns. Then the covariance-matrix $Cov_A$ is quite small, which makes calculating the eigenvalues easy.
-We can then use the first few principal components to get a good approximation of the complete dataset $A$.
+We can now transform the dataset $A$ to one dataset $B$ that uncorrelated by 
+$$ B = E_{Cov_A}^T A $$
+$B$ has a covariance-matrix that is diagonal, it's entries are $\Lambda_{Cov_A}$.
+
+
 
 
 
