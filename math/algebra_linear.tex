@@ -532,7 +532,17 @@ Thus $V$ are just eigenvectors of $A^T A$ for eigenvalues $\sigma_i^2$.
 Analogously we find $U$ for $AA^T$.
 
 
-\paragraph{Example for a shear-matrix}: SVD means that any matrix-transformation can be rewritten as a rotation, scale and another roation. Even a shear-matrix!
+\paragraph{Summarized}: Let's summarize what we found out:
+
+Any $A$ can be decomposed as $A = V \Sigma U^T$, where:
+\begin{itemize}
+    \item $V: B_{\rowspace{A}}$. We have proven $V$ to equal $V = E_{A^TA}$
+    \item $U = AV$ and $U: B_{\collspace{A}}$. We have proven $U$ to equal $U = E_{AA^T}$.
+    \item $\Sigma$, a diagonal matrix of normalizers. Proven to equal $\Sigma = \Lambda$
+\end{itemize}
+
+
+\paragraph{Example for a shear-matrix}: SVD means that any matrix-transformation can be rewritten as a rotation, scale and another rotation. Even a shear-matrix!
 \begin{lstlisting}
 M = [
     [1, .5],
@@ -546,6 +556,28 @@ U @ (np.eye(2) * S) @ VT
 SVD is often used for image compression, too. Just leave out some lower $\sigma_i$'s, then you can also leave out equally many columns / rows of $U$ and $V^T$, respectively.
 
 
+
+\subsubsection{Principal component analysis}
+A common application of SVA is PCA.
+Assume $A$ has had it's mean subtracted.
+Then the covariance-matrix $Cov_A = A^TA$. (Ordinarily, we calculate the covariance matrix with $\frac{1}{n-1} \sum_i (X_i - \hat{X}) (X_i - \hat{X})^T $).
+
+Thus the eigenvector-matrix of $Cov_A$ is $E_{Cov_A} = E_{A^T A} = V$ and writing out the full eigenvector-formula we get 
+$$ Cov_A E_{Cov_A} = E_{Cov_A} \Lambda_{Cov_A} $$
+
+Define the principal component matrix $P$ as 
+\begin{equation}
+    \begin{aligned}
+         P  &= X E_{Cov_A} \\
+            &= V \Sigma E_{A A^T} E_{Cov_A} \\
+            &= V \Sigma E_{A A^T} E_{A^T A} \\
+            &= V \Sigma \\
+            &= E_{Cov_A} \Lambda_{Cov_A}
+    \end{aligned}
+\end{equation}
+
+Usually, $A$ has many more rows than columns. Then the covariance-matrix $Cov_A$ is quite small, which makes calculating the eigenvalues easy.
+We can then use the first few principal components to get a good approximation of the complete dataset $A$.
 
 
 
