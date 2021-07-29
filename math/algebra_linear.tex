@@ -471,11 +471,18 @@ Square matrices may be decomposed to $\mtrx{A} = \mtrx{X} \mtrx{\Lambda} \mtrx{X
 More generally, any matrix may be decomposed to $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$.
 Before proving this, lets first interpret that statement from a matrix point of view.
 
-Consider some basis $B_{\collspace{A^T}}$. Through the transformation $\mtrx{A}: \reals^n \then \reals^m$ that basis $B_{\collspace{A^T}}$ is transformed into \collspace{A}.
-So far so easy - but we have an additional requirement: we want that transformed basis to be a basis itself: $ \mtrx{A} B_{\collspace{A^T}} = B_{\collspace{A}}$.
+Consider some basis $B_{\rowspace{A}}$. Through the transformation $\mtrx{A}: \reals^n \then \reals^m$ that basis $B_{\rowspace{A}}$ is transformed into \collspace{A}.
+So far so easy - but we have an additional requirement: we want that transformed basis to be a basis itself: $ \mtrx{A} B_{\rowspace{A}} : B_{\collspace{A}}$.
 
-There may be many bases $B_{\collspace{A^T}}$, but with that additional requirement, it must truely be a special basis. Let's call it $\mtrx{V}$, and the resulting new basis $\mtrx{A} \mtrx{V} = \mtrx{U}$.
+There may be many bases $B_{\rowspace{A}}$, but with that additional requirement, it must truly be a special basis. Let's call it $\mtrx{V}$, and the resulting new basis $\mtrx{A} \mtrx{V} = \mtrx{U}$.
 Also, we want $\mtrx{U}$ not only to be a basis, but also normal; so let's normalize it to $\mtrx{U}\mtrx{\Sigma}$. With all that we get: $\mtrx{A} \mtrx{V} = \mtrx{U} \mtrx{\Sigma}$.
+
+Summarizing our requirements:
+\begin{itemize}
+    \item V is a basis for the rowspace: $\mtrx{V}: B_{\rowspace{A}}$
+    \item The transformation of V, $\mtrx{A} \mtrx{V} = \mtrx{U}$, is a basis for the collumnspace $\mtrx{U}: B_{\collspace{A}}$
+    \item The normalizers of U are called $\mtrx{\Sigma}$
+\end{itemize}
 
 So these are our requirements. Let's jump into a proof. \\
 
@@ -509,7 +516,7 @@ Note that $u_i$ is, by construction, an eigenvector of $\mtrx{A} \mtrx{A}^T$:
 
 \paragraph{Rephrased} It is really worth it to rephrase that proof again, this time fully matrix-oriented. 
 
-Our goal is to find a matrix $V$ such that $V: B_{\collspace{A^T}}$ \emph{and also} $AV = U': B_{\collspace{A}}$.
+Our goal is to find a matrix $V$ such that $V: B_{\rowspace{A}}$ \emph{and also} $AV = U': B_{\collspace{A}}$.
 Normalize $U'$ to $U' = U \Sigma$, where $\Sigma$ is a diagonal matrix of scalings. 
 Thus our requirements can be written as $AV = U\Sigma$ or, since $V$ is a basis and as such orthogonal, $A = U \Sigma V^T$. \\
 
@@ -520,7 +527,8 @@ To find $V$ consider $A^T A$ (note that $A^T A: \PSD$):
         A^TA    &= ( U \Sigma V^T )^T U \Sigma V^T & \\
                 &= V \Sigma^T U^T U \Sigma V^T & \\
                 &= V \Sigma U^T U \Sigma V^T & \text { because $\Sigma$ is diagonal} \\
-                &= V \Sigma \Sigma V^T & \text{ because $U$ is orthogonal, so that $U^{-1} = U^T$}
+                &= V \Sigma \Sigma V^T & \text{ because $U$ is orthogonal, so that $U^{-1} = U^T$} \\
+                &= V \Sigma^2 V^T
     \end{aligned}
 \end{equation}
 Thus $V$ are just eigenvectors of $A^T A$ for eigenvalues $\sigma_i^2$.
