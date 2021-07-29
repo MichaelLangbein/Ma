@@ -562,7 +562,7 @@ Writing out the full eigenvector-formula we get
 $$ Cov_A E_{Cov_A} = E_{Cov_A} \Lambda_{Cov_A} $$
 
 
-Define the principal component matrix $P$ as $P  &= A E_{Cov_A}$.
+Define the principal component matrix $P$ as $P = A E_{Cov_A}$.
 $A$ isn't square, so there's no eigenvalue-decomposition, but there is a singular-value decomposition. So:
 \begin{equation}
     \begin{aligned}
@@ -578,6 +578,18 @@ Note that the principal components are a basis for $A$. They are always orthogon
 Usually, $A$ has many more rows than columns. Then the covariance-matrix $Cov_A$ is quite small, which makes calculating the eigenvalues easy.
 We can now transform the dataset $A$ to one dataset $B$ that uncorrelated by 
 $$ B = E_{Cov_A}^T A $$
+\footnote{
+    Compare section \ref{changeOfBasis}: 
+    \begin{equation}
+        \begin{aligned}
+            (\vec{v})_B &= \mtrx{B}^{-1} \mtrx{A} (\vec{v})_A \\
+                        &= \mtrx{B}^{-1} \mtrx{I} (\vec{v})_A \\
+                        &= \mtrx{E}^{-1} (\vec{v})_A \\
+                        &= \mtrx{E}^T (\vec{v})_A
+        \end{aligned}
+    \end{equation}
+}
+
 $B$ has a covariance-matrix that is diagonal, it's entries are $\Lambda_{Cov_A}$.
 
 
