@@ -1,33 +1,384 @@
-\section{Rust}
+\section{RUST}
 
-\subsection{Variables}
-\paragraph{let} may only be used inside functions. For stuff that goes out of scope with the function body.
-\paragraph{const} will be inlined at every usage point.
-\paragraph{static} are the same as globals. Once assigned to memory, never moved from there. 
+\subsection{Tools}
 
-\subsection{Modules}
+\subsubsection{Compiler: rustc}
+\begin{lstlisting}[language=sh]
+rustc main.rs
+./main
+\end{lstlisting}
 
-\subsection{Attributes}
+\subsubsection{Buildtool & package-manager: cargo}
+\begin{lstlisting}[language=sh]
+cargo new my_project_name
+cargo build [--release]
+cargo check  # checks but doesn't build executable (faster)
+cargo update  # installs the latest versions matching Cargo.lock.toml.dependencies. updates Cargo.lock
+cargo run  # builds & executes
+cargo doc --open  # builds and opens browser docs for all used crates
+\end{lstlisting}
 
-\subsection{Macros}
+\subsection{Language}
 
-\subsection{Pointers}
-\paragraph{References} \inlinecode{&} borrows a variables value. There may be no more than one mutable reference in the same scope. That is, the following will not compile:
-\begin{lstlisting}[lang=rust]
-fn main() {
-    let mut s = String::from("hello!");
+\begin{itemize}
+    \item Statements perform an action, but don't return a value.
+    \item Expressions evaluate to a value.
+\end{itemize}
 
-    let mr1 = & mut s;
-    let mr2 = & mut s;
+Example: assignment is a statement with an expression as part of it.
+```
+     statement
+I-------------------I
+assignment expression
+I--------I I--------I
+let sum  = 1 + 2;
+```
+Example: function definitions are statements.
+Note: calling a macro is an expression. Calling a block `{}` is an expression, too.
 
-    println!("{}, {}", mr1, mr2);
+
+\subsubsection{Memory management}
+
+\paragraph{Stack and heap}
+
+\begin{itemize}
+    \item There is no `free` for the stack.
+    \item Adding data onto the stack is called `pushing`.
+    \item Reserving space on the heap is called `allocating`. In other words, the stack knows no reserving; allocating always refers to the heap.
+    \item Pushing to the stack is faster than allocating on the heap, because the stack always knows where the next free space is: it's always on the very top of the stack.
+    \item Also reading from the stack is faster then from the heap, because reading from heap involves following potentially many pointers. In fact, the only reasons to use the heap are
+    \begin{itemize}
+        \item  when we want to be able to dynamically grow or shrink memory at runtime,
+        \item  when we want data to persist multiple scopes (like something complex being returned from a function)
+    \end{itemize}
+    \item When calling a function, the arguments (and any function-local variables) (including, potentially, pointers to the heap) get pushed onto the stack
+\end{itemize}
+
+\paragraph{Ownership rules}
+\begin{itemize}
+    \item each value has a variable called its *owner*.
+    \item there can be only one owner at a time.
+    \item when the owner goes out of scope `{}`, the value will be dropped.
+\end{itemize}
+
+\paragraph{Re-assignment}
+\begin{lstlisting}[language=rust]
+let s1 = String::from("hello");
+let s2 = s1;
+println!("{}, world!", s1);  // <-- throws error
+\end{lstlisting}
+When re-assigning a value on the heap (like here: ``String::from("hello");` is being re-assigned from `s1` to `s2`) rust considers the first variable `s1` as invalid. Why? If `s1` and `s2` were both still valid at the end of the scope, they'd both attempt to drop their memory at the end of the scope. That's called a double-free, a common error in c++.
+
+Note that the re-assignment was a shallow copy: only the pointer to the data had been copied, not the data. In fact, rust *never* automatically does a deep-copy. So you can always assume that re-assignments are fast and cheap. If you want to have a deep-copy, use `let s2 = s1.clone();`
+
+Note also that this rule only applies to heap-data. Stack-only data will always be copied:
+
+\begin{lstlisting}[language=rust]
+let x = 5;
+let y = x;
+println!("x = {}, y = {}", x, y);  // <--  no error here
+\end{lstlisting}
+
+When creating your own data-types:
+\begin{itemize}
+    \item `Copy` trait: makes it clear that this is a stack-data-structure. Called when re-assigning this data-structure.
+    \item `Drop` trait: makes it clear that this is a heap-data-structure. Called for cleanup when data-structure goes out of scope.
+\end{itemize}
+
+\paragraph{Function-calls}
+Passing variables to functions is just like re-assignment: it will move or copy, just like re-assignment does. As such, it behaves differently for heap- and stack-data.
+
+For heap-variables, the function takes ownership of the variable, meaning that the calling scope may no longer access the value.
+
+\begin{lstlisting}[language=rust]
+let s = String::from("hi");
+print_string(s);
+println!("{}", s);  // <-- throws error
+
+
+fn print_string(some_string: String) {
+    println!("{}", some_string);
+    // some_string now goes out of scope and `drop` is called
 }
 \end{lstlisting}
 
-\paragraph{Box}
+Same thing for returning values from functions:
+\begin{lstlisting}[language=rust]
+fn make_string() -> String {
+    let some_string = String::from("hi");
+    some_string  // some_string goes out of scope ... but since it's value is being `move`d, the data is not freed.
+}
+
+fn main() {
+    let s1 = make_string();  // ownership moves from some_string to s1
+    println!("{}", s1);
+}  // now "hi" moves out of scope, drop called.
+\end{lstlisting}
+
+How do you operate on data without destroying it?
+You return it again after each operation, meaning you pass ownership to the function and then pass it back into a new variable.
+Example: 
+
+\begin{lstlisting}[language=rust]
+fn main() {
+    let s1 = String::from("hi");  // "hi" owned by s1
+    let (s2, len) = calculate_length(s1);  // "hi" owned by s and then s2
+    println("the length of '{}' is {}", s2, len);
+}
+fn calculate_length(s: String) -> (String, usize) {
+    let length = s.len();
+    (s, length)
+}
+\end{lstlisting}
+
+\paragraph{References}
+But there is another way to operate on data without passing ownership: *references and borrowing*.
+\begin{lstlisting}[language=rust]
+fn main() {
+    let s1 = String::from("hi");
+    let len = calculate_length(&s1);
+    println("the length of '{}' is {}", s1, len);
+}
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}
+\end{lstlisting}
+Passing a value as a reference makes sure that no `drop` is called at the end of the scope, and the calling scope's variable remains the owner of the data.
+
+Taking a closer look:
+`let ref = &s1;` creates a *reference* which is only a pointer to `s1` and does not take ownership away from `s1`.
+
+Note that references are immutable: 
+\begin{lstlisting}[language=rust]
+fn main() {
+    let s = String::from("hi");
+    change(&s);  // <-- throws error
+}
+fn change(s: &String) {
+    s.push_str(", world");
+}
+\end{lstlisting}
+We need to explicitly specify that this data may be mutated:
+\begin{lstlisting}[language=rust]
+fn main() {
+    let mut s = String::from("hi");
+    change(&mut s);
+}
+fn change(s: &mut String) {
+    s.push_str(", world");
+}
+\end{lstlisting}
+But then there is another restriction: we may only ever have one mutable reference to some data. This helps so that threads cannot interact.
+\begin{lstlisting}[language=rust]
+let mut s = String::from("hi");
+let r1 = &mut s;
+let r2 = &mut s;
+println!("{}, {}", r1, r2);  // <-- will fail
+\end{lstlisting}
+(Note that you may have multiple *im*mutable references)
+
+\paragraph{Slices}
+Slices are another type of references. They are references to a *contiguous part* of some data.
+
+\begin{lstlisting}[language=rust]
+fn main() {
+    let sentence = String::from("I'm a sentence.");
+    let first_word = get_first_word(&sentence);
+    println!("The first word in '{}' is: {}", sentence, first_word);
+    sentence.clear();  // <-- this will cause a *positive* error: compiler will warn us that the sentence's data is still in use somewhere.
+    println("After clearing, the first word is now {}", first_word);
+}
+
+fn get_first_word(s: &String) -> &str  {  // &str and &[i32] are examples of slice-types
+    &s[0..5]
+}
+\end{lstlisting}
+
+
+\paragraph{Boxes}
+Boxes are smart-pointers: they contain a reference to some heap-data and the data's size. The data is de-allocated once the box no longer has an owner.
+
+Example: Box to create a linked list:
+\begin{lstlisting}[language=rust]
+struct Entry {
+    text: String,
+    next: Option<Box<Entry>>,
+}
+
+fn create_linked_list(first_text: String) -> Box<Entry> {
+    let e = Entry {
+        text: first_text,
+        next: None
+    };
+    Box::new(e)
+}
+
+fn append_new_entry(list: &mut Box<Entry>, text: String) {
+    match &mut list.next {
+        Some(n) => append_new_entry(n, text),
+        None => {
+            let new_entry = create_linked_list(text);
+            list.next = Some(new_entry);
+        }
+    }
+
+}
+
+fn read_all_entries(list: &Box<Entry>) {
+    println!("{}", list.text);
+    match &list.next {
+        Some(n) => read_all_entries(&n),
+        None => return,
+    }
+}
+
+
+fn main() {
+    let mut list = create_linked_list(String::from("First entry"));
+    append_new_entry(&mut list, String::from("Second entry"));
+    append_new_entry(&mut list, String::from("Third entry"));
+    read_all_entries(&list);
+}
+\end{lstlisting}
+
+Example: Box to create a heap-array:
+\begin{lstlisting}[language=rust]
+fn create_heap_array(size: usize, fill_value: f32) -> Box<[f32]> {
+    // 0. Cannot just do the below line, because rust won't allow runtime-sized arrays [fill_val; size]
+    // Box::new([fill_value; size]) 
+    // 1. Instead: using vec as an intermediate step
+    let data = vec![fill_value; size];  
+    // 2. Turning vec into Box
+    let b = data.into_boxed_slice();  
+    b
+}
+
+fn main() {
+    let size = 10;
+    let arr_fives = create_heap_array(size, 5.0);
+    println!("{}", arr_fives[5]);
+}
+\end{lstlisting}
 
 \paragraph{Lifetimes}
+Lifetimes are required when we want structs to use data that is owned by someone else.
 
-\subsection{Unit tests}
 
-\subsection{WASM}
+\subsubsection{Unsafe rust}
+Creating that linked list was a pain. Fortunately, when we promise rust that we know what we're doing, we can use a more c-like, [*unsafe* version of the code](https://rust-unofficial.github.io/too-many-lists/fifth-basics.html).
+
+\subsubsection{enums}
+\begin{itemize}
+    \item enums
+    \begin{itemize}
+        \item Result: enum{Ok, Err}
+        \item Ordering: enum{Less, Greater, Equal}
+        \item Option: enum{Some, None}
+        \item Maybe:
+    \end{itemize}
+\end{itemize}
+
+Letting `Result` crash if there is an error:
+\begin{lstlisting}[language=rust]
+let guess: u32 = guess_str.trim().parse.expect("Something went wrong!");
+\end{lstlisting}
+
+Better: handling potential error:
+\begin{lstlisting}[language=rust]
+let guess: u32 = match guess_str.trim().parse() {
+    Ok(num) => num,
+    Err(_) => continue,
+};
+\end{lstlisting}
+
+\subsubsection{Structs}
+\begin{lstlisting}[language=rust]
+struct Matrix {
+    rows: usize,
+    cols: usize,
+    data: Vec<f32>,
+}
+
+impl Matrix {
+    fn zeros(rows: usize, cols: usize) -> Matrix {
+        Matrix {
+            rows,
+            cols,
+            data: vec![0.0; (rows * cols).into()]
+        }
+    }
+
+    fn eye(rows: usize, cols: usize) -> Matrix {
+        let mut d = Vec::with_capacity(rows * cols);
+        for r in 0..rows {
+            for c in 0..cols {
+                if r == c {
+                    d.push(1.0);
+                } else {
+                    d.push(0.0);
+                }
+            }
+        }
+        Matrix {
+            rows,
+            cols,
+            data: d
+        }
+    }
+
+    fn count_up(rows: usize, cols: usize) -> Matrix {
+        let size = rows * cols;
+        let mut d = Vec::with_capacity(size);
+        for i in 0..size {
+            d.push(i as f32);
+        }
+        Matrix {
+            rows,
+            cols,
+            data: d
+        }
+    }
+
+    fn get(&self, row: usize, col: usize) -> f32 {
+        let i = self.cols * row + col;
+        self.data[i]
+    }
+
+    fn set(&mut self, row: usize, col: usize, val: f32) {
+        let i = self.cols * row + col;
+        self.data[i] = val;
+    }
+
+    fn dot(&self, other: &Matrix) -> Matrix {
+        if self.cols != other.rows {
+            panic!("Matrices A and B cannot be multiplied: A.cols != B.rows");
+        }
+
+        let mut out = Matrix::zeros(self.rows, other.cols);
+        for r in 0..self.rows {
+            for c in 0..other.cols {
+                let mut sum = 0.0;
+                for i in 0..self.cols {
+                    sum += self.get(r, i) * other.get(i, c);
+                }
+                out.set(r, c, sum);
+            }
+        }
+
+        out
+    }
+}
+
+fn main() {
+    let eye = Matrix::eye(2, 2);
+    let cnt = Matrix::count_up(2, 3);
+    let prd = eye.dot(&cnt);
+    assert_eq!(eye.rows, prd.rows);
+    assert_eq!(cnt.cols, prd.cols);
+    assert_eq!(prd.data[0], 0.0);
+    assert_eq!(prd.data[3], 3.0);
+}
+\end{lstlisting}
+
+\subsubsection{Macros}
+... can be recognized by the `!` in the macro's name.

@@ -6,16 +6,16 @@
 	\caption{Most common data-structures}
 	\begin{tabularx}{1.2\textwidth}{@{}rllll@{}}
 		\toprule
-		\multicolumn{1}{l}{}             & \textbf{insertion}                                                     & \textbf{removal}                                                                                    & \textbf{search}                                                      & \textbf{notes}                                                                                                                                                                                                                       \\
-		\cmidrule(l){2-5} 
-		\multicolumn{1}{r|}{\textbf{array}}       & x                                                                      & x                                                                                                   & n                                                                    &                                                                                                                                                                                                                                      \\
-		\multicolumn{1}{r|}{\textbf{linked list}} & 1                                                                      & 1                                                                                                   & n                                                                    & infinite size                                                                                                                                                                                                                        \\
-		\multicolumn{1}{r|}{\textbf{stack}}       & 1, always FILO                                                         & 1, always FILO                                                                                      & n                                                                    &                                                                                                                                                                                                                                      \\
-		\multicolumn{1}{r|}{\textbf{queue}}       & 1, always FIFO                                                         & 1, always FIFO                                                                                      & n                                                                    &                                                                                                                                                                                                                                      \\
-		\multicolumn{1}{r|}{\textbf{hash-table}}  & 1                                                                      & 1                                                                                                   & \begin{tabular}[c]{@{}l@{}}1 \\ n/k if table gets large\end{tabular} &                                                                                                                                                                                                                                      \\
-		\multicolumn{1}{r|}{\textbf{index tree}}  & log(n)                                                                 & log(n)                                                                                              & log(n)                                                               &                                                                                                                                                                                                                                      \\
-		\multicolumn{1}{r|}{\textbf{binary heap}} & \begin{tabular}[c]{@{}l@{}}Average 1,\\ worst case log(n)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Root element: 1\\ log(n) otherwise\end{tabular} & \begin{tabular}[c]{@{}l@{}}find-min: 1\\ Otherwise: n\end{tabular}   & \begin{tabular}[c]{@{}l@{}}A binary tree where each child is larger than its parent\\ Stays semi-sorted: easy to get smallest element,\\ but increasingly harder to get second, third, ...\\ Useful for priority queues\end{tabular} \\
-		\multicolumn{1}{r|}{\textbf{tries}}       &                                                                        &                                                                                                     &                                                                      &                                                                                                                                                                                                                                      \\
+		\multicolumn{1}{l}{}                      & \textbf{insertion}        & \textbf{removal}          & \textbf{search}           & \textbf{notes}            \\
+		\cmidrule(l){2-5}
+		\multicolumn{1}{r|}{\textbf{array}}       & x                         & x                         & n                         &                           \\
+		\multicolumn{1}{r|}{\textbf{linked list}} & 1                         & 1                         & n                         & infinite size             \\
+		\multicolumn{1}{r|}{\textbf{stack}}       & 1, always FILO            & 1, always FILO            & n                         &                           \\
+		\multicolumn{1}{r|}{\textbf{queue}}       & 1, always FIFO            & 1, always FIFO            & n                         &                           \\
+		\multicolumn{1}{r|}{\textbf{hash-table}}  & 1                         & 1                         & \begin{tabular}[c]{@{}l@{}}1 \\ n/k if table gets large\end{tabular} &                           \\
+		\multicolumn{1}{r|}{\textbf{index tree}}  & log(n)                    & log(n)                    & log(n)                    &                           \\
+		\multicolumn{1}{r|}{\textbf{binary heap}} & \begin{tabular}[c]{@{}l@{}}Average 1,\\ worst case log(n)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Root element: 1\\ log(n) otherwise\end{tabular} & \begin{tabular}[c]{@{}l@{}}find-min: 1\\ Otherwise: n\end{tabular} & \begin{tabular}[c]{@{}l@{}}A binary tree where each child is larger than its parent\\ Stays semi-sorted: easy to get smallest element,\\ but increasingly harder to get second, third, ...\\ Useful for priority queues\end{tabular} \\
+		\multicolumn{1}{r|}{\textbf{tries}}       &                           &                           &                           &                           \\
 		\bottomrule
 	\end{tabularx}
 \end{table}
@@ -124,12 +124,77 @@ int main(){
 
 \subsection{Linked lists}
 
-Linked lists have the advantage that they have no prefixed size. Addition and insertion at any point is O(1). On the other hand, searching takes O(n) in the worst case. 
+Linked lists have the advantage that they have no prefixed size. Addition and insertion at any point is O(1). On the other hand, searching takes O(n) in the worst case.
+\begin{lstlisting}[language=c]
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct String {
+	char* text;
+	int length;
+} String;
+
+
+String* string_create(char* text, int length){
+	char* textCopy = strdup(text);
+	String* string = malloc(sizeof(String));
+	string->text = textCopy;
+	string->length = length;
+	return string;
+}
+
+
+void string_destroy(String* string){
+	free(string->text);
+	free(string);
+}
+
+typedef struct Node {
+	struct String* data;
+	struct Node* next;
+} Node;
+
+
+Node* node_create(String* text){
+	Node* node = malloc(sizeof(Node));
+	node->data = text;
+	return node;
+}
+
+void node_destroy(Node* node){
+	if (node->next != NULL) { node_destroy(node->next); }
+	el_destroy(node->data);
+	free(node);
+}
+
+void node_append(Node* ll, String* text) {
+    if (ll->next != NULL) { ll_append(ll->next, text); }
+    else {
+        Node* newNode = node_create(text);
+        ll->next = newNode;
+    }
+}
+
+void node_print_all(Node* ll) {
+    printf("%s \n", ll->data);
+    if (ll->next != NULL) {
+        node_print_all(ll->next);
+    }
+}
+
+void main() {
+    Node* ll = node_create(string_create("Hi!", 3));
+    node_append(ll, string_create("I'm", 3));
+    node_append(ll, string_create("Michael", 7));
+    node_print_all(ll);
+}
+\end{lstlisting}
 
 
 \subsection{Binary trees}
 
-Trees make sense when the keys have to be ordered in some sense. 
+Trees make sense when the keys have to be ordered in some sense.
 
 \begin{lstlisting}[language=c]
 #include <stdio.h>
@@ -255,7 +320,7 @@ int main(){
 
 \subsection{Hash-tables}
 
-Hash tables are basically a array with a hash-function. The hash function is there to associate string-keys to the integer-array-indices. The array needs as many elements as the hash-function can create integer-keys. 
+Hash tables are basically a array with a hash-function. The hash function is there to associate string-keys to the integer-array-indices. The array needs as many elements as the hash-function can create integer-keys.
 
 Through the hash-function the hash-table has insertion- and lookup-times of expected O(1). However, when the array gets many elements. it might happen that the hash-function gives the same integer-key to several string-keys. To acommodate such a case, the array-elements are implemented as linked lists. This makes the worst-case loopup-time O(n/k).
 
