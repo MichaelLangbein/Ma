@@ -8,7 +8,7 @@ rustc main.rs
 ./main
 \end{lstlisting}
 
-\subsubsection{Buildtool & package-manager: cargo}
+\subsubsection{Buildtool \& package-manager: cargo}
 \begin{lstlisting}[language=sh]
 cargo new my_project_name
 cargo build [--release]
@@ -62,7 +62,7 @@ Note: calling a macro is an expression. Calling a block `{}` is an expression, t
 \end{itemize}
 
 \paragraph{Re-assignment}
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 let s1 = String::from("hello");
 let s2 = s1;
 println!("{}, world!", s1);  // <-- throws error
@@ -73,7 +73,7 @@ Note that the re-assignment was a shallow copy: only the pointer to the data had
 
 Note also that this rule only applies to heap-data. Stack-only data will always be copied:
 
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 let x = 5;
 let y = x;
 println!("x = {}, y = {}", x, y);  // <--  no error here
@@ -90,7 +90,7 @@ Passing variables to functions is just like re-assignment: it will move or copy,
 
 For heap-variables, the function takes ownership of the variable, meaning that the calling scope may no longer access the value.
 
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 let s = String::from("hi");
 print_string(s);
 println!("{}", s);  // <-- throws error
@@ -103,7 +103,7 @@ fn print_string(some_string: String) {
 \end{lstlisting}
 
 Same thing for returning values from functions:
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 fn make_string() -> String {
     let some_string = String::from("hi");
     some_string  // some_string goes out of scope ... but since it's value is being `move`d, the data is not freed.
@@ -119,7 +119,7 @@ How do you operate on data without destroying it?
 You return it again after each operation, meaning you pass ownership to the function and then pass it back into a new variable.
 Example: 
 
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 fn main() {
     let s1 = String::from("hi");  // "hi" owned by s1
     let (s2, len) = calculate_length(s1);  // "hi" owned by s and then s2
@@ -133,7 +133,7 @@ fn calculate_length(s: String) -> (String, usize) {
 
 \paragraph{References}
 But there is another way to operate on data without passing ownership: *references and borrowing*.
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 fn main() {
     let s1 = String::from("hi");
     let len = calculate_length(&s1);
@@ -146,10 +146,10 @@ fn calculate_length(s: &String) -> usize {
 Passing a value as a reference makes sure that no `drop` is called at the end of the scope, and the calling scope's variable remains the owner of the data.
 
 Taking a closer look:
-`let ref = &s1;` creates a *reference* which is only a pointer to `s1` and does not take ownership away from `s1`.
+`let ref = \&s1;` creates a *reference* which is only a pointer to `s1` and does not take ownership away from `s1`.
 
 Note that references are immutable: 
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 fn main() {
     let s = String::from("hi");
     change(&s);  // <-- throws error
@@ -159,7 +159,7 @@ fn change(s: &String) {
 }
 \end{lstlisting}
 We need to explicitly specify that this data may be mutated:
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 fn main() {
     let mut s = String::from("hi");
     change(&mut s);
@@ -169,7 +169,7 @@ fn change(s: &mut String) {
 }
 \end{lstlisting}
 But then there is another restriction: we may only ever have one mutable reference to some data. This helps so that threads cannot interact.
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 let mut s = String::from("hi");
 let r1 = &mut s;
 let r2 = &mut s;
@@ -180,7 +180,7 @@ println!("{}, {}", r1, r2);  // <-- will fail
 \paragraph{Slices}
 Slices are another type of references. They are references to a *contiguous part* of some data.
 
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 fn main() {
     let sentence = String::from("I'm a sentence.");
     let first_word = get_first_word(&sentence);
@@ -199,7 +199,7 @@ fn get_first_word(s: &String) -> &str  {  // &str and &[i32] are examples of sli
 Boxes are smart-pointers: they contain a reference to some heap-data and the data's size. The data is de-allocated once the box no longer has an owner.
 
 Example: Box to create a linked list:
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 struct Entry {
     text: String,
     next: Option<Box<Entry>>,
@@ -242,7 +242,7 @@ fn main() {
 \end{lstlisting}
 
 Example: Box to create a heap-array:
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 fn create_heap_array(size: usize, fill_value: f32) -> Box<[f32]> {
     // 0. Cannot just do the below line, because rust won't allow runtime-sized arrays [fill_val; size]
     // Box::new([fill_value; size]) 
@@ -279,12 +279,12 @@ Creating that linked list was a pain. Fortunately, when we promise rust that we 
 \end{itemize}
 
 Letting `Result` crash if there is an error:
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 let guess: u32 = guess_str.trim().parse.expect("Something went wrong!");
 \end{lstlisting}
 
 Better: handling potential error:
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 let guess: u32 = match guess_str.trim().parse() {
     Ok(num) => num,
     Err(_) => continue,
@@ -292,7 +292,7 @@ let guess: u32 = match guess_str.trim().parse() {
 \end{lstlisting}
 
 \subsubsection{Structs}
-\begin{lstlisting}[language=rust]
+\begin{lstlisting}[language=c]
 struct Matrix {
     rows: usize,
     cols: usize,

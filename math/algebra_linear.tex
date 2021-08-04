@@ -307,12 +307,14 @@ $$
 $$
 $\det{\mtrx{A}}$ is defined as $a_{11}a_{22} - a_{12}a_{21}$. The definitions for higher order matrix-determinants are similar, but so extremely tedious that we just ignore them here. 
 
-\begin{proof} \label{det_0}
+
+\begin{theorem}  \label{det_0}
     Let $ \mtrx{A} \vec{x} = 0 $ and $ \vec{x} \neq \vec{0}$. Then it must hold that $\det{\mtrx{A}} = 0$.
     In fact, this holds in two directions:
 
     $$ \thereis \vec{x} \neq \vec{0}: \mtrx{A} \vec{x} = 0  \iff \det{\mtrx{A}} = 0 $$
-
+\end{theorem}
+\begin{proof}
     We can prove this making use of theorem \ref{lin_indep_if_no_bx0}. From the given it follows that $\mtrx{A}$ is linearly dependent. 
     Thus $\thereis \vec{a} \in \mtrx{A}: \vec{a} = \sum_{A/a} \alpha_i \vec{a}_i$. In the case of a $2 \times 2$ matrix this expression becomes very simple: $\vec{a}_1 = \alpha \vec{a}_2$. 
     Breaking $\vec{a}_1$ into its components
@@ -334,7 +336,8 @@ $\det{\mtrx{A}}$ is defined as $a_{11}a_{22} - a_{12}a_{21}$. The definitions fo
 
 
 \paragraph{Interpretation} The size of the determinant can be seen as the scaling-factor of the transformation described by the matrix $A$.
-It is also a measure of how much linearly independent the rows/cols of $A$ are. The size of the determinant equals the size of the (hyper-)parallelogram spanned by the columns. If two vectors are almost linearly dependent, they will be almost parallel, leading to a very small area of the parallelogram. So if you have a small determinant, your columns are almost dependent. If you have a large one, your colums are very orthogonal. 
+It is also a measure of how much linearly independent the rows/cols of $A$ are. The size of the determinant equals the size of the (hyper-)parallelogram spanned by the columns. If two vectors are almost linearly dependent, they will be almost parallel, leading to a very small area of the parallelogram. So if you have a small determinant, your columns are almost dependent. If you have a large one, your columns are very orthogonal. 
+If your determinant is zero, that means that your matrix $A$ is a transformation $Ax$ that squishes (at least) one of the dimensions of $x$ into nothing.
 
 
 
@@ -439,25 +442,25 @@ It is also a measure of how much linearly independent the rows/cols of $A$ are. 
 
 \begin{equation}
     \begin{aligned}
-        A x &= \lambda x \\
-        ( A - \lambda I ) x &= 0 \\
-        \det{A - \lambda I} &= 0 \text{ using eq. \ref{det_0}}
+        A e &= \lambda e \\
+        ( A - \lambda I ) e &= 0 \\
+        \det{A - \lambda I} &= 0 \text{ using theorem \ref{det_0}}
     \end{aligned}
 \end{equation}
 
-Any \emph{square} matrix can be eigenvector (aka. spectrally) decomposed: $\mtrx{A} = \mtrx{X} \mtrx{\Lambda}\mtrx{X}^{-1}$.
+Any \emph{square} matrix can be eigenvector (aka. spectrally) decomposed: $\mtrx{A} = \mtrx{E} \mtrx{\Lambda}\mtrx{E}^{-1}$.
 
 \begin{theorem} \label{symm_then_orth}
-    [$\mtrx{A}: \symm \then \mtrx{X}: \orth$]
+    $\mtrx{A}: \symm \then \mtrx{E}: \orth$
     \begin{equation}
         \begin{aligned}
-                                                                & <Ax, y> &= <x, A^Ty> \\
-            \text{Since } A:\symm:                              & <Ax, y> &= <x, Ay> \\
-            \text{Since } x, y \text{ are eigenvalues of } A:   & <\lambda_x x, y> &= <x, \lambda_y y> \\
-                                                                & \lambda_x <x, y> &= \lambda_y <x, y>
+                                                                    & <Ae_1, e_2>           &= <e_1, A^Te_2> \\
+            \text{Since } A:\symm:                                  & <Ae_1, e_2>           &= <e_1, Ae_2> \\
+            \text{Since } e_1, e_2 \text{ are eigenvalues of } A:   & <\lambda_1 e_1, e_2>  &= <e_1, \lambda_2 e_2> \\
+                                                                    & \lambda_1 <e_1, e_2>  &= \lambda_2 <e_1, e_2>
         \end{aligned}
     \end{equation}
-    Thus, either $\lambda_x = \lambda_y$ or $x \orth y$ 
+    Thus, either $\lambda_1 = \lambda_2$ or $e_1 \orth e_2$ 
 \end{theorem}
 
 \begin{theorem}
@@ -468,60 +471,11 @@ Any \emph{square} matrix can be eigenvector (aka. spectrally) decomposed: $\mtrx
 
 \subsection{Singular value decomposition}
 Square matrices may be decomposed to $\mtrx{A} = \mtrx{X} \mtrx{\Lambda} \mtrx{X}^{-1}$.
-More generally, any matrix may be decomposed to $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$.
-Before proving this, lets first interpret that statement from a matrix point of view.
+More generally, we state that any matrix may be decomposed to $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$.
+But how do we find $\mtrx{U}$ and $\mtrx{V}$?
 
-Consider some basis $B_{\rowspace{A}}$. Through the transformation $\mtrx{A}: \reals^n \then \reals^m$ that basis $B_{\rowspace{A}}$ is transformed into \collspace{A}.
-So far so easy - but we have an additional requirement: we want that transformed basis to be a basis itself: $ \mtrx{A} B_{\rowspace{A}} : B_{\collspace{A}}$.
-
-There may be many bases $B_{\rowspace{A}}$, but with that additional requirement, it must truly be a special basis. Let's call it $\mtrx{V}$, and the resulting new basis $\mtrx{A} \mtrx{V} = \mtrx{U}$.
-Also, we want $\mtrx{U}$ not only to be a basis, but also normal; so let's normalize it to $\mtrx{U}\mtrx{\Sigma}$. With all that we get: $\mtrx{A} \mtrx{V} = \mtrx{U} \mtrx{\Sigma}$.
-
-Summarizing our requirements:
-\begin{itemize}
-    \item V is a basis for the rowspace: $\mtrx{V}: B_{\rowspace{A}}$
-    \item The transformation of V, $\mtrx{A} \mtrx{V} = \mtrx{U}$, is a basis for the collumnspace $\mtrx{U}: B_{\collspace{A}}$
-    \item The normalizers of U are called $\mtrx{\Sigma}$
-\end{itemize}
-
-So these are our requirements. Let's jump into a proof. \\
-
-
-Consider $\mtrx{A}^T \mtrx{A}$. It is a Gram-matrix, and as such PSD. We have: 
-$$ \mtrx{A}^T \mtrx{A} v_i = \lambda_i v_i $$
-by eigenvalue decomposition. Define $\sigma_i = \sqrt{\lambda_i}$. This exists, because $\mtrx{A}^T \mtrx{A}: \PSD$.
-$$ \mtrx{A}^T \mtrx{A} v_i = \sigma_i^2 v_i $$
-
-\paragraph{Case 1}: Assume that $\mtrx{A}$ is full rank; i.e. $\forall i: \sigma_i > 0$.
-Let $u_i = \frac{1}{\sigma_i} \mtrx{A} v_i$. 
-Expressed in matrix-form this gives us
-\begin{equation}
-    \begin{aligned}
-        \mtrx{U}                            &= \mtrx{A} \mtrx{V} \mtrx{\Sigma}^{-1} \\
-        \mtrx{U} \mtrx{\Sigma}              &= \mtrx{A} \mtrx{V} \\
-        \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T   &= \mtrx{A}
-    \end{aligned}
-\end{equation}
-
-Note that $u_i$ is, by construction, an eigenvector of $\mtrx{A} \mtrx{A}^T$:
-\begin{equation}
-    \begin{aligned}
-        A A^T u_i   &= A A^T A v_i \frac{1}{\sigma_i} \\
-                    &= A \sigma_i^2 v_i \frac{1}{\sigma_i} \\
-                    &= \sigma_i^2 A v_i \frac{1}{\sigma_i}\\
-                    &= \sigma_i^2 u_i
-    \end{aligned}
-\end{equation}
-
-
-\paragraph{Rephrased} It is really worth it to rephrase that proof again, this time fully matrix-oriented. 
-
-Our goal is to find a matrix $V$ such that $V: B_{\rowspace{A}}$ \emph{and also} $AV = U': B_{\collspace{A}}$.
-Normalize $U'$ to $U' = U \Sigma$, where $\Sigma$ is a diagonal matrix of scalings. 
-Thus our requirements can be written as $AV = U\Sigma$ or, since $V$ is a basis and as such orthogonal, $A = U \Sigma V^T$. \\
-
-Let's find those very special $V$ and $U$.
-To find $V$ consider $A^T A$ (note that $A^T A: \PSD$):
+Well, consider $\mtrx{A}^T\mtrx{A}$.
+By our statement that $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$, we have:
 \begin{equation}
     \begin{aligned}
         A^TA    &= ( U \Sigma V^T )^T U \Sigma V^T & \\
@@ -531,18 +485,19 @@ To find $V$ consider $A^T A$ (note that $A^T A: \PSD$):
                 &= V \Sigma^2 V^T
     \end{aligned}
 \end{equation}
-Thus $V$ are just eigenvectors of $A^T A$ for eigenvalues $\sigma_i^2$.
-Analogously we find $U$ for $AA^T$.
+$\mtrx{A}^T\mtrx{A}$ is a square and symmetric matrix, and as such can be eigenvalue-decomposed. That means that such matrices $V$ and $\Sigma$ must exist. And as we see here, $\mtrx{V}$ is simply the matrix of eigenvectors of $\mtrx{A}^T\mtrx{A}$, $E_{A^TA}$!
+Also, $\mtrx{\Sigma}^2_{A^TA} = \mtrx{\Lambda}_{A^TA}$.
 
+We can do the same thing with $\mtrx{A}\mtrx{A}^T$ to find that $\mtrx{U} = E_{AA^T}$ and $\mtrx{\Sigma}^2_{AA^T} = \mtrx{\Lambda}_{AA^T}$.
 
-\paragraph{Summarized}: Let's summarize what we found out:
-
-Any $A$ can be decomposed as $A = V \Sigma U^T$, where:
+Summarized:
 \begin{itemize}
-    \item $V: B_{\rowspace{A}}$. We have proven $V$ to equal $V = E_{A^TA}$
-    \item $U = AV$ and $U: B_{\collspace{A}}$. We have proven $U$ to equal $U = E_{AA^T}$.
-    \item $\Sigma$, a diagonal matrix of normalizers. Proven to equal $\Sigma = \Lambda$
+    \item Every matrix can be decomposed as $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$, where ...
+    \item ... $\mtrx{V} = E_{A^TA}$
+    \item ... $\mtrx{U} = E_{AA^T}$
+    \item ... and $\mtrx{\Sigma} = \mtrx{\Lambda}^{1/2}_{AA^T} = \mtrx{\Lambda}^{1/2}_{A^TA}$
 \end{itemize}
+
 
 
 \paragraph{Example for a shear-matrix}: SVD means that any matrix-transformation can be rewritten as a rotation, scale and another rotation. Even a shear-matrix!
@@ -560,49 +515,31 @@ SVD is often used for image compression, too. Just leave out some lower $\sigma_
 
 
 \subsubsection{Principal component analysis}
-A common application of eigenvector-decomposition/SVA is PCA.
+A common application of eigenvector-decomposition is PCA.
 Assume $A$ has had it's mean subtracted.
 Then the covariance-matrix $Cov_A = A^TA$. (Ordinarily, we calculate the covariance matrix with $\frac{1}{n-1} \sum_i (X_i - \hat{X}) (X_i - \hat{X})^T $).
 
-$Cov_A$ is square and symmetric, and so we can do an eigenvector-decomposition on it: The eigenvector-matrix of $Cov_A$ is $E_{Cov_A} = E_{A^T A}$.
-Also note that in terms of a singular-value-decomposition, $E_{Cov_A} = E_{A^T A} = V$.
-Writing out the full eigenvector-formula we get 
-$$ Cov_A E_{Cov_A} = E_{Cov_A} \Lambda_{Cov_A} $$
+We want to find some transformation $P$, that transforms $A$ to $B$, such that $Cov_B$ is diagonal.
 
-
-Define the principal component matrix $P$ as $P = A E_{Cov_A}$.
-$A$ isn't square, so there's no eigenvalue-decomposition, but there is a singular-value decomposition. So:
+\begin{equation}
+    B = A P
+\end{equation}
 \begin{equation}
     \begin{aligned}
-         P  &= A E_{Cov_A} \\
-            &= V \Sigma E_{A A^T} E_{Cov_A} \\
-            &= V \Sigma E_{A A^T} E_{A^T A} \\
-            &= V \Sigma \\
-            &= E_{Cov_A} \Lambda_{Cov_A}
+        Cov_B   &= B^T B \text{ this is allowed because B does also have its mean subtracted: P does not translate} \\
+                &= (A P)^T A P \\
+                &= P^T A^T A P \\
+                &= P^T Cov_A P
     \end{aligned}
 \end{equation}
-Note that the principal components are a basis for $A$. They are always orthogonal.
-
-Usually, $A$ has many more rows than columns. Then the covariance-matrix $Cov_A$ is quite small, which makes calculating the eigenvalues easy.
-We can now transform the dataset $A$ to one dataset $B$ that uncorrelated by 
-$$ B = E_{Cov_A}^T A $$
-\footnote{
-    Compare section \ref{changeOfBasis}: 
-    \begin{equation}
-        \begin{aligned}
-            (\vec{v})_B &= \mtrx{B}^{-1} \mtrx{A} (\vec{v})_A \\
-                        &= \mtrx{B}^{-1} \mtrx{I} (\vec{v})_A \\
-                        &= \mtrx{E}^{-1} (\vec{v})_A \\
-                        &= \mtrx{E}^T (\vec{v})_A
-        \end{aligned}
-    \end{equation}
-}
-
-$B$ has a covariance-matrix that is diagonal, it's entries are $\Lambda_{Cov_A}$.
-
-
-
-
+Try $P = E_{Cov_A}$. 
+\begin{equation}
+    \begin{aligned}
+        Cov_B                       &= E_{Cov_A}^T Cov_A E_{Cov_A} \\
+        E_{Cov_A} Cov_B E_{Cov_A}^T &= Cov_A
+    \end{aligned}
+\end{equation}
+Aha! If $Cov_B = \Lambda_{Cov_A}$, then this is an eigenvalue decomposition - and $Cov_B$ is indeed diagonal, as required.
 
 
 
