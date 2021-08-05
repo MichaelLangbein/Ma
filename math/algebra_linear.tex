@@ -456,24 +456,24 @@ Once at a sprint-discussion I wondered why principal components (see about those
 \begin{theorem} \label{symm_then_orth}
     $\mtrx{A}: \symm \then \mtrx{E}_A: \orth$
 
-    For any matrix, symmetric or not, and for any vectors x, y, eigenvectors or not, it holds:
+    For any matrix $A$, symmetric or not, and for any vectors $x$ and $y$, eigenvectors or not, it holds:
     $\forall A, \forall x, y: <Ax, y> = <x, A^Ty>$
     This is true because 
     \begin{equation}
         \begin{aligned}
-            <x, y> &= x^T y \\
-            <Ax, y> &= (Ax)^T y \\
-                    &= x^T A^T y \\
-            <x, A^Ty> &= x^T A^T y
+            <x, y>      &= x^T y \\
+            <Ax, y>     &= (Ax)^T y \\
+                        &= x^T A^T y \\
+            <x, A^Ty>   &= x^T A^T y
         \end{aligned}
     \end{equation}
-    Then we can use that finding as follows:
+    Then we can use that finding as follows for $\mtrx{A}: \symm$ and $x, y \in \mtrx{E}_A$:
     \begin{equation}
         \begin{aligned}
-                                                                    & <Ax, y>           &= <x, A^Ty> \\
-            \text{Since } A:\symm:                                  & <Ax, y>           &= <x, Ay> \\
+                                                                & <Ax, y>           &= <x, A^Ty> \\
+            \text{Since } A:\symm:                              & <Ax, y>           &= <x, Ay> \\
             \text{Since } x, y \text{ are eigenvalues of } A:   & <\lambda_x x, y>  &= <x, \lambda_y y> \\
-                                                                    & \lambda_x <x, y>  &= \lambda_y <x, y>
+                                                                & \lambda_x <x, y>  &= \lambda_y <x, y>
         \end{aligned}
     \end{equation}
     Thus, either $\lambda_x = \lambda_y$ or $x \orth y$ 
