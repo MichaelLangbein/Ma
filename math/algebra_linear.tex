@@ -450,17 +450,33 @@ If your determinant is zero, that means that your matrix $A$ is a transformation
 
 Any \emph{square} matrix can be eigenvector (aka. spectrally) decomposed: $\mtrx{A} = \mtrx{E} \mtrx{\Lambda}\mtrx{E}^{-1}$.
 
+
+
+Once at a sprint-discussion I wondered why principal components (see about those later) were all orthogonal. Here's the proof why. (Note that the proof only holds for symmetric matrices - which, in PCA, $C_A$ is indeed symmetric.)
 \begin{theorem} \label{symm_then_orth}
-    $\mtrx{A}: \symm \then \mtrx{E}: \orth$
+    $\mtrx{A}: \symm \then \mtrx{E}_A: \orth$
+
+    For any matrix, symmetric or not, and for any vectors x, y, eigenvectors or not, it holds:
+    $\forall A, \forall x, y: <Ax, y> = <x, A^Ty>$
+    This is true because 
     \begin{equation}
         \begin{aligned}
-                                                                    & <Ae_1, e_2>           &= <e_1, A^Te_2> \\
-            \text{Since } A:\symm:                                  & <Ae_1, e_2>           &= <e_1, Ae_2> \\
-            \text{Since } e_1, e_2 \text{ are eigenvalues of } A:   & <\lambda_1 e_1, e_2>  &= <e_1, \lambda_2 e_2> \\
-                                                                    & \lambda_1 <e_1, e_2>  &= \lambda_2 <e_1, e_2>
+            <x, y> &= x^T y \\
+            <Ax, y> &= (Ax)^T y \\
+                    &= x^T A^T y \\
+            <x, A^Ty> &= x^T A^T y
         \end{aligned}
     \end{equation}
-    Thus, either $\lambda_1 = \lambda_2$ or $e_1 \orth e_2$ 
+    Then we can use that finding as follows:
+    \begin{equation}
+        \begin{aligned}
+                                                                    & <Ax, y>           &= <x, A^Ty> \\
+            \text{Since } A:\symm:                                  & <Ax, y>           &= <x, Ay> \\
+            \text{Since } x, y \text{ are eigenvalues of } A:   & <\lambda_x x, y>  &= <x, \lambda_y y> \\
+                                                                    & \lambda_x <x, y>  &= \lambda_y <x, y>
+        \end{aligned}
+    \end{equation}
+    Thus, either $\lambda_x = \lambda_y$ or $x \orth y$ 
 \end{theorem}
 
 \begin{theorem}
