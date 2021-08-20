@@ -29,8 +29,8 @@ Gaussian processes are a means of interpolating a value $y_x$ from surrounding v
 That is different from what linear regression or its extension GLS do: regression predicts $y$ from explanatory variables $x$, assuming a (linear) model.
 Gaussian processes don't do that. They only interpolate between already observed $y$'s. No model is assumed.
 
-Millions of surfaces $Y$ may be sampled from $N(0, \Sigma) = P(Y)$.
-We call $P(Y)$ the prior. $\Sigma$ can be very large, so we assume that it can be modeled by a covariance-function $cov(h)$ which is \emph{only dependent on the distance between two points, not on the points themselves}.
+Millions of surfaces $\mtrx{Y}$ may be sampled from $N(\vec{0}, \mtrx{\Sigma}) = P(\mtrx{Y})$.
+We call $P(\mtrx{Y})$ the prior. $\mtrx{\Sigma}$ can be very large, so we assume that it can be modeled by a covariance-function $cov(h)$ which is \emph{only dependent on the distance between two points, not on the points themselves}.
 
 \begin{lstlisting}[language=python]
 import numpy as np
@@ -79,40 +79,40 @@ sample3 = prior.rvs()
 \end{lstlisting}
 
 \begin{figure}
-    \caption{3 samples from prior $P(Y)$}
+    \caption{3 samples from prior $P(\mtrx{Y})$}
     \centering
     \includegraphics[width=0.7\linewidth]{images/gp_prior_samples.png}
 \end{figure}
 
-We have observed some samples $D = {(x_i, y_i)}$.
-Which of these millions of surfaces are most likely given those observations? We can answer that with $P(Y|D)$.
+We have observed some samples $\mtrx{D} = {(x_i, y_i)}$.
+Which of these millions of surfaces are most likely given those observations? We can answer that with $P(\mtrx{Y}|\mtrx{D})$.
 \begin{figure}
-    \caption{Observations $D$. Which field $Y$ is most likely to have produced these observations?}
+    \caption{Observations $\mtrx{D}$. Which field $\mtrx{Y}$ is most likely to have produced these observations?}
     \centering
     \includegraphics[width=0.4\linewidth]{images/gp_observations.jpg}
 \end{figure}
 
 We can calculate the posterior using 
 $$
-P(Y|D) ~ P(D|Y) P(Y)
+P(\mtrx{Y}|\mtrx{D}) \sim P(\mtrx{D}|\mtrx{Y}) P(\mtrx{Y})
 $$
 But since in gaussian processes we assume multivariate-normals, this can be done much easier.
 
-Consider a multivariate normal distribution on, say, 400 dimensions $N(\mu, \Sigma)$. Those 400 dimensions could, for example, be pixel-values in a 20 by 20 image.
+Consider a multivariate normal distribution on, say, 400 dimensions $N(\vec{\mu}, \mtrx{\Sigma})$. Those 400 dimensions could, for example, be pixel-values in a 20 by 20 image.
 Now assume that out of those 400 dimensions we have measurements for $s$ samples, leaving a rest $r = 400 - s$.
-For multivariate-normal distributions, we can easily and analytically obtain the conditional distribution $P(y_r | y_s) = N(\hat{\mu}, \hat{\Sigma})$.
+For multivariate-normal distributions, we can easily and analytically obtain the conditional distribution $P(\vec{y}_r | \vec{y}_s) = N(\hat{\vec{\mu}}, \hat{\mtrx{\Sigma}})$.
 
-Split $y$ like so:
-$$ y = \myarray{y_r \\ y_s} $$
+Split $\vec{y}$ like so:
+$$ y = \myarray{\vec{y}_r \\ \vec{y}_s} $$
 Analogously we can split the covariance-matrix:
-$$ \Sigma = \begin{bmatrix}
-    \Sigma_{rr} & \Sigma_{rs} \\
-    \Sigma_{sr} & \Sigma_{ss} \\
+$$ \mtrx{\Sigma} = \begin{bmatrix}
+    \mtrx{\Sigma}_{rr} & \mtrx{\Sigma}_{rs} \\
+    \mtrx{\Sigma}_{sr} & \mtrx{\Sigma}_{ss} \\
 \end{bmatrix}  $$
 
-Then, according to \href{https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Conditional_distributions}{wikipedia}, we can obtain $\hat{\mu}$ and $\hat{\Sigma}$ like so:
-$$ \hat{\mu}_r = \mu_r + \Sigma_{rs} \Sigma_{ss}^{-1} (y_s - \mu_s) $$
-$$ \hat{\Sigma}_r = \Sigma_{rr} - \Sigma_{rs} \Sigma_{ss}^{-1} \Sigma_{sr} $$
+Then, according to \href{https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Conditional_distributions}{wikipedia}, we can obtain $\hat{\vec{\mu}}$ and $\hat{\mtrx{\Sigma}}$ like so:
+$$ \hat{\vec{\mu}}_r = \vec{\mu}_r + \mtrx{\Sigma}_{rs} \mtrx{\Sigma}_{ss}^{-1} (\vec{y}_s - \vec{\mu}_s) $$
+$$ \hat{\mtrx{\Sigma}}_r = \mtrx{\Sigma}_{rr} - \mtrx{\Sigma}_{rs} \mtrx{\Sigma}_{ss}^{-1} \mtrx{\Sigma}_{sr} $$
 
 \begin{lstlisting}[language=python]
 sampleIndices = np.asarray(list(map(lambda x: int(x), samples[:, 0])))
@@ -166,12 +166,12 @@ Autoregressive and spatial-autoregressive models.
       \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Interpolate y from other y's.\\ Explanatories can be added with GLS\end{tabular}} &
       \multicolumn{1}{l|}{interpolate y from other y's} \\ \midrule
     \multicolumn{1}{|l|}{model} &
-      \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}$y = X\alpha + \epsilon$\\ \\ $\epsilon ~ N(0, \Sigma)$\end{tabular}} &
-      \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}$Y ~ N(0, \Sigma)$\\ $P(Y|D) = N(\hat{\mu}, \hat{\Sigma})$\\ $\tilde{y} = \sum \alpha_i y_i$\\ Y is a field of size n by m\\ D is the observations \end{tabular}} &
-      \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}$y_t = \sum \alpha_i y_{t-i} + \epsilon$\\ $\epsilon ~ N(0, \sigma)$, iid \end{tabular}} \\ \midrule
+      \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}$y = X\alpha + \epsilon$\\ \\ $\epsilon \sim N(\vec{0}, \mtrx{\Sigma})$\end{tabular}} &
+      \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}$Y \sim N(\vec{0}, \mtrx{\Sigma})$\\ $P(\mtrx{Y}|\mtrx{D}) = N(\hat{\vec{\mu}}, \hat{\mtrx{\Sigma}})$\\ $\tilde{y} = \sum \alpha_i \vec{y}_i$\\ Y is a field of size n by m\\ D is the observations \end{tabular}} &
+      \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}$y_t = \sum \alpha_i y_{t-i} + \epsilon$\\ $\epsilon \sim N(0, \sigma)$, iid \end{tabular}} \\ \midrule
     \multicolumn{1}{|l|}{Specialities} &
       \multicolumn{1}{l|}{} &
-      \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}$\Sigma$ is encoded using a covariance-function cov(h)\\ to save on parameters\end{tabular}} &
+      \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}$\mtrx{\Sigma}$ is encoded using a covariance-function cov(h)\\ to save on parameters\end{tabular}} &
       \multicolumn{1}{l|}{} \\ \midrule
     \multicolumn{1}{|l|}{$\epsilon$} &
       \multicolumn{1}{l|}{} &

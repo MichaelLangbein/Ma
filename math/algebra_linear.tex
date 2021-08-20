@@ -340,7 +340,12 @@ It is also a measure of how much linearly independent the rows/cols of $A$ are. 
 If your determinant is zero, that means that your matrix $A$ is a transformation $Ax$ that squishes (at least) one of the dimensions of $x$ into nothing.
 
 
-
+\paragraph{Properties}
+\begin{itemize}
+    \item $\det{\mtrx{A} \mtrx{B}} = \det{\mtrx{A}}\det{\mtrx{B}}$
+    \item $\det{\mtrx{A} + \mtrx{B}} \neq \det{\mtrx{A}} + \det{\mtrx{B}}$
+    \item $\det{\mtrx{A}} = \prod{\lambda_i}$ (see eivenvalues, later)
+\end{itemize}
 
 
 
@@ -482,6 +487,14 @@ Once at a sprint-discussion I wondered why principal components (see about those
 \begin{theorem}
     [As a corollary, the eigenvalue decomposition can be simplified]: $\mtrx{A}: \symm \then \mtrx{A} = \mtrx{X} \mtrx{\Lambda} \mtrx{X}^{-1} = \mtrx{X} \mtrx{\Lambda} \mtrx{X}^T$
 \end{theorem}
+
+\paragraph{Interpretation of eigenvalues}
+\begin{itemize}
+    \item $\lambda$ is complex: $\mtrx{A}$ contains a rotation
+    \item $\lambda$ is negative: $\mtrx{A}$ contains some mirroring
+    \item $\lambda$ is 0: $\det{\mtrx{A}} = 0$, i.e. $\mtrx{A}$ squishes a dimension
+\end{itemize}
+
 
 
 
