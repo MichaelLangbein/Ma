@@ -499,33 +499,118 @@ Once at a sprint-discussion I wondered why principal components (see about those
 
 
 \subsection{Singular value decomposition}
-Square matrices may be decomposed to $\mtrx{A} = \mtrx{X} \mtrx{\Lambda} \mtrx{X}^{-1}$.
-More generally, we state that any matrix may be decomposed to $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$.
-But how do we find $\mtrx{U}$ and $\mtrx{V}$?
+Let $\mtrx{A}$ be of size $m \times n$. We will prove that also such non-square matrices can be decomposed, too, namely into:
+\begin{equation}
+    \mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T
+\end{equation}
+where:
+\begin{itemize}
+    \item $\mtrx{U}$ and $\mtrx{V}$ are orthonormals of sizes $m \times m$ and $n \times n$, respectively
+    \item $\mtrx{\Sigma}$ is a diagonal matrix of size $m \times n$
+\end{itemize}
+In other words: 
+\begin{equation}
+    \mtrx{A} \mtrx{V} = \mtrx{U} \mtrx{\Sigma}
+\end{equation}
+We'll find an orthonormal basis $\mtrx{V} \subset R_A$ which is transformed into an orthonormal basis $\mtrx{U} \subset C_A$.
 
-Well, consider $\mtrx{A}^T\mtrx{A}$.
-By our statement that $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$, we have:
+
+We'll work with a practical example alongside the proof. Let $\mtrx{A} = \begin{bmatrix}
+  2 & 0 \\
+  0 & 1 \\
+  0 & 2   
+\end{bmatrix}$.
+
+Consider $\mtrx{A}^T \mtrx{A}$. Contrary to $\mtrx{A}$, this is a psd matrix. It has eigenvectors $[\vec{e}_1, \vec{e}_2, ...] = \mtrx{E}_{A^TA} = \begin{bmatrix}
+    1 & 0 \\
+    0 & 1
+\end{bmatrix}$ and eigenvalues 4 and 5.
+
+Now consider the vector $\vec{y}_i = \mtrx{A} \vec{e}_i$. Multiplying both sides with $\lambda_i$ we observe that:
 \begin{equation}
     \begin{aligned}
-        A^TA    &= ( U \Sigma V^T )^T U \Sigma V^T & \\
-                &= V \Sigma^T U^T U \Sigma V^T & \\
-                &= V \Sigma U^T U \Sigma V^T & \text { because $\Sigma$ is diagonal} \\
-                &= V \Sigma \Sigma V^T & \text{ because $U$ is orthogonal, so that $U^{-1} = U^T$} \\
-                &= V \Sigma^2 V^T
+        \lambda_i \vec{y}_i &= \lambda_i \mtrx{A} \vec{e}_i \\
+                            &= \mtrx{A} \lambda_i \vec{e}_i \\
+                            &= \mtrx{A} \mtrx{A}^T \mtrx{A} \vec{e}_i \\
+                            &= \mtrx{A} \mtrx{A}^T \vec{y}_i
     \end{aligned}
 \end{equation}
-$\mtrx{A}^T\mtrx{A}$ is a square and symmetric matrix, and as such can be eigenvalue-decomposed. That means that such matrices $V$ and $\Sigma$ must exist. And as we see here, $\mtrx{V}$ is simply the matrix of eigenvectors of $\mtrx{A}^T\mtrx{A}$, $E_{A^TA}$!
-Also, $\mtrx{\Sigma}^2_{A^TA} = \mtrx{\Lambda}_{A^TA}$.
+In other words: $\vec{y}_i$ is an eigenvector of $\mtrx{A} \mtrx{A}^T$ with eigenvalue $\lambda_i$.
 
-We can do the same thing with $\mtrx{A}\mtrx{A}^T$ to find that $\mtrx{U} = E_{AA^T}$ and $\mtrx{\Sigma}^2_{AA^T} = \mtrx{\Lambda}_{AA^T}$.
+Indeed: $\mtrx{A} \mtrx{A}^T = \begin{bmatrix}
+    4 & 0 & 0 \\
+    0 & 1 & 2 \\
+    0 & 2 & 4
+\end{bmatrix}$ and $\mtrx{A} \mtrx{A}^T \myarray{0 \\ 1 \\ 2} = 5 \myarray{0 \\ 1 \\ 2}$.
 
-Summarized:
+A note on the size of $\vec{y}_i$: $|\vec{y}_i| = |\mtrx{A} \vec{e}_i| = \sqrt{|\mtrx{A}\vec{e}_i|^2} = \sqrt{\vec{e}_i^T \mtrx{A}^T \mtrx{A} \vec{e}_i} = \sqrt{\lambda_i} |\vec{e}_i|$.
+If we want $\vec{y}_i$ to have normalized size we redefine it as $ \vec{y}_i = \frac{1}{\sqrt{\lambda_i}} \mtrx{A} \vec{e}_i $
+
+Also, if $\lambda_i = 0$ then $\vec{y}_i = \vec{0}$.
+
+
+Now, let $k = \rank{\mtrx{A}}$ and define the following new matrices:
+\begin{equation}
+    \begin{aligned}
+        \hat{\mtrx{U}} &= [\vec{y}_i / \text{ where } \lambda_i = 0], \text{ size } m \times k  &= \begin{bmatrix}
+                                                                                                        0 & 1 \\
+                                                                                                        \frac{1}{\sqrt{5}} & 0 \\
+                                                                                                        \frac{2}{\sqrt{5}} & 0
+                                                                                                    \end{bmatrix}  \\
+        \hat{\mtrx{V}} &= [\vec{e}_i / \text{ where } \lambda_i = 0], \text{ size } b \times k &= \begin{bmatrix}
+                                                                                                        1 & 0 \\
+                                                                                                        0 & 1
+                                                                                                    \end{bmatrix}
+    \end{aligned}
+\end{equation}
+
+Consider $\hat{\mtrx{U}}^T \mtrx{A} \hat{\mtrx{V}} \vec{b}_i$, where $\vec{b}_1 = \myarray{1 \\ 0}, \vec{b}_2 = \myarray{0 \\ 1}$:
+\begin{equation}
+    \begin{aligned}
+        \hat{\mtrx{U}}^T \mtrx{A} \hat{\mtrx{V}} \vec{b}_i  &= \hat{\mtrx{U}}^T \mtrx{A} \vec{e}_i \\
+                                                            &= \frac{1}{\lambda_i} \hat{\mtrx{U}}^T \mtrx{A} \lambda_i \vec{e}_i \\
+                                                            &= \frac{1}{\lambda_i} \hat{\mtrx{U}}^T \mtrx{A} \mtrx{A}^T \mtrx{A} \vec{e}_i \\
+                                                            &= \frac{1}{\lambda_i} \hat{\mtrx{U}}^T \mtrx{A} \mtrx{A}^T \vec{y}_i \sqrt{\lambda_i} \\
+                                                            &= \frac{1}{\sqrt{\lambda_i}} \hat{\mtrx{U}}^T \mtrx{A} \mtrx{A}^T \vec{y}_i \\
+                                                            &= \frac{1}{\sqrt{\lambda_i}} \hat{\mtrx{U}}^T \lambda_i \vec{y}_i \\
+                                                            &= \sqrt{\lambda_i} \hat{\mtrx{U}}^T \vec{y}_i \text{, now, making use of } \hat{\mtrx{U}} \vec{b}_i = \vec{y}_i \\
+                                                            &= \sqrt{\lambda_i} \vec{b}_i
+    \end{aligned}
+\end{equation}
+Generally:
+\begin{equation}
+    \begin{aligned}
+        \hat{\mtrx{U}}^T \mtrx{A} \hat{\mtrx{V}} \mtrx{I} &= \sqrt{\lambda_i} I \\
+        \hat{\mtrx{U}}^T \mtrx{A} \hat{\mtrx{V}}   &= \mtrx{\Sigma}
+    \end{aligned}
+\end{equation}
+where in our case $\mtrx{\Sigma} = \begin{bmatrix}
+    0 & \sqrt{5} \\
+    \sqrt{4} & 0 
+\end{bmatrix}$
+
+We'll now expand
 \begin{itemize}
-    \item Every matrix can be decomposed as $\mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T$, where ...
-    \item ... $\mtrx{V} = E_{A^TA}$
-    \item ... $\mtrx{U} = E_{AA^T}$
-    \item ... and $\mtrx{\Sigma} = \mtrx{\Lambda}^{1/2}_{AA^T} = \mtrx{\Lambda}^{1/2}_{A^TA}$
+    \item $k \times m$ matrix $\hat{\mtrx{U}}$ to $m \times m$ matrix $\mtrx{U} = [\vec{y}_i]$, even where $\lambda_i = 0$
+    \item $k \times n$ matrix $\hat{\mtrx{V}}$ to $n \times n$ matrix $\mtrx{V} = [\vec{e}_i]$, even where $\lambda_i = 0$
+    \item $k \times k$ matrix $\mtrx{\Sigma}$ to $m \times n$ matrix $\mtrx{\Sigma} = \begin{cases}
+        \text{if } i = j \land i < k: \sqrt{\lambda_i} \\
+        \text{else } 0
+    \end{cases}$
 \end{itemize}
+With that we obtain
+\begin{equation}
+    \mtrx{A} = \mtrx{U} \mtrx{\Sigma} \mtrx{V}^T
+\end{equation}
+In our example case we have 
+$$
+    \mtrx{\Sigma} = \begin{bmatrix}
+        \sqrt{5} & 0 \\
+        0        & 0 \\
+        0        & \sqrt{4}
+    \end{bmatrix}
+$$
+
 
 
 
@@ -544,31 +629,32 @@ SVD is often used for image compression, too. Just leave out some lower $\sigma_
 
 
 \subsubsection{Principal component analysis}
-A common application of eigenvector-decomposition is PCA.
-Assume $A$ has had it's mean subtracted.
-Then the covariance-matrix $Cov_A = A^TA$. (Ordinarily, we calculate the covariance matrix with $\frac{1}{n-1} \sum_i (X_i - \hat{X}) (X_i - \hat{X})^T $).
+Consider a $m \times n$ matrix $\mtrx{A}$. Let $\mtrx{X} = \mtrx{A} - \mtrx{\mu}$, the matrix with its mean subtracted.
+Then we can express the covariance of $\mtrx{X}$ as $\mtrx{C}_X = \mtrx{X}^T \mtrx{X}$.
 
-We want to find some transformation $P$, that transforms $A$ to $B$, such that $Cov_B$ is diagonal.
-
+We want to find a transformation $\mtrx{P}$ such that $\mtrx{Y} = \mtrx{X} \mtrx{P}$ is uncorrelated. We'll prove that such a matrix does exist.
 \begin{equation}
-    B = A P
+    \thereis \mtrx{P}: \mtrx{Y} = \mtrx{X} \mtrx{P} \land \mtrx{C}_Y: \text{diag}
 \end{equation}
+
+Try $\mtrx{P} = \mtrx{E}_{C_X}$. Then:
 \begin{equation}
     \begin{aligned}
-        Cov_B   &= B^T B \text{ this is allowed because B does also have its mean subtracted: P does not translate} \\
-                &= (A P)^T A P \\
-                &= P^T A^T A P \\
-                &= P^T Cov_A P
+        \mtrx{C}_Y  &= \mtrx{Y}^T \mtrx{Y} \\
+                    &= (\mtrx{X} \mtrx{P})^T \mtrx{X} \mtrx{P} \\
+                    &= \mtrx{P}^T \mtrx{X}^T \mtrx{X} \mtrx{P} \\
+                    &= \mtrx{P}^T C_\mtrx{X} \mtrx{P} \\
+                    &= \mtrx{E}_{C_X}^T C_X \mtrx{E}_{C_X}
     \end{aligned}
 \end{equation}
-Try $P = E_{Cov_A}$. 
-\begin{equation}
-    \begin{aligned}
-        Cov_B                       &= E_{Cov_A}^T Cov_A E_{Cov_A} \\
-        E_{Cov_A} Cov_B E_{Cov_A}^T &= Cov_A
-    \end{aligned}
-\end{equation}
-Aha! If $Cov_B = \Lambda_{Cov_A}$, then this is an eigenvalue decomposition - and $Cov_B$ is indeed diagonal, as required.
+Thus $C_Y = \Lambda_{C_X}$, which is diagonal, as required.
+
+
+Note: Sometimes we care not about $cov(n_1, n_2)$ but about $cov(m_1, m_2)$. Then we use: $C_X = \mtrx{X} \mtrx{X}^T$ and $\thereis \mtrx{P}: Y = \mtrx{P}\mtrx{X}$. Try $\mtrx{E}_{C_X}$
+
+    
+
+
 
 
 
