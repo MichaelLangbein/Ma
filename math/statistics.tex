@@ -202,8 +202,10 @@ def empiricalVariogram(distanceMatrix, data):
     
 def fitVariogram(samples):
     pass  # TBD
-  
-(cov0, h95) = fitVariogram(samples)
+
+
+residuals = prediction - samples
+(cov0, h95) = fitVariogram(residuals)
 
 SigmaRR = cov0 - variogramFunction(cov0, h95, distancesRR)
 SigmaSS = cov0 - variogramFunction(cov0, h95, distancesSS)
@@ -211,10 +213,10 @@ SigmaRS = cov0 - variogramFunction(cov0, h95, distancesRS)
 SigmaSR = SigmaRS.transpose()
 SigmaSSInverse = np.linalg.inv(SigmaSS)
 
-meanPosterior = SigmaRS @ SigmaSSInverse @ sampleValues
+meanPosterior = prediction + SigmaRS @ SigmaSSInverse @ sampleValues
 SigmaPosterior = SigmaRR - SigmaRS @ SigmaSSInverse @ SigmaSR
 
-prediction = meanPosterior
+predictionPosterior = meanPosterior
 \end{lstlisting}
 
 
