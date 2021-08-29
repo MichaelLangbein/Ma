@@ -29,7 +29,8 @@ Gaussian processes are a means of interpolating a value $y_x$ from surrounding v
 That is different from what linear regression or its extension GLS do: regression predicts $y$ from explanatory variables $x$, assuming a (linear) model.
 Gaussian processes don't do that. They only interpolate between already observed $y$'s. No model is assumed.
 
-Millions of surfaces $\mtrx{Y}$ may be sampled from $N(\vec{0}, \mtrx{\Sigma}) = P(\mtrx{Y})$.
+Consider the $n \times m$ surface $\mtrx{Y}$. Assume that the value of any pixel in $\mtrx{Y}$ follows a gaussian distribution - which may be correlated to all other pixels in $\mtrx{Y}$.
+Millions of surfaces $\mtrx{Y}$ may be sampled from $N(\vec{0}, \mtrx{\Sigma}) = P(\mtrx{Y})$, where $\vec(0)$ is of size $n \times m$ and $\mtrx{\Sigma}$ is of size $nm \times nm$.
 We call $P(\mtrx{Y})$ the prior. $\mtrx{\Sigma}$ can be very large, so we assume that it can be modeled by a covariance-function $cov(h)$ which is \emph{only dependent on the distance between two points, not on the points themselves}.
 
 \begin{lstlisting}[language=python]
