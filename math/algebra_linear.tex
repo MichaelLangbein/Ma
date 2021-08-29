@@ -629,7 +629,7 @@ SVD is often used for image compression, too. Just leave out some lower $\sigma_
 
 
 \subsubsection{Principal component analysis}
-Consider a $m \times n$ matrix $\mtrx{A}$. Let $\mtrx{X} = \mtrx{A} - \mtrx{\mu}$, the matrix with its mean subtracted.
+Consider a $m \times n$ matrix $\mtrx{A}$. Let $\mtrx{X} = \mtrx{A} - \mtrx{\mu}$, the matrix with its column-mean subtracted.
 Then we can express the covariance of $\mtrx{X}$ as $\mtrx{C}_X = \mtrx{X}^T \mtrx{X}$.
 
 We want to find a transformation $\mtrx{P}$ such that $\mtrx{Y} = \mtrx{X} \mtrx{P}$ is uncorrelated. We'll prove that such a matrix does exist.
@@ -650,7 +650,7 @@ Try $\mtrx{P} = \mtrx{E}_{C_X}$. Then:
 Thus $C_Y = \Lambda_{C_X}$, which is diagonal, as required.
 
 
-Note: Sometimes we care not about $cov(n_1, n_2)$ but about $cov(m_1, m_2)$. Then we use: $C_X = \mtrx{X} \mtrx{X}^T$ and $\thereis \mtrx{P}: Y = \mtrx{P}\mtrx{X}$. Try $\mtrx{E}_{C_X}$
+Note: Sometimes we care not about $cov(n_1, n_2)$ but about $cov(m_1, m_2)$. Then we use: $\mtrx{X} = \mtrx{A} - \mtrx{\mu}$, the matrix with its \emph{row}-mean subtracted. With that $C_X = \mtrx{X} \mtrx{X}^T$ and $\thereis \mtrx{P}: Y = \mtrx{P}\mtrx{X}$. Try $\mtrx{E}_{C_X}$
 
     
 
