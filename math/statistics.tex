@@ -176,6 +176,47 @@ The relation \inlinecode{Sigma = cov0 - variogramFunction(distances)} comes from
   \end{aligned}
 \end{equation}
 In practical applications, we'll usually fit our function \inlinecode{cov0 * ( 1 - np.exp( -3*h/h95 ) )} by moving the parameters \inlinecode{cov0} and \inlinecode{h95} until the residuals fit properly.
+Our code would then look like this:
+
+\begin{lstlisting}[language=python]
+def empiricalVariogram(distanceMatrix, data):
+  variogram = {}
+  d0 = np.min(distanceMatrix)
+  d1 = np.max(distanceMatrix)
+  nrHs = 20
+  deltaH = (d1 - d0) / nrHs
+  for h in np.linspace(d0, d1, nrHs):
+      Nh = 0
+      hSum = 0
+      pairs = (h <= distanceMatrix) * (distanceMatrix < h+deltaH)
+      for i in range(nrTotal):
+          for j in range(i, nrTotal):
+              if pairs[i, j]:
+                  v = data[i]
+                  vh = data[j]
+                  hSum += np.power(v - vh, 2)
+                  Nh += 1
+      if Nh > 0:
+          variogram[h] = hSum / (2 * Nh)
+    return variogram
+    
+def fitVariogram(samples):
+    pass  # TBD
+  
+(cov0, h95) = fitVariogram(samples)
+
+SigmaRR = cov0 - variogramFunction(cov0, h95, distancesRR)
+SigmaSS = cov0 - variogramFunction(cov0, h95, distancesSS)
+SigmaRS = cov0 - variogramFunction(cov0, h95, distancesRS)
+SigmaSR = SigmaRS.transpose()
+SigmaSSInverse = np.linalg.inv(SigmaSS)
+
+meanPosterior = SigmaRS @ SigmaSSInverse @ sampleValues
+SigmaPosterior = SigmaRR - SigmaRS @ SigmaSSInverse @ SigmaSR
+
+prediction = meanPosterior
+\end{lstlisting}
+
 
 For more, see this \href{https://michaeloneill.github.io/GPR-tutorial.html}{very thorough tutorial}.
 
