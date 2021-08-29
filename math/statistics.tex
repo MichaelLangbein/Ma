@@ -44,18 +44,18 @@ def distance(x0, x1):
     return size(x0 - x1)
 
 def getDistanceMatrix(rowPoints, colPoints):
+    # deliberately not exploiting symmetry 
+    # <- this way it works with non-square matrices, too.
     rows = len(rowPoints)
     cols = len(colPoints)
     distances = np.zeros((rows, cols))
     for i in range(rows):
-        for j in range(cols):
+        for j in range(cols): 
             p0 = rowPoints[i]
             p1 = colPoints[j]
-            distances[i, j] = distance(p0, p1)
+            d = distance(p0, p1)
+            distances[i, j] = d
     return distances
-
-def covFunction(h):
-    return np.exp(- np.power(h, 2))
 
 deltaX = 0.1
 deltaY = 0.1
@@ -70,15 +70,21 @@ for x in range(gridX):
 distances = getDistanceMatrix(points, points)
 
 mean = np.zeros((nrPoints))
-Sigma = covFunction(distances)
-prior = multivariate_normal(mean, Sigma, allow_singular=True)
+cov0 = 1.3  # overall variance
+h95 = 2     # distance at which cov(h) >= 0.95 * cov0
+
+def variogramFunction(h):
+    return cov0 * ( 1 - np.exp( -3*h/h95 ) )
+
+Sigma = cov0 - variogramFunction(distances)
+prior = multivariate_normal(mean, Sigma)
 
 sample1 = prior.rvs()
 sample2 = prior.rvs()
 sample3 = prior.rvs()
 \end{lstlisting}
 
-\begin{figure}
+\begin{figure}[H]
     \caption{3 samples from prior $P(\mtrx{Y})$}
     \centering
     \includegraphics[width=0.7\linewidth]{images/gp_prior_samples.png}
@@ -86,7 +92,7 @@ sample3 = prior.rvs()
 
 We have observed some samples $\mtrx{D} = {(x_i, y_i)}$.
 Which of these millions of surfaces are most likely given those observations? We can answer that with $P(\mtrx{Y}|\mtrx{D})$.
-\begin{figure}
+\begin{figure}[H]
     \caption{Observations $\mtrx{D}$. Which field $\mtrx{Y}$ is most likely to have produced these observations?}
     \centering
     \includegraphics[width=0.4\linewidth]{images/gp_observations.jpg}
@@ -115,8 +121,13 @@ $$ \hat{\vec{\mu}}_r = \vec{\mu}_r + \mtrx{\Sigma}_{rs} \mtrx{\Sigma}_{ss}^{-1} 
 $$ \hat{\mtrx{\Sigma}}_r = \mtrx{\Sigma}_{rr} - \mtrx{\Sigma}_{rs} \mtrx{\Sigma}_{ss}^{-1} \mtrx{\Sigma}_{sr} $$
 
 \begin{lstlisting}[language=python]
-sampleIndices = np.asarray(list(map(lambda x: int(x), samples[:, 0])))
-nonSampleIndices = np.asarray(list(filter(lambda v: v not in sampleIndices, np.arange(nrPoints))))
+indices = np.arange(nrPoints)
+sampleIndices = np.asarray(list(
+    map(lambda x: int(x),
+        samples[:, 0])))
+nonSampleIndices = np.asarray(list(
+    filter(lambda v: v not in sampleIndices,
+           indices)))
 samplePoints = points[sampleIndices]
 nonSamplePoints = points[nonSampleIndices]
 sampleValues = samples[:, 3]
@@ -125,25 +136,46 @@ sampleValues = samples[:, 3]
 # But we could have also picked the right values from Sigma
 # without any need for re-computation.
 distancesRR = getDistanceMatrix(nonSamplePoints, nonSamplePoints)
-SigmaRR = covFunction(distancesRR)
+SigmaRR = cov0 - variogramFunction(distancesRR)
 
 distancesSS = getDistanceMatrix(samplePoints, samplePoints)
-SigmaSS = covFunction(distancesSS)
+SigmaSS = cov0 - variogramFunction(distancesSS)
 SigmaSSInverse = np.linalg.inv(SigmaSS)
 
 distancesRS = getDistanceMatrix(nonSamplePoints, samplePoints)
-SigmaRS = covFunction(distancesRS)
+SigmaRS = cov0 - variogramFunction(distancesRS)
 SigmaSR = SigmaRS.transpose()
 
-meanPosterior = np.matmul(np.matmul(SigmaRS, SigmaSSInverse), sampleValues)
-SigmaPosterior = SigmaRR - np.matmul(np.matmul(SigmaRS, SigmaSSInverse), SigmaSR)
+meanPosterior = SigmaRS @ SigmaSSInverse @ sampleValues
+SigmaPosterior = SigmaRR - SigmaRS @ SigmaSSInverse @ SigmaSR
 
-posterior = multivariate_normal(meanPosterior, SigmaPosterior, allow_singular=True)    
+posterior = multivariate_normal(meanPosterior, SigmaPosterior)   
 \end{lstlisting}
 
+We can now plot the \inlinecode{meanPosterior} around our \inlinecode{samples}. Doing so we obtain the graphic as shown in figure \ref{gpPosterior}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{images/gp_posterior_samples.png}
+  \caption{Samples and fitted posterior fit together well}
+  \label{gpPosterior}
+\end{figure}
 
 
-
+Note how we assumed that the covariance matrix $\mtrx{\Sigma}$ could be parameterized with a covariance-function $c(h)$. Only this way do we have any chance of finding a good approximation for $\mtrx{\Sigma}$ with only few samples.
+The relation \inlinecode{Sigma = cov0 - variogramFunction(distances)} comes from the variogram $\gamma(h)$ as in here:
+\begin{equation}
+  \begin{aligned}
+    2 \gamma(h) &= E[(Z(x+h) - Z(x))^2] \\
+                &= E[( (Z(x+h) - \mu) - (Z(x) - \mu) )^2] \\
+                &= E[ (Z(x+h) - \mu)^2  - 2(Z(x+h) - \mu)(Z(x) - \mu)  + (Z(x) - \mu)^2 ] \\
+                &= E[ (Z(x+h) - \mu)^2 ]  - 2 E[(Z(x+h) - \mu)(Z(x) - \mu)]  + E[ (Z(x) - \mu)^2 ] \\
+                &= c(0) - 2 c(h) + c(0) \\
+      \gamma(h) &= c(0) - c(h) \\
+           c(h) &= c(0) - \gamma(h)
+  \end{aligned}
+\end{equation}
+In practical applications, we'll usually fit our function \inlinecode{cov0 * ( 1 - np.exp( -3*h/h95 ) )} by moving the parameters \inlinecode{cov0} and \inlinecode{h95} until the residuals fit properly.
 
 For more, see this \href{https://michaeloneill.github.io/GPR-tutorial.html}{very thorough tutorial}.
 
