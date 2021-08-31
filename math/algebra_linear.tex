@@ -652,10 +652,49 @@ Thus $C_Y = \Lambda_{C_X}$, which is diagonal, as required.
 
 Note: Sometimes we care not about $cov(n_1, n_2)$ but about $cov(m_1, m_2)$. Then we use: $\mtrx{X} = \mtrx{A} - \mtrx{\mu}$, the matrix with its \emph{row}-mean subtracted. With that $C_X = \mtrx{X} \mtrx{X}^T$ and $\thereis \mtrx{P}: Y = \mtrx{P}\mtrx{X}$. Try $\mtrx{E}_{C_X}$
 
+\paragraph{Example: Eigenfaces} are a very fun example of PCA.
+
+\begin{lstlisting}[language=python]
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import imageio
+    import os
     
+    
+    (X, Y, S) = (119, 95, 50)
+    P = X * Y
+    
+    allFaces = np.zeros((P, S))
+    for s, path in enumerate(paths[:S]):
+        image = imageio.imread(path)
+        allFaces[: , s] = image.reshape((P))
+    
+    meanFace = np.mean(allFaces, axis=1, keepdims=True)
+    allFacesNorm = allFaces - meanFace
+    cov = allFacesNorm @ allFacesNorm.transpose()
+    evals, evecs = np.linalg.eigh(cov, k=cutoff)
+    plt.imshow(np.abs(evecs[:, 0].reshape((X, Y))))
+    
+    cutoff = 100
+    evecsC = evecs[:, -cutoff:]
 
 
+    face = allFaces[:, 45]
+    faceEncoded = face @ evecsC
+    faceReconstr = meanFace[0, :] + (evecsC @ faceEncoded)
+\end{lstlisting}
 
+\begin{figure}[H]
+    \caption{First eigenfaces}
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/eigenface1.png}
+\end{figure}
+
+\begin{figure}[H]
+    \caption{Reconstructing a faces from its percentages of the eigenfaces}
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/eigenface_reconstructed.png}
+\end{figure}
 
 
 
