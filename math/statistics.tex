@@ -266,6 +266,165 @@ Autoregressive and spatial-autoregressive models.
     \end{table}
 
 
+\subsection{Bayesian networks}
+Bayesian networks are a neat tool when we can manually encode some complex causation-graphs.
+
+\begin{lstlisting}[language=python]
+
+  def find(lst, predicate):
+  for entry in lst:
+      if predicate(entry):
+          return entry
+
+def prod(lst):
+  p = lst[0]
+  for entry in lst[1:]:
+      p *= entry
+  return p
+
+def getCombinations(lists):
+  combinations = []
+  if len(lists) == 0:
+      combinations = []
+  elif len(lists) == 1:
+      combinations = lists[0]
+  elif len(lists) == 2:
+      for a in lists[0]:
+          for b in lists[1]:
+              combinations.append([a, b])
+  else:
+      firstList = lists[0]
+      subCombos = getCombinations(lists[1:])
+      for a in firstList:
+          for b in subCombos:
+              combinations.append([a, *b])
+  return combinations
+
+
+
+class Node:
+  def __init__(self, name, pmf, allowedValues, parents = []):
+      self.name = name
+      self.pmf = pmf
+      self.allowedValues = allowedValues
+      self.parents = parents
+
+  def setPmf(self, pmf):
+      self.pmf = pmf
+
+  def calcProb(self, value):
+
+      if value not in self.allowedValues:
+          return 0.0
+
+      parentData = self.__getParentData()
+      
+      p = 0.0
+      if len(parentData) > 0:
+          for combination in getCombinations(parentData):
+              parentValues = {entry['name']: entry['value'] for entry in combination}
+              parentProbs = [entry['prob'] for entry in combination]
+              p += self.pmf(value, parentValues) * prod(parentProbs)
+      else:
+          p = self.pmf(value, {})
+
+      return p
+
+  def __getParentData(self):
+      parentData = []
+      for i, parent in enumerate(self.parents):
+          parentData.append([])
+          for value in parent.allowedValues:
+              prob = parent.calcProb(value)
+              parentData[i].append({
+                  'name': parent.name,
+                  'value': value,
+                  'prob': prob
+              })
+      return parentData
+
+
+class Net:
+  def __init__(self, nodes):
+      self.nodes = nodes
+      self.memo = {}
+      for node in self.nodes:
+          self.memo[node.name] = {}
+
+  def calcProb(self, nodeName, value):
+      if self.memo[nodeName][value]:
+          return self.memo[nodeName][value]
+      else:
+          node = self.__findNode(nodeName)
+          prob = node.calcProb(value)
+          self.memo[nodeName][value] = prob
+          return prob
+
+  def setPmf(self, nodeName, pmf):
+      # setting pmf
+      node = self.__findNode(nodeName)
+      node.setPmf(pmf)
+
+      # invalidating downstream cached results
+      self.memo[nodeName] = {}
+      children = self.__findChildren(nodeName, True)
+      for child in children:
+          self.memo[child.name] = {}
+
+  def __findNode(self, nodeName):
+      node = find(self.nodes, lambda n: n.name == nodeName)
+      return node
+
+  def __findChildren(self, nodeName, recursive=False):
+      pass
+
+
+
+def randomSelection(door, parents):
+  return 1/3
+
+guest = Node('guest', randomSelection, [1, 2, 3])
+
+real = Node('real', randomSelection, [1, 2, 3])
+
+
+def pickingRandomOther(door, parents):
+  if parents['real'] == door:
+      return 0
+  if parents['guest'] == door:
+      return 0
+  elif parents['real'] == parents['guest']:
+      return 1/2
+  else:
+      return 1
+
+monty = Node('monty', pickingRandomOther, [1, 2, 3], [real, guest])
+
+
+# %%
+monty.calcProb(1)
+# %%
+def guestPicked1(door, parents):
+  if door == 1:
+      return 1
+  else:
+      return 0
+
+guest.setPmf(guestPicked1)
+
+monty.calcProb(2)
+# %%
+def realDoorIs2(door, parents):
+  if door == 2:
+      return 1
+  else:
+      return 0
+
+real.setPmf(realDoorIs2)
+
+monty.calcProb(3)
+\end{lstlisting}
+
 
 
 
