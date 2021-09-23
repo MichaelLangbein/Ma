@@ -106,6 +106,25 @@ def timesTwo(n):
 timesTwo(2)  # <-- 6
 \end{lstlisting}
 
+A common use for decorators is memoization:
+\begin{lstlisting}[language=python]
+
+def memoize(function):
+    memo = {}
+    def wrappedFunction(x):
+        if x not in memo:            
+            memo[x] = function(x)
+        return memo[x]
+    return wrappedFunction
+
+@memoize
+def fib(n):
+    if n <= 2:
+        return 1
+    else:
+        return fib(n - 1) + fib(n - 2)
+\end{lstlisting}
+
 
 \subsection{Metaprogramming}
 
