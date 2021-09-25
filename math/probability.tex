@@ -34,7 +34,7 @@ Note that a random variable strictly takes a single $\omega$ as argument, not a 
 
 We then calculate the probability that a random variable $X$ has a certain value $x$ as such: 
 
-$$ \probFunct[X=x] = \sum_{X^{-1}(x)} \probFunct[\omega]$$
+$$ \probFunct[X=x] = \sum_{X^{-1}(x)} \probFunct[\omega] $$
 
 \begin{definition}[Expectation]
     The expectation of a random variable is defined as 
@@ -51,6 +51,38 @@ As a nice little exercise, we prove the formula for the conditional probability 
     $$ \probFunct[A | \overline{B}] = $$
 \end{proof}
 
+
+
+As an illustrative example, consider the following probabilities. People can be \emph{small} (S) or \emph{tall} (T). They can be \emph{good} (G) or \emph{bad} (B) at basketball.
+Here are the tables of probabilities:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{llllll}
+      &      &  &   & S    & T    \\
+      &      &  &   & 0.6  & 0.4  \\
+      &      &  &   &      &      \\
+      &      &  &   & S    & T    \\
+    B & 0.14 &  & B & 0.54 & 0.08 \\
+    G & 0.86 &  & G & 0.6  & 0.32
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{llll}
+        $P(B|S)$ & 0.9 & $P(B|T)$ & 0.8 \\
+        $P(G|S)$ & 0.1 & $P(G|T)$ & 0.2 
+    \end{tabular}
+\end{table}
+
+Notice the following facts:
+\begin{itemize}
+    \item notice how $P(G|T) \neq 1 - P(G|S)$
+    \item notice how $P(G|T) = 1 - P(B|T)$
+    \item $P(A, B) = P(A|B) P(B) = P(B|A) P(A)$
+    \item $ \Sigma_A \Sigma_B P(A, B) = 1.0 $
+\end{itemize}
 
 As yet another exercise, here is the formula of the probability of a union of arbitrary events: 
 
@@ -74,7 +106,7 @@ As yet another exercise, here is the formula of the probability of a union of ar
 
 \subsubsection{Uncountable sets and infinitessimals}
 
-Conventional probability restricts \samplespace 's to only include sigma-algebras, that is, sets of which every subset is guaranteed to be measureable. This is neccessary because it turns out that some uncountable sets do indeed have subsets that you cannot assign a probability to. However, we can sidestep this difficulty by restricting ourselves only to countable sets. If we need continuity, we can include infinitessimals in that set.
+Conventional probability restricts \samplespace 's to only include sigma-algebras, that is, sets of which every subset is guaranteed to be measurable. This is necessary because it turns out that some uncountable sets do indeed have subsets that you cannot assign a probability to. However, we can sidestep this difficulty by restricting ourselves only to countable sets. If we need continuity, we can include infinitessimals in that set.
 
  
  
@@ -85,7 +117,25 @@ Conventional probability restricts \samplespace 's to only include sigma-algebra
      \item T-Test interpretation: If $\probFunct[A|B] = x$, then this does \emph{not} mean that $\probFunct[A|\overline{B}] = 1 - x$.
      \item Prosecutors fallacy aka. inverse fallacy: $P(A|B) \neq P(B|A)$
  \end{itemize}
+
+ \paragraph{$\probFunct[A|\overline{B}] \neq 1 - \probFunct[A | B]$}. 
+ \begin{proof}
+     By contradiction. 
+     \begin{equation}
+         \begin{aligned}
+            \probFunct[A|B]                 &= 1 - \probFunct[A | \overline{B}] \\
+                                            &= \frac{  \probFunct[B] - \probFunct[A \intersection \overline{B}]  }{  \probFunct[B]  }  \\
+            \probFunct[A|B] \probFunct[B]   &=         \probFunct[B] - \probFunct[A \intersection \overline{B}] \\
+            \probFunct[A \intersection B]   &= \probFunct[B] - \probFunct[A \intersection \overline{B}] \\
+            \probFunct[A \intersection B] + \probFunct[A \intersection \overline{B}]  &= \probFunct[B] \\
+            \probFunct[A] &= \probFunct[B]
+         \end{aligned}
+     \end{equation}
+     Thus $\probFunct[A|\overline{B}] \neq 1 - \probFunct[A | B]$. But not that it \emph{does} hold true that $\probFunct[\overline{A}|B] = 1 - \probFunct[A | B]$
+ \end{proof}
  
+
+
 
 \subsection{Probability distributions}
 

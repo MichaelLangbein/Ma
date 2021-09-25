@@ -19,6 +19,31 @@ $$ \partDiff{E}{\vec{w}} = -  (\vec{y} - \vec{\hat{y}}) \mtrx{X}  $$
 
 
 
+
+
+\subsubsection{You are absolutely allowed to invert a linear regression relation}
+Linear regressions are focussed on $P(y | x)$ ... but you can absolutely revert that relation. For example, you are allowed to predict size from basketball scores, even though in reality it's likely the other way round.
+
+Assume 
+$$ y = \alpha x + \epsilon $$
+and 
+$$ \epsilon ~ N(0, \sigma^2_\epsilon), x ~ N(\mu_x, \sigma^2_x)$$
+This yields $P(y|x) = N(\alpha x, \sigma^2_\epsilon)$. But in the same vain we may also write
+$$ x = \frac{y}{\alpha} - \frac{\epsilon}{\alpha} $$
+With:
+$$ P(x|y) = N(\frac{\mu_y}{\alpha},  \frac{\sigma^2_\epsilon}{\alpha^2}) $$
+
+We can also arrive at the same joint distribution $P(x, y)$ coming from $x$ as well as from $y$.
+
+\begin{equation}
+    \begin{aligned}
+        P(x, y) &= P(y|x) P(x) &= N(\alpha x, \sigma^2_\epsilon) N(\mu_x, \sigma^2_x) \\
+                &= P(x|y) P(y) &= N( \frac{y}{\alpha}, \frac{\sigma^2_\epsilon}{\alpha^2} ) \int_X P(x, y)
+    \end{aligned}
+\end{equation}
+
+All the regression-model tells us, is that there is a relation $ y = \alpha x + \epsilon $ between $x$ and $y$. It does \emph{not} imply a direction or causality.
+
 \subsection{Spatial modelling}
 
 \subsubsection{Generalized least squares}
@@ -426,7 +451,15 @@ monty.calcProb(3)
 \end{lstlisting}
 
 
-
+Note that you can change the direction of an edge in a bayesian net - but you'll have to change the associated probability tables.
+Let's say we start with a relation $A \then B$ and have given $P(A)$ and $P(B|A)$.
+To turn this around into $B \then A$ we need to obtain $P(B)$ and $P(A|B)$.
+We can get $P(A|B)$ as:
+$$ P(A|B) = \frac{P(A, B)}{P(B)} = \frac{P(B|A)P(A)}{P(B)} = \frac{P(B|A)P(A)}{ \int_A P(B|A)P(A) }  $$
+which is, obviously, different from $P(A)$, so we \emph{do need} to make changes to the tables.
+We can also obtain $P(B)$ as:
+$$ P(B) = \int_A P(A, B) = \int_A P(B|A)P(A) $$
+So we can calculate the terms $P(B)$ and $P(A|B)$ from our given $P(A)$ and $P(B|A)$.
 
 
 
