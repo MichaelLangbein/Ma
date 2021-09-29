@@ -103,6 +103,37 @@ As yet another exercise, here is the formula of the probability of a union of ar
     
 \end{proof}
 
+\subsubsection{A few lemmas on conditional probability} \label{condPropLemmas}
+
+In a "causal" chain of events $A, B, C$ we can integrate out the middle-event $B$.
+\begin{equation}
+    \begin{aligned}
+        p(A, B, C)  &= \frac{p(A, B, C)}{p(A, B)} \frac{p(A, B)}{p(A)} p(A) \\
+                    &= p(C|AB) p(B|A) p(A) \\
+    \end{aligned}
+\end{equation}
+
+\begin{equation}
+    p(A, C) = \Sigma_B p(A, B, C)
+\end{equation}
+
+\begin{equation}
+    \begin{aligned}
+            p(C | A) &= \frac{p(A, C)}{p(A)} \\
+                     &= \Sigma_B p(C|A, B) p(B|A)
+    \end{aligned}
+\end{equation}
+
+We can take the expression for conditional probability and condition \emph{every term} on a third event.
+\begin{equation}
+    \begin{aligned}
+        p(B|A, C) &= \frac{p(A, B, C)}{p(A, C)} \\
+        p(A|B, C) &= \frac{p(A, B, C)}{p(B, C)} \\
+        p(A|B, C) &= \frac{p(B|A, C) p(A|C) p(C)}{p(B|C)p(C)} \\
+                  &= \frac{p(B|A, C) p(A|C)}{p(B|C)} \\
+    \end{aligned}
+\end{equation}
+
 
 \subsubsection{Uncountable sets and infinitessimals}
 

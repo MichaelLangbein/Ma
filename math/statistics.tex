@@ -462,6 +462,96 @@ $$ P(B) = \int_A P(A, B) = \int_A P(B|A)P(A) $$
 So we can calculate the terms $P(B)$ and $P(A|B)$ from our given $P(A)$ and $P(B|A)$.
 
 
+\subsection{Hidden-state models}
+
+\begin{figure} \label{hiddenMarkovStates}
+    \caption{Hidden Markov state model}
+    \centering
+      \includegraphics[width=0.5\textwidth]{images/hidden_markov_states.jpg}
+\end{figure}
+
+Imagine a model as in image \ref{hiddenMarkovStates}.
+What is known: 
+\begin{itemize}
+    \item $p(y_t|s_t)$
+    \item $p(s_t+1|s_t)$
+\end{itemize}
+
+From this we can deduce:
+$$ p(s_0|y_0) = p(y_0|s_0) \frac{p(s_0)}{p(y_0)} $$
+$$ p(s_1|y_0) = \Sigma_{s_0} p(s_1|s_0) p(s_0|y_0) $$
+$$ p(y_1|y_0) = \Sigma_{s_0} \Sigma_{s_1} p(y_1|s_1) p(s_1|s_0) p(s_0|y_0) $$
+Note that $ p(y_1|y_0) $ is not a function of either $s_0$ nor $s_1$.
+
+\begin{equation}
+    \begin{aligned}
+        p(s_1|y_0, y_1) &= \frac{ p(y_1|s_1, y_0) p(s_1|y_0) }{ p(y_1|y_0) } \\
+                        &= \frac{ p(y_1|s_1) p(s_1|y_0) }{ p(y_1|y_0) } \\
+                        & \propto p(y_1|s_1) p(s_1|y_0) \text{ ... since $p(y_1|y_0)$ is not a function of $s$ }
+    \end{aligned}
+\end{equation}
+(As reference, see the findings \ref{condPropLemmas}.)
+
+More generally, we can write the \textbf{update-equation} as:
+\begin{equation}
+    p(s_t | \vec{y}_{[1..t]}) \propto p(y_t | s_t) p(s_t | \vec{y}_{[1..t-1]})
+\end{equation}
+... where $p(s_t | \vec{y}_{[1..t-1]})$ is the result of the last prediction equation.
+
+With the \textbf{prediction-equation}:
+\begin{equation}
+    p(s_{t+1} | \vec{y}_{[1..t]} ) = \Sigma_{s_t} p(s_{t+1} | s_t) p(s_t | \vec{y}_{[1..t]}) )
+\end{equation}
+... where $ p(s_t | \vec{y}_{[1..t]}) $ is the result of the last update equation.
+
+\begin{lstlisting}[language=python]
+    states = ('Rainy', 'Sunny')
+     
+    observations = ('walk', 'shop', 'clean')
+     
+    start_prob = {'Rainy': 0.6, 'Sunny': 0.4}
+     
+    transition_prob = {
+       'Rainy' : {'Rainy': 0.7, 'Sunny': 0.3},
+       'Sunny' : {'Rainy': 0.4, 'Sunny': 0.6},
+    }
+     
+    emission_prob = {
+       'Rainy' : {'walk': 0.1, 'shop': 0.4, 'clean': 0.5},
+       'Sunny' : {'walk': 0.6, 'shop': 0.3, 'clean': 0.1},
+    }
+    
+    state_series = ['Rainy', 'Sunny', 'Sunny', 'Sunny', 'Rainy', 'Sunny', 'Rainy', 'Rainy', 'Sunny', 'Sunny', 'Sunny']
+    emission_series = ['clean', 'walk', 'walk', 'shop', 'clean', 'shop', 'clean', 'clean', 'clean', 'shop', 'clean']
+    
+    
+    def prediction(states, transition_prob, prob_St_Yt):
+        prob_St1_Yt = {}
+        for state1 in states:
+            prob_St1_Yt[state1] = 0.0
+            for state0 in states:
+                prob_St1_Yt[state1] += transition_prob[state0][state1] * prob_St_Yt[state0]
+        return prob_St1_Yt
+    
+    
+    def update(states, emission, emission_prob, prob_St1_Yt):
+        prob_St_Yt = {}
+        for state in states:
+            prob_St_Yt[state] = emission_prob[state][emission] * prob_St1_Yt[state]
+        sm = sum(prob_St_Yt.values())
+        for state in prob_St_Yt:
+            prob_St_Yt[state] = prob_St_Yt[state] / sm
+        return prob_St_Yt
+    
+            
+    prob_St1_Yt = start_prob
+    for t in range(10):
+        emission = emission_series[t]
+        prob_St_Yt = update(states, emission, emission_prob, prob_St1_Yt)
+        prob_St1_Yt = prediction(states, transition_prob, prob_St_Yt)
+\end{lstlisting}
+
+
 
 \subsection{Tests}
 Often, statistical tests work \emph{the wrong way round}. You have your hypothesis, like "these groups are different". Then you state the opposite, the \emph{null-hypothesis}. Then you determine how likely your data is under the null-hypothesis - the \emph{p-value}. And than you hope that the p-value is very low.
