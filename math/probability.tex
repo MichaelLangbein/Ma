@@ -141,6 +141,52 @@ Conventional probability restricts \samplespace 's to only include sigma-algebra
 
  
  
+
+
+\subsection{Decomposing variance - the road to sensitivity analysis}
+
+\paragraph{Expressing variance as expectation} ...
+\begin{equation}
+    \begin{aligned}
+        V_X &= E_{ (X - E_X)^2 } \\
+            &= E_{ X^2 - 2 X E_X + E_X^2 } \\
+            &= E_{X^2} - E_X^2
+    \end{aligned}
+\end{equation}
+
+\paragraph{Conditional expectation and variance} ...
+
+\begin{definition} \label{conditionalExpectation}
+    Conditional expectation:
+    $$ E_{Y|x} = \Sigma y P(y|x) $$
+\end{definition}
+
+\begin{definition} \label{conditionalVariance}
+    Conditional variance: 
+    $$ V_{Y|x} = E_{(Y - E_{Y|x})^2 | x} $$ 
+\end{definition}
+
+\paragraph{Law of total expectation} ...
+\begin{equation} \label{lawOfTotalExpectation}
+    \begin{aligned}
+        E_Y &= \Sigma_Y y P(y) \\
+            &= \Sigma_Y y \Sigma_X P(y|x) P(x) \\
+            &= \Sigma_X (\Sigma_Y y P(y|x)) P(x) \\
+            &= \Sigma_X E_{Y|x} P(x) \\
+            &= E_{E_{Y|x}}
+    \end{aligned}
+\end{equation}
+
+\paragraph{Law of total variance} ...
+\begin{equation} \label{lawOfTotalVariance}
+    \begin{aligned}
+        V_Y &= E_{Y^2} - E_Y^2 \\
+            &= E_{E_{Y^2 | X}} - E^2_{E_{Y|X}} \\
+            &= E_{  V_{Y|X} + E^2_{Y|X}  } - E^2_{E_{Y|X}} \\
+            &= E_{V_{Y|X}} + E_{E^2_{Y|X}} - E^2_{E_{Y|X}} \\
+            &= E_{V_{Y|X}} + V_{E_{Y|X}}
+    \end{aligned}
+\end{equation}
  
  
  \subsubsection{Probabilistic fallacies}
