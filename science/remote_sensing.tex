@@ -37,7 +37,7 @@ Consequently, there are no acquisition plans for Sentinel-5P.
 
 
 
-\subsection{Important satellites and service providers}
+\subsection{Important satellites}
 
 
 \begin{table}
@@ -78,6 +78,8 @@ The Sentinel missions include radar and super-spectral imaging for land, ocean a
 Each Sentinel mission is based on a constellation of two satellites to fulfill and revisit the coverage requirements
 for each mission, providing robust datasets for all Copernicus services.
 
+
+\subsection{Important service providers}
 \paragraph{CHIRPS} is ...
 
 \paragraph{EODC}: \href{https://www.eodc.eu/}{Earth Observation Data Center for Water Resources Monitoring}
@@ -88,13 +90,109 @@ for each mission, providing robust datasets for all Copernicus services.
 
 \paragraph{NASA's ECS} (Earth observation center Core System) is a vast catalogue of ...
 
+\paragraph{Kaggle} (see \href{https://www.kaggle.com/search?q=sentinel}{here}) is a useful source for ready-labeled datasets for training.
 
 
+\subsection{Obtaining data}
+In geoscience, actually obtaining data is an art... unfortunately. At least, OSM and AWS+STAC make things a little more standardized.
 
-
-
-
-
+\begin{lstlisting}[language=python]
+    #%%
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from pystac_client import Client
+    import os
+    import requests as req
+    from urllib.parse import urlparse
+    import json
+    
+    #%% Part 0: directories
+    thisDir = os.getcwd()
+    assetDir = os.path.join(thisDir, 'assets')
+    osmDir = os.path.join(assetDir, 'osm')
+    os.makedirs(osmDir, exist_ok=True)
+    
+    
+    #%% Part 1: download S2 data
+    
+    catalog = Client.open("https://earth-search.aws.element84.com/v0")
+    bbox = [
+        11.213092803955078,
+        48.06580565720895,
+        11.300640106201172,
+        48.09161057547795
+    ]
+    searchResults = catalog.search(
+        collections=['sentinel-s2-l2a-cogs'],
+        bbox=bbox,
+        max_items=4,
+    )
+    
+    
+    for item in searchResults.get_items():
+        itemDir = os.path.join(assetDir, item.id)
+        os.makedirs(itemDir, exist_ok=True)
+        for key, val in item.assets.items():
+            url = urlparse(val.href)
+            fileName = os.path.basename(url.path)
+            targetPath = os.path.join(itemDir, fileName)
+            response = req.get(val.href)
+            with open(targetPath, 'wb') as fh:
+                fh.write(response.content)
+    
+    
+    
+    # %% Part 2: download OSM data
+    # Tested with http://overpass-turbo.eu/#
+    
+    
+    stringifiedBbox = f"{bbox[1]},{bbox[0]},{bbox[3]},{bbox[2]}"
+    
+    buildingQuery = f"""
+        [out:json];     /* output in json format */
+        way[building]( {stringifiedBbox} );
+        (._;>;);        /* get the nodes that make up the ways  */
+        out geom;
+    """
+    
+    treesQuery = f"""
+    [out:json];
+    (
+        way[landuse=forest]( {stringifiedBbox} );
+        way[landuse=meadow]( {stringifiedBbox} );
+        way[landuse=orchard]( {stringifiedBbox} );
+    );              /* union of the above statements */
+    (._;>;);
+    out geom;
+    """
+    
+    waterQuery = f"""
+    [out:json];
+    way[natural=water]( {stringifiedBbox} );
+    (._;>;);
+    out geom;
+    """
+    
+    queries = {
+        'buildings': buildingQuery,
+        'trees': treesQuery,
+        'water': waterQuery
+    }
+    
+    
+    overpass_url = "http://overpass-api.de/api/interpreter"
+    for name, query in queries.items():
+        response = req.get(overpass_url, params={'data': query})
+        data = response.json()
+        filePath = os.path.join(osmDir, name + '.json')
+        with open(filePath, 'w') as fh:
+            json.dump(data, fh, indent=4)
+    
+    
+    
+    # %%
+    
+\end{lstlisting}
 
 
 \subsection{Image preprocessing}
@@ -103,4 +201,168 @@ for each mission, providing robust datasets for all Copernicus services.
 \subsection{Image segmentation}
 \subsubsection{Maximum-likelyhood classifier}
 \subsubsection{PCA}
+
 \subsubsection{U-Net}
+The U-Net is a popular, convolutional neural net for image segmentation.
+\begin{lstlisting}[language=python]
+#%%
+import os
+
+
+inputDir = "./data/images"
+targetDir = "./data/annotations/trimaps"
+imageSize = (160, 160)
+numClasses = 3
+batchSize = 32
+
+inputImagePaths = sorted([
+    os.path.join(inputDir, fName)
+    for fName in os.listdir(inputDir)
+    if fName.endswith(".jpg")
+])
+
+targetImagePaths = sorted([
+        os.path.join(targetDir, fName)
+    for fName in os.listdir(targetDir)
+    if fName.endswith(".png") and not fName.startswith(".")
+])
+
+#%% Data-loader
+
+from tensorflow import keras as k
+import numpy as np
+from tensorflow.keras.preprocessing.image import load_img
+
+class OxfordPets(k.utils.Sequence):
+    def __init__(self, batchSize, imgSize, inputImgPaths, targetImgPaths):
+        self.batchSize = batchSize
+        self.imgSize = imgSize
+        self.inputImgPaths = inputImgPaths
+        self.targetImgPaths = targetImgPaths
+
+    def __len__(self):
+        """ Gives tf the amount of batches available """
+        return len(self.targetImgPaths) // self.batchSize
+
+    def __getitem__(self, idx):
+        """ Returns tuple (input, target) corresponding to batch #idx """
+        i = idx * self.batchSize
+        
+        batchInputImgPaths = self.inputImgPaths[i : i + self.batchSize]
+        batchTargetImgPaths = self.targetImgPaths[i : i + self.batchSize]
+        
+        x = np.zeros((self.batchSize, self.imgSize[0], self.imgSize[1], 3), dtype='float32')
+        for j, path in enumerate(batchInputImgPaths):
+            img = load_img(path, target_size=self.imgSize)
+            x[j, :, :, :] = img
+        
+        y = np.zeros((self.batchSize, self.imgSize[0], self.imgSize[1], 1), dtype='uint8')
+        for j, path in enumerate(batchTargetImgPaths):
+            img = load_img(path, target_size=self.imgSize, color_mode='grayscale')
+            y[j] = np.expand_dims(img, 2)
+            # Ground truth labels are 1, 2, 3. Subtract one to make them 0, 1, 2:
+            y[j] -= 1
+        return x, y
+
+    
+
+#%% 
+from tensorflow.keras import layers
+
+
+def makeModel(imgSize, numClasses):
+    inputs = k.Input(shape=imgSize + (3,))
+
+    ### First half of model: downsampling inputs
+
+    # Entry block
+    x = layers.Conv2D(32, 3, strides=2, padding="same")(inputs)
+    x = layers.BatchNormalization()(x)
+    x = layers.Activation('relu')(x)
+    previousBlockActivation = x
+
+    # Blocks 1, 2, 3 are identical apart from the feature depth
+    for filters in [64, 128, 256]:
+        x = layers.Activation('relu')(x)
+        x = layers.SeparableConv2D(filters, 3, padding='same')(x)
+        x = layers.BatchNormalization()(x)
+        
+        x = layers.Activation('relu')(x)
+        x = layers.SeparableConv2D(filters, 3, padding='same')(x)
+        x = layers.BatchNormalization()(x)
+
+        x = layers.MaxPooling2D(3, strides=2, padding='same')(x)
+
+        # Project residual
+        residual = layers.Conv2D(filters, 1, strides=2, padding='same')(previousBlockActivation)
+        x = layers.add([x, residual])
+        previousBlockActivation = x  # Setting aside next residual
+
+
+    ### Second half of network: upsampling inputs
+
+    for filters in [256, 128, 64, 32]:
+        x = layers.Activation('relu')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding='same')(x)
+        x = layers.BatchNormalization()(x)
+
+        x = layers.Activation('relu')(x)
+        x = layers.Conv2DTranspose(filters, 3, padding='same')(x)
+        x = layers.BatchNormalization()(x)
+
+        x = layers.UpSampling2D(2)(x)
+
+        # Project residual
+        residual = layers.UpSampling2D(2)(previousBlockActivation)
+        residual = layers.Conv2D(filters, 1, padding='same')(residual)
+        x = layers.add([x, residual])
+        previousBlockActivation = x
+
+    
+    outputs = layers.Conv2D(numClasses, 3, activation='softmax', padding='same')(x)
+
+    model = k.Model(inputs, outputs)
+    return model
+
+
+k.backend.clear_session()
+
+model = makeModel(imageSize, numClasses)
+model.summary()
+
+
+# %%
+import random
+
+# Split our img paths into a training and a validation set
+val_samples = 1000
+random.Random(1337).shuffle(inputImagePaths)
+random.Random(1337).shuffle(targetImagePaths)
+trainInputImgPaths = inputImagePaths[:-val_samples]
+trainTargetImgPaths = targetImagePaths[:-val_samples]
+valInputImgPaths = inputImagePaths[-val_samples:]
+valTargetImgPaths = targetImagePaths[-val_samples:]
+
+# Instantiate data Sequences for each split
+trainGen = OxfordPets(batchSize, imageSize, trainInputImgPaths, trainTargetImgPaths)
+validGen = OxfordPets(batchSize, imageSize, valInputImgPaths, valTargetImgPaths)
+
+
+# %%
+# Configure the model for training.
+# We use the "sparse" version of categorical_crossentropy
+# because our target data is integers.
+model.compile(optimizer="rmsprop", loss="sparse_categorical_crossentropy")
+
+callbacks = [
+    k.callbacks.ModelCheckpoint("oxford_segmentation.h5", save_best_only=True)
+]
+
+# Train the model, doing validation at the end of each epoch.
+epochs = 15
+model.fit(trainGen, epochs=epochs, validation_data=validGen, callbacks=callbacks)
+
+# %%
+valPreds = model.predict(validGen)
+
+\end{lstlisting}
