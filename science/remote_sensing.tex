@@ -224,7 +224,44 @@ In geoscience, actually obtaining data is an art... unfortunately. At least, OSM
 \subsection{Radar}
 \subsection{Image segmentation}
 \subsubsection{Maximum-likelyhood classifier}
+
 \subsubsection{PCA}
+Sentinel 2 has 12 optical bands - that's not counting the additional water-vapor and classification-layers.
+But they contain a lot of duplicated information.
+We get very good segmentation when we recombine the bands to their most diagonal combinations.
+
+\begin{lstlisting}[language=python]
+def pcaBandReduction(data, nrOutputBands):
+    r, c, b = data.shape
+    D = np.reshape(data, (r*c, b))
+    Dm = D - np.mean(D)
+    Cdm = Dm.transpose() @ Dm
+    eVals, eVecs = np.linalg.eig(Cdm)
+    P = eVecs
+    Dmt = Dm @ P[:, 0:nrOutputBands]
+    transformedData = np.reshape(Dmt, (r, c, nrOutputBands))
+    return transformedData
+
+
+reducedData = pcaBandReduction(allData, 3)
+\end{lstlisting}
+
+This yields this very nice image:
+\begin{figure}[H]
+    \caption{Weßling after PCA on the 10 biggest S2 channels}
+    \centering
+      \includegraphics[width=0.65\textwidth]{images/pca_wessling.png}
+\end{figure}
+
+We can add an interpretation to the different combination-weights:
+\begin{figure}[H]
+    \caption{Interpretation of the most important primary components}
+    \centering
+      \includegraphics[width=0.65\textwidth]{images/pca_wessling_pcs.png}
+\end{figure}
+
+
+
 
 \subsubsection{U-Net}
 The U-Net is a popular, convolutional neural net for image segmentation.
