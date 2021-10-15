@@ -133,6 +133,7 @@ In geoscience, actually obtaining data is an art... unfortunately. At least, OSM
     )
     
     
+    # Option 1: Downloading full datasets
     for item in searchResults.get_items():
         itemDir = os.path.join(assetDir, item.id)
         os.makedirs(itemDir, exist_ok=True)
@@ -144,6 +145,25 @@ In geoscience, actually obtaining data is an art... unfortunately. At least, OSM
             with open(targetPath, 'wb') as fh:
                 fh.write(response.content)
     
+
+    # Option 2: downloading only bbox-subset
+    for item in searchResults.get_items():
+        itemData = {}
+        for key, val in item.assets.items():
+            if val.href.endswith('tif'):
+                with rio.open(val.href) as fh:
+                    coordTransformer = Transformer.from_crs('EPSG:4326', fh.crs)
+                    coordUpperLeft = coordTransformer.transform(bbox[3], bbox[0])
+                    coordLowerRight = coordTransformer.transform(bbox[1], bbox[2]) 
+                    pixelUpperLeft = fh.index( coordUpperLeft[0],  coordUpperLeft[1] )
+                    pixelLowerRight = fh.index( coordLowerRight[0],  coordLowerRight[1] )
+                    # make http range request only for bytes in window
+                    window = rio.windows.Window.from_slices(
+                        ( pixelUpperLeft[0],  pixelLowerRight[0] ), 
+                        ( pixelUpperLeft[1],  pixelLowerRight[1] )
+                    )
+                    subset = fh.read(1, window=window)
+                    item[key] = subset
     
     
     # %% Part 2: download OSM data
