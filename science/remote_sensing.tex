@@ -246,7 +246,15 @@ def pcaBandReduction(data, nrOutputBands):
 reducedData = pcaBandReduction(allData, 3)
 \end{lstlisting}
 
-This yields this very nice image:
+This yields this very nice image below. It segments  objects into: 
+\begin{itemize}
+    \item Pink: water
+    \item Yellow: building
+    \item Green: forrest
+    \item White: fields
+    \item Turquoise: clouds
+\end{itemize}
+
 \begin{figure}[H]
     \caption{Weßling after PCA on the 10 biggest S2 channels}
     \centering
