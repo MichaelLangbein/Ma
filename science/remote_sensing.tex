@@ -126,6 +126,10 @@ In geoscience, actually obtaining data is an art... unfortunately. At least, OSM
         collections=['sentinel-s2-l2a-cogs'],
         bbox=bbox,
         max_items=4,
+        query={
+            "eo:cloud_cover":{"lt":10},
+            "sentinel:valid_cloud_cover": {"eq": True}
+        },
     )
     
     
