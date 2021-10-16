@@ -223,7 +223,7 @@ In geoscience, actually obtaining data is an art... unfortunately. At least, OSM
 \subsubsection{}
 \subsection{Radar}
 \subsection{Image segmentation}
-\subsubsection{Maximum-likelyhood classifier}
+
 
 \subsubsection{PCA}
 Sentinel 2 has 12 optical bands - that's not counting the additional water-vapor and classification-layers.
@@ -267,6 +267,82 @@ We can add an interpretation to the different combination-weights:
     \centering
       \includegraphics[width=0.65\textwidth]{images/pca_wessling_pcs.png}
 \end{figure}
+
+
+
+
+\subsubsection{Maximum-likelihood classifier}
+Maximum likelihood is probably the simplest form of supervised learning you can do.
+Let's assume that we can group pixels according to their band-values in the groups field, forrest, water, and building.
+We want to know the probability of a pixel being in the class 'water', given it's band-values.
+\begin{equation}
+    P(W|b_1, b_2, b_3, ...) = P(b_1, b_2, b_3 | W) \frac{P(W)}{P(b_1, b_2, b_3)}
+\end{equation}
+The term $P(b_1, b_2, b_3 | W)$ is our likelihood. When just comparing different probabilities we may ditch the fraction $\frac{P(W)}{P(b_1, b_2, b_3)}$. As such, the simplest classification algorithm could be implemented like this:
+
+\begin{lstlisting}[language=python]
+import scipy.stats._multivariate as mult
+
+
+def getLikelihoodFunction(samples):
+    """
+        samples: n * b numpy array
+            n: nr of samples
+            b: nr of bands
+    """
+    mu = np.mean(samples, axis=0)
+    dm = samples - mu
+    Cov = dm.transpose() @ dm
+    return mult.multivariate_normal(mu, Cov, allow_singular=True)
+
+
+def maxLikelihoodClassify(labelledData, data):
+    """
+        labelledData: list of np.arrays
+        data: np.array
+        All np.arrays of size n * b
+            n: nr of samples
+            b: nr of bands
+    """
+
+    n, b = data.shape
+    l = len(labelledData)
+
+    llhs = [
+        getLikelihoodFunction(labelSampleData)
+        for labelSampleData in labelledData
+    ]
+
+    allClassifications = np.zeros((n, l), dtype=np.dtype('float32'))
+    for i, llh in enumerate(llhs):
+        allClassifications[:, i] = llh.pdf(data)
+
+    maxLlhClasses = np.argmax(allClassifications, axis=1)
+    return maxLlhClasses
+
+
+#%%
+waterSamples = allData[190:201, 275:300, :].reshape(11*25, 10)
+buildingSamples = allData[170:200, 300:390, :].reshape(30*90, 10)
+treesSamples = allData[50:100, 250:300, :].reshape(50*50, 10)
+fieldSamples = allData[50:90, 330:360, :].reshape(40*30, 10)
+dataLinear = allData.reshape(268*661, 10)
+
+
+classes = maxLikelihoodClassify([waterSamples, buildingSamples, treesSamples, fieldSamples], dataLinear)
+classesImg = classes.reshape(268, 661, 1)
+plt.imshow(classesImg, cmap="Set3")
+    
+\end{lstlisting}
+
+
+This classifies our Weßling scene quite nicely.
+\begin{figure}[H]
+    \caption{Supervised classification of Weßling scene using maximum-likelihood}
+    \centering
+      \includegraphics[width=0.65\textwidth]{images/max_likelihood_wessling.png}
+\end{figure}
+
 
 
 
