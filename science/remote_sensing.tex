@@ -12,6 +12,31 @@ Radar satellites have their own 'light' source: they actively send out radio-rad
 \end{itemize}
 
 
+\begin{figure}[H]
+    \caption{Frequencies capable of penetrating the atmosphere}
+    \centering
+      \includegraphics[width=0.75\textwidth]{images/rs_atmospheric_absorption.png}
+\end{figure}
+
+\begin{figure}[H]
+    \caption{Guide to the selection of frequencies in VIS \& NIR range}
+    \centering
+      \includegraphics[width=0.75\textwidth]{images/rs_vis_nir_curves.png}
+\end{figure}
+
+\begin{figure}[H]
+    \caption{Example of important groups in VIS \& NIR}
+    \centering
+      \includegraphics[width=0.35\textwidth]{images/rs_vis_nir_groups.png}
+\end{figure}
+
+
+\subsection{Radar}
+Radar is a little different from the optical VIS / NIR satellites.
+The earth does not emit any radar-radiation (naturally, only a few pulsars do). So SAR-satellites need to actively send out signals.
+On the bright side (haha) that means that SAR can be used at night. Also, with radio waves being longer than optical waves, they can penetrate clouds.
+SAR-satellites often only carry a single antenna. This means that the band-centered strategies of PCA and max-llh-classification don't work there, since there is only one band.
+
 
 
 
@@ -39,27 +64,6 @@ Consequently, there are no acquisition plans for Sentinel-5P.
 
 \subsection{Important satellites}
 
-
-\begin{table}
-    \centering
-    \begin{tabular}{llllllll}
-        \toprule
-        Satellite   & Owner & Bands & Data available at                    & Started    & Orbit                                                         & Resolution & Description                                               \\
-        \midrule
-        Landsat     & NASA  &       & USGS Earth explorer / AWS-S2 as COGs &            &                                                               &            & US optical, very long running                             \\
-        Modis       & NASA  &       &                                      &            &                                                               &            & Optical (but very coarse) / Temperature, water-vapor      \\
-        Copernicus  & ESA   &       &                                      &            &                                                               &            &                                                           \\
-        Sentinel 1  & ESA   &       & Sentinel-hub EO-browser              & 03.04.2014 & Near-polar, sun-sync, 1.5h, 6-day world coverage (using both) & 5m * 5m    & Radar                                                     \\
-        Sentinel 2  & ESA   &       & Sentinel-hub EO-browser              &            &                                                               &            & Optical                                                   \\
-        Sentinel 3  & ESA   &       & Sentinel-hub EO-browser              &            &                                                               &            & Sea surface topography, temperature (also fire detection) \\
-        Sentinel 5p & ESA   &       & Sentinel-hub EO-browser              &            &                                                               & 6km * 4km  & Atmospheric gasses                                        \\
-        TerraSarX   & DLR   &       &                                      & 15.06.2007 &                                                               & 1m/3m/16m  & Radar, very high resolution, commercial/scientific coop   \\
-        RapidEye    &       &       &                                      &            &                                                               &            &                                                           \\
-        Ikonos      &       &       &                                      &            &                                                               &            &                                                           \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
 \paragraph{Landsat} program is the longest-running enterprise for acquisition of satellite imagery of Earth.
 On July 23, 1972 the Earth Resources Technology Satellite was launched. This was eventually renamed to Landsat. 
 The most recent, Landsat 8, was launched on February 11, 2013. The instruments on the Landsat satellites have acquired millions of images.
@@ -71,7 +75,6 @@ The images, archived in the United States and at Landsat receiving stations arou
 
 \paragraph{Modis} ...
 
-\paragraph{Copernicus} ...
 
 \paragraph{Sentinel} ESA is currently developing seven missions under the Sentinel programme.
 The Sentinel missions include radar and super-spectral imaging for land, ocean and atmospheric monitoring.
@@ -80,6 +83,10 @@ for each mission, providing robust datasets for all Copernicus services.
 
 
 \subsection{Important service providers}
+
+\paragraph{Copernicus} is a EU program that makes satellite data freely available for the public. It financed ENVISAT and then the Sentinel program.
+It also now made a contract with Finnish mini-SAR-company Iceye, publishing their data to the public for free.
+
 \paragraph{CHIRPS} is ...
 
 \paragraph{EODC}: \href{https://www.eodc.eu/}{Earth Observation Data Center for Water Resources Monitoring}
@@ -94,7 +101,7 @@ for each mission, providing robust datasets for all Copernicus services.
 
 
 \subsection{Obtaining data}
-In geoscience, actually obtaining data is an art... unfortunately. At least, OSM and AWS+STAC make things a little more standardized.
+In geo-science, actually obtaining data is an art... unfortunately. At least, OSM and AWS+STAC make things a little more standardized.
 
 \begin{lstlisting}[language=python]
     #%%
@@ -220,8 +227,7 @@ In geoscience, actually obtaining data is an art... unfortunately. At least, OSM
 
 
 \subsection{Image preprocessing}
-\subsubsection{}
-\subsection{Radar}
+
 \subsection{Image segmentation}
 
 
