@@ -6,11 +6,15 @@ Satellites all work the same way: they are flying machines that carry a camera. 
 Radar satellites have their own 'light' source: they actively send out radio-radiation and collect the reflection.
 
 \begin{itemize}
-    \item Optical
-    \item Radar: not hindered by clouds. Good for flood-detection
-    \item Microwave: good for atmospheric observation
+    \item Ultra-violet. Breaks molecular bonds. 
+    \item Optical. Electrons get in an excited state, and send out a photon again when they fall back down.
+    \item NIR: heat.
+    \item Radar: not hindered by clouds. Good for flood-detection. \begin{itemize}
+        \item Microwave: good for atmospheric observation. Makes molecules vibrate.
+    \end{itemize}
 \end{itemize}
 
+EM-radiation has not only a frequency - it is also characterized by its \emph{phase}.
 
 
 
@@ -32,12 +36,19 @@ Note that not all satellites can change their focus. Sentinel-5P, for example, d
 Consequently, there are no acquisition plans for Sentinel-5P.
 
 
+Important orbits:
+\begin{itemize}
+    \item Lower earth orbit: 160-1000 km above sea level. ISS is at 600 km, OCO2 at 700 km. ~15.000 km/h for OCO. \begin{itemize}
+        \item A-track: a.k.a. the afternoon track. Passes equator from south at 14:00.
+    \end{itemize}
+    \item Geo-stationary: 30.000 km above sea level. For communication- and relay-satellites. ~ 10.000 km/h.
+    \item Moon: 300.000 km
+\end{itemize}
 
 
 
 
-
-\subsection{Important satellites and service providers}
+\subsection{Important satellites}
 
 
 \begin{table}
@@ -73,12 +84,33 @@ The images, archived in the United States and at Landsat receiving stations arou
 
 \paragraph{Copernicus} ...
 
+\paragraph{ENVISAT} was ESA's environmental satellite. First satellite to measure CO2. Huge: large as a bus. 
+Launched 2002, scheduled until 2007, eventually lost contact 2012. Didn't manage to go to graveyard orbit - still hangs around at 800km.
+Passes two objects a year > 10kg within 200m. Danger of causing Kessler syndrome.
+Since replaced by the Sentinel-series.
+
 \paragraph{Sentinel} ESA is currently developing seven missions under the Sentinel programme.
 The Sentinel missions include radar and super-spectral imaging for land, ocean and atmospheric monitoring.
 Each Sentinel mission is based on a constellation of two satellites to fulfill and revisit the coverage requirements
 for each mission, providing robust datasets for all Copernicus services.
 
-\paragraph{CHIRPS} is ...
+\paragraph{Sentinel-1} Began 2014. Always in pairs. 700km. 12 day repeat cycle. 
+C-Band only. Huge data. Single scene is 4 GB in size.
+Usually operates in Wide-Swath mode (5*20m, 250km swath), but can be tasked to focus on regions in strip-map mode (5*5m, 80km swath).
+
+
+\paragraph{OCO-2 and OCO-3} are NASA's CO2 monitors. OCO-2 is in A-track at 700km. Launched 2014, supposed to last for a few more years.
+OCO-3 is docked to the japanese Lab on ISS (ISS itself intended to last until ~2032).
+
+
+\subsection{Service providers}
+
+\paragraph{Amazon S3} keeps a lot of satellite data as COGs. \begin{itemize}
+    \item Sentinel 1 from \href{https://registry.opendata.aws/sentinel-1/}{here}
+    \item Sentinel 2 from \href{https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/2020/S2A_36QWD_20200701_0_L2A/TCI.tif}{here}
+    \item Landsat from \href{https://landsat-pds.s3.amazonaws.com/c1/L8/139/045/LC08_L1TP_139045_20170304_20170316_01_T1/LC08_L1TP_139045_20170304_20170316_01_T1}{here}
+\end{itemize}
+
 
 \paragraph{EODC}: \href{https://www.eodc.eu/}{Earth Observation Data Center for Water Resources Monitoring}
 
@@ -91,15 +123,24 @@ for each mission, providing robust datasets for all Copernicus services.
 
 
 
-
-
-
-
-
-
 \subsection{Image preprocessing}
-\subsubsection{}
+\begin{itemize}
+    \item Geometric distortions
+    \item Georeferencing
+\end{itemize}
+
+
 \subsection{Radar}
+\begin{itemize}
+    \item Earth does not emit any radar (in fact, only lightning and some pulsars do emit radar naturally). So, radar must be an active sensor. Advantage: works at night.
+    \item The higher the wavelength, the better the penetration power: L&P bands go through foliage and into the topsoil.
+    \item The lower the wavelength, the better the resolution.
+    \item Two data-products: amplitude and phase.
+    \item Side-facing. This way water can specularly reflect radar and appear perfectly black in image.
+\end{itemize}
+
+
+
 \subsection{Image segmentation}
 \subsubsection{Maximum-likelyhood classifier}
 \subsubsection{PCA}
