@@ -1,5 +1,11 @@
 \section{Fourier and Laplace}
 
+Some qualitative intuition before we begin.
+The Fourier transform scans a signal for sinusoidal terms.
+The Laplace transform does the same, but \emph{also} scans the signal for exponential terms.
+That's why the latter is so popular in differential equations: many differential equations have solutions that contain both sinusoidal and exponential terms. 
+
+
 \begin{figure}[H]
   \caption{Time Base versus Fourier Base}
   \centering
@@ -227,6 +233,32 @@ Taylor  & $f^{(n)}(t)|t_0$                                          & $\frac{(x-
     \subprf{}{}{}
 \end{proof}
 
+Fourier analysis is often a lot better at compressing. The below image has been created with only 321 frequencies out of a 119*95 image.
+\begin{lstlisting}[language=python]
+def compressImage(image, threshold):
+    freqs = fft.rfft2(image)
+    mags = np.abs(freqs)
+    thresholdValue = threshold * np.max(mags)
+    indices = mags >= thresholdValue
+    freqsFiltered = freqs * indices
+    imageRestored = fft.irfft2(freqsFiltered)
+
+    print("entries above threshold: " + str(np.count_nonzero(indices)))
+    return imageRestored
+
+image = imageio.imread(files[0])
+restored = compressImage(image, 0.003)
+
+fix, axes = plt.subplots(1, 2)
+axes[0].imshow(image)
+axes[1].imshow(restored)
+\end{lstlisting}
+
+\begin{figure}[h]
+    \caption{Image restored from top 321 frequencies after Fourier transform}
+    \centering
+      \includegraphics[width=0.5\textwidth]{images/fourier_compression.png}
+\end{figure}
 
 
 \subsubsection{Proving that Fourier functions form a basis}

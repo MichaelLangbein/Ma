@@ -48,7 +48,7 @@ However, note that axiom 2 is actually a case of "fully external" induction.
     }
 \end{proof}
 
-If you don't beleive the argument in the previous proof, consider this: 
+If you don't believe the argument in the previous proof, consider this: 
 \begin{proof}
     \subprf{
     Suppose all of the following: \\
@@ -109,7 +109,7 @@ It is notable that you can never reach a standard number when adding nonstandard
 \subsubsection{Fourier}
 \subsubsection{Laplace}
 
-\subsection{Eulers formula}
+\subsection{Euler's formula}
 Proof: Consider the function $f(t)=e^{-it}(cost+isint)$ for $t \in \reals$. By the quotient rule
 $$ f'(t) = e^{-it} (i\ cos(t) - \sin(t)) -ie^{-it} (\cos(t) + i \sin(t)) = 0 $$
 identically for all $t \in \reals$. Hence, $f$ is constant everywhere. Since $f(0)=1$, it follows that $f(t)=1$ identically. Therefore, $e^{it}=cost+isint$ for all $t \in \reals$, as claimed.
@@ -121,7 +121,7 @@ identically for all $t \in \reals$. Hence, $f$ is constant everywhere. Since $f(
 
 \paragraph{u-substitution}
 
-\paragraph{Integration by parts} is the last trick up our sleve when all other strategies havent helped. Consider the integral 
+\paragraph{Integration by parts} is the last trick up our sleave when all other strategies haven't helped. Consider the integral 
 
 $$ \int x e^x \diff{x} $$
 
@@ -129,21 +129,22 @@ We can rewrite this integral as
 
 $$ \int u \diff{v} $$
 
-where $u = x$ and $\diff{v} = e^x \diff{x}$. In general, you always want to pick $u$ in such a way that $u$ gets simpler after being differentiated. $x$ does get a lot simpler after differentiation, whereas $e^x$ doesn't, so the choice is clear. 
+where $u = x$ and $\diff{v} = e^x \diff{x}$. In general, you always want to pick $u$ in such a way that $u$ gets simpler after being differentiated.
+$x$ does get a lot simpler after differentiation, whereas $e^x$ doesn't, so the choice is clear. 
 
 We then use the following: 
 
-$$ \int u \diff{v} = uv - \int v \diff{u} $$\footnote{The proof goes like this: ...}
+$$ \int u \diff{v} = uv - \int v \diff{u} $$\footnote{The proof goes like this: Starting with the product rule of differentiation: $(ab)' = a'b + ba'$ we get $(ab)' - a'b = ba'$ and  $ab - \int a'b \diff{x} = \int ba' \diff{x} $}
 
 Since we chose $u = x$ we have $\diff{u} = \diff{x}$, and from $\diff{v} = e^x \diff{x}$ we get $v = e^x$. This yields us: 
 
 $$ xe^x - \int e^x \diff{x} $$
 $$ e^x ( x - 1) $$
 
-as the sollution. 
+as the solution. 
 
 \subsection{Vector calculus}
 
-inetration over a vector, integration along a vector, integration along a surface. 
+Integration over a vector, integration along a vector, integration along a surface. 
 
 You can find a nice introduction (mostly in the second part of) this pdf: \inlinecode{http://www.maths.gla.ac.uk/~cc/2A/2A_notes/2A_chap4.pdf} and here \inlinecode{http://geocalc.clas.asu.edu/pdf-preAdobe8/SIMP_CAL.pdf}
