@@ -6,7 +6,7 @@ Containers and virtual machines.
     \item By contrast, a virtual machine (VM) runs a full-blown “guest” operating system with virtual access to host resources through a hypervisor. In general, VMs provide an environment with more resources than most applications need.
 \end{itemize}
 
-Images are described by \emph{Dockerfiles} that list all the contents of an image. These image files can be downloaded from a central repository called \emph{docker hub}.
+Images are described by \emph{Dockerfile}s that list all the contents of an image. These image files can be downloaded from a central repository called \emph{docker hub}.
 Usually, you write your own dockerfile that specifies as a dependency a more general dockerfile as your base. 
 \begin{itemize}
     \item an \emph{image} is an executable package that includes everything needed to run an application--the code, a runtime, libraries, environment variables, and configuration files. Includes execution of all \inlinecode{RUN} statements
@@ -26,7 +26,10 @@ Usually, you write your own dockerfile that specifies as a dependency a more gen
         \item \inlinecode{container} \begin{itemize}
                 \item \inlinecode{run -p 4000:80 -d --name=<nameofyourcontaineralllowercase> <nameofyourappalllowercase>}execute that package
                     (where \inlinecode{-p 4000:80} means \emph{map the containers port 80 to the systems port 4000} and \inlinecode{-d} stands for \emph{detached},
-                    i.e. get back control of your command-line after starting the container). \inlinecode{run} is actually a shorthand for \inlinecode{create} and \inlinecode{start}.
+                    i.e. get back control of your command-line after starting the container). \inlinecode{run} is actually a shorthand for \inlinecode{create} and \inlinecode{start}. \begin{itemize}
+                      \item `--expose`: makes a port available inside of a docker-network.
+                      \item `--publish`: is the long-form of `-p`. It makes the port available outside of a docker-network.
+                    \end{itemize}
                 \item \inlinecode{run -it ...} creates a new container from an image
                 \item \inlinecode{start -i ...} starts up an existing container
                 \item \inlinecode{logs --tail 100 --since <minutes> --timestamps --follow <containerid>}: All \inlinecode{stdout} and \inlinecode{stderr} (?) goes to this log

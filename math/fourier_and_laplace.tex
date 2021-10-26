@@ -433,3 +433,25 @@ axes[2].set_title('reconstructed')
     \centering
       \includegraphics[width=0.75\textwidth]{images/deconvolution.png}
   \end{figure}
+
+\subsubsection{Important transformations}
+Both Fourier and Laplace make a few operations much simpler. 
+They turn differentiations and exponentials into algebraic terms, and convolutions into products.
+As such they are very popular in differential equations,
+because you can transform a differential equation to Fourier/Laplace domain, solve for the desired function algebraically
+instead of having to solve the actual differential equation, and then transform back.
+Laplace is more popular in the differential equation world because it works for non-stable systems, too,
+whereas Fourier assumes that the system never explodes at any point.
+
+\begin{figure}[h]
+  \caption{Important Fourier transformations}
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/fourier_transforms.png}
+\end{figure}
+
+\begin{figure}[h]
+    \caption{Important Laplace transformations}
+    \centering
+      \includegraphics[width=0.7\textwidth]{images/laplace_transforms.png}
+\end{figure}
+
