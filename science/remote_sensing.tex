@@ -69,7 +69,39 @@ Note that not all satellites can change their focus. Sentinel-5P, for example, d
 Consequently, there are no acquisition plans for Sentinel-5P.
 
 
-Important orbits:
+
+
+
+\subsection{Radar}
+Radar is a little different from the optical VIS / NIR satellites.
+The earth does not emit any radar-radiation (naturally, only a few pulsars do). So SAR-satellites need to actively send out signals.
+On the bright side (haha) that means that SAR can be used at night. Also, with radio waves being longer than optical waves, they can penetrate clouds.
+SAR-satellites often only carry a single antenna. This means that the band-centered strategies of PCA and max-llh-classification don't work there, since there is only one band.
+
+
+Radar has some really weird properties.
+
+Distance travelled by ray 1 = $d_1$
+Distance travelled by ray 2 = $d_2 = d_1 + \delta $
+$$d_2 = d_1 + \delta$$
+$$t1 = 2 d_1 / c$$
+$$t2 = 2 (d_1 + \delta) / c$$
+Pulse duration $\tau$. Two points can only be differentiated if their beams return at least $\tau$ seconds apart.
+$$t_2 - t_1 = \tau $$
+$$ \tau = 2 \delta / c$$
+Minimum slant distance between the two points:
+$$\delta = \tau c / 2$$
+Minimum ground distance between the two points:
+$$r = \tau c / (2 \sin(\theta) )$$
+
+Thus:
+\begin{itemize}
+    \item The resolution is only a function of the incidence angle $\theta$ and the pulse duration $\tau$ - not of the platform altitude. A satellite gets an equally good resolution as an aircraft does.
+    \item Resolution gets \emph{better} the higher the incidence angle $\theta$. This is why radar is always side-facing. There is no spatial resolution directly under the platform. Opposite to optical sensors, resolution gets better the further out the observation.
+    \item 
+\end{itemize}
+
+Thus:
 \begin{itemize}
     \item Lower earth orbit: 160-1000 km above sea level. ISS is at 600 km, OCO2 at 700 km. ~15.000 km/h for OCO. \begin{itemize}
         \item A-track: a.k.a. the afternoon track. Passes equator from south at 14:00.
@@ -79,6 +111,20 @@ Important orbits:
 \end{itemize}
 
 
+\paragraph{Polarization}: EM waves have a plane. In fact, there is a plane for the electrical wave and a perpendicular one for the magnetic field.
+If a horizontally polarized light beam hits my eye, I'd only see a horizontal line. Non-polarized light consists of many waves with all possible angles. If they hit my eye, I's see a circle, not a line.
+A radar antenna emits electric waves either vertically (V) or horizontally (H). The scattered signal \emph{might} have changed that polarization. Some antennas can pick up both V and H and differentiate between the two.
+Antenna designs:
+\begin{itemize}
+    \item receive H, Transmit H: HH. Strong signal from horizontal, non-voluminous surfaces. Streets.
+    \item receive H, Transmit V: HV. Strong signal from horizontal, voluminous surfaces. Rough fields, low shrubbery
+    \item VH. Strong signal from vertical, voluminous surfaces. High trees
+    \item VV. Strong signal from vertical, non-voluminous surfaces. Walls.
+\end{itemize}
+Note that direct sunlight is unpolarized - the sun sends out waves in all possible orientations.
+But light can fall on objects that align polarization. Pretty much any time light reflects from something, it gets (at least partially, that is, elliptically) polarized.
+The more refraction, the more likely a change in polarization. Consequently, polarization change happens much when there is volume-scattering (branches, dry soil, ...)
+The direction of polarization is often parallel to the surface.
 
 
 
@@ -95,8 +141,8 @@ The images, archived in the United States and at Landsat receiving stations arou
  the temporal resolution is 16 days.[2] Landsat images are usually divided into scenes for easy downloading.
  Each Landsat scene is about 115 miles long and 115 miles wide (or 100 nautical miles long and 100 nautical miles wide, or 185 kilometers long and 185 kilometers wide).
 
-\paragraph{Modis} ...
 
+\paragraph{Modis on Aqua and Terra} (NASA) is a spectro-radiometer. It measures 36 bands.
 
 \paragraph{ENVISAT} was ESA's environmental satellite. First satellite to measure CO2. Huge: large as a bus. 
 Launched 2002, scheduled until 2007, eventually lost contact 2012. Didn't manage to go to graveyard orbit - still hangs around at 800km.
@@ -590,6 +636,18 @@ valPreds = model.predict(validGen)
 
 \end{lstlisting}
 
+
+\subsection{Remote sensing for water quality}
+Nasa has very good documentation for this on \href{https://earthdata.nasa.gov/learn/pathfinders/water-quality-data-pathfinder}{their website}.
+
+\begin{itemize}
+    \item Salinity: measured by SMOS (ESA) and Aquarius (NASA)
+    \item Ocean current. Shine \emph{really} long wave radar on the ocean - several kilometers (thats LF, VLF and ULF radio waves, btw). At this range, waves cancel out and you get the median height of the water to a few centimeters exact. Using Navier-Stokes, water height is related to current. Unfortunately, this really only works for surface currents.
+\end{itemize}
+
+\subsection{Remote sensing for floods}
+
+\subsection{Remote sensing for ecology}
 
 
 \subsection{SNAP}
