@@ -725,70 +725,70 @@ Unfortunately, however, L2-water-products are not disseminated via scihub. Inste
 Created a graph in SNAP.
 
 \begin{lstlisting}[language=xml]
-<graph id="Graph">
-  <version>1.0</version>
-  <node id="Read">
-    <operator>Read</operator>
-    <sources/>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>C:\Users\lang_m13\Desktop\snap_workspace\S3B_OL_2_WRR____20211103T090328_20211103T094745_20211103T113121_2657_058_378______MAR_O_NR_003.SEN3\xfdumanifest.xml</file>
-    </parameters>
-  </node>
-  <node id="Subset">
-    <operator>Subset</operator>
-    <sources>
-      <sourceProduct refid="Read"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
-      <region>0,0,0,0</region>
-      <referenceBand/>
-      <geoRegion>POLYGON ((6.779224872589111 57.80636978149414, 17.677661895751953 57.80636978149414, 17.677661895751953 51.95401382446289, 6.779224872589111 51.95401382446289, 6.779224872589111 57.80636978149414, 6.779224872589111 57.80636978149414))</geoRegion>
-      <subSamplingX>1</subSamplingX>
-      <subSamplingY>1</subSamplingY>
-      <fullSwath>false</fullSwath>
-      <tiePointGridNames/>
-      <copyMetadata>true</copyMetadata>
-    </parameters>
-  </node>
-  <node id="OWTClassification">
-    <operator>OWTClassification</operator>
-    <sources>
-      <sourceProduct refid="Subset"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <owtType>COASTAL</owtType>
-      <reflectancesPrefix>Oa</reflectancesPrefix>
-      <inputReflectanceIs>RADIANCE_REFLECTANCES</inputReflectanceIs>
-      <writeInputReflectances>false</writeInputReflectances>
-    </parameters>
-  </node>
-  <node id="Write">
-    <operator>Write</operator>
-    <sources>
-      <sourceProduct refid="OWTClassification"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>C:\Users\lang_m13\Desktop\snap_workspace\OWTClassification.tif</file>
-      <formatName>GeoTIFF</formatName>
-    </parameters>
-  </node>
-  <applicationData id="Presentation">
-    <Description/>
+    <graph id="Graph">
+    <version>1.0</version>
     <node id="Read">
-            <displayPosition x="27.0" y="34.0"/>
+      <operator>Read</operator>
+      <sources/>
+      <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+        <file>${input}</file>
+      </parameters>
     </node>
     <node id="Subset">
-      <displayPosition x="96.0" y="76.0"/>
+      <operator>Subset</operator>
+      <sources>
+        <sourceProduct refid="Read"/>
+      </sources>
+      <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+        <sourceBands/>
+        <region>0,0,0,0</region>
+        <referenceBand/>
+        <geoRegion>POLYGON ((6.779224872589111 57.80636978149414, 17.677661895751953 57.80636978149414, 17.677661895751953 51.95401382446289, 6.779224872589111 51.95401382446289, 6.779224872589111 57.80636978149414, 6.779224872589111 57.80636978149414))</geoRegion>
+        <subSamplingX>1</subSamplingX>
+        <subSamplingY>1</subSamplingY>
+        <fullSwath>false</fullSwath>
+        <tiePointGridNames/>
+        <copyMetadata>true</copyMetadata>
+      </parameters>
     </node>
     <node id="OWTClassification">
-      <displayPosition x="113.0" y="132.0"/>
+      <operator>OWTClassification</operator>
+      <sources>
+        <sourceProduct refid="Subset"/>
+      </sources>
+      <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+        <owtType>COASTAL</owtType>
+        <reflectancesPrefix>Oa</reflectancesPrefix>
+        <inputReflectanceIs>RADIANCE_REFLECTANCES</inputReflectanceIs>
+        <writeInputReflectances>false</writeInputReflectances>
+      </parameters>
     </node>
     <node id="Write">
-            <displayPosition x="190.0" y="199.0"/>
+      <operator>Write</operator>
+      <sources>
+        <sourceProduct refid="OWTClassification"/>
+      </sources>
+      <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+        <file>${output}</file>
+        <formatName>GeoTIFF</formatName>
+      </parameters>
     </node>
-  </applicationData>
-</graph>
+    <applicationData id="Presentation">
+      <Description/>
+      <node id="Read">
+              <displayPosition x="27.0" y="34.0"/>
+      </node>
+      <node id="Subset">
+        <displayPosition x="96.0" y="76.0"/>
+      </node>
+      <node id="OWTClassification">
+        <displayPosition x="113.0" y="132.0"/>
+      </node>
+      <node id="Write">
+              <displayPosition x="190.0" y="199.0"/>
+      </node>
+    </applicationData>
+  </graph>  
 \end{lstlisting}
 
 Can be run from command line in a \href{https://hub.docker.com/r/mundialis/esa-snap}{SNAP-docker-container} with 
@@ -806,6 +806,14 @@ For example, if a parameter for a file included the variable for \inlinecode{\$\
      <file>${myFilename}</file>
     </parameters>
 \end{lstlisting}
-and then call gpt using \inlinecode{gpt mygraph.xml -PmyFilename=path/to/my/file}.
+and then call gpt using 
+\begin{lstlisting}[language=bash]
+basePath=/home/michael/Desktop/code/snap
+fileName=S3A_OL_2_WRR____20211103T094250_20211103T102707_20211103T121733_2657_078_136______MAR_O_NR_003.SEN3
+$basePath/snap/bin/gpt $basePath/workspace/mygraph.xml \
+    -t target.tiff -f GeoTIFF \
+    -Pinput=$basePath/workspace/$fileName/xfdumanifest.xml \
+    -Poutput=$basePath/workspace/output.tif
+\end{lstlisting}
 
 
