@@ -1,6 +1,8 @@
 
 \section{Remote sensing}
 
+It's not all that easy to find good media about the remote sensing field. I do however enjoy the snippy tone of \href{http://blog.imagico.de/}{http://blog.imagico.de/}.
+
 
 \subsection{Electromagnetic radiation}
 Satellites all work the same way: they are flying machines that carry a camera. The camera has one or more sensors, each of which can observe some part of the electromagnetic spectrum.
@@ -111,6 +113,23 @@ for each mission, providing robust datasets for all Copernicus services.
 
 \paragraph{Copernicus} is a EU program that makes satellite data freely available for the public. It financed ENVISAT and then the Sentinel program.
 It also now made a contract with Finnish mini-SAR-company Iceye, publishing their data to the public for free.
+Also, the remote-sensing field is only going to be commercially viable if we provide higher level products than the satellites alone. 
+Copernicus delivers \emph{thematic} maps that do \emph{not} show the underlying satellite data on their \href{https://www.copernicus.eu/en}{Copernicus services} pages.
+This may well be the most valuable source of data for remote-sensing based products.
+
+
+\paragraph{Sentinelhub} (\href{https://www.sentinel-hub.com/}{homepage}, \href{https://www.sentinel-hub.com/explore/eobrowser/}{eo-browser}) is intended as a more user-oriented tool.
+It facilitates Google-Earth-esque processing in the backend, having you only download the end-product. Nice features include: 3d-view, creation of timeseries-gifs, pins that can be aggregated to a story.
+The webpage has a somewhat redacted selection of products - for example, I couldn't find S3-water data.
+But it also offers a set of python tools. Documentation can be found \href{https://sentinelhub-py.readthedocs.io/en/latest/examples/process_request.html#Example-5:-Other-Data-Collections}{here}.
+All data is listed \href{https://www.sentinel-hub.com/explore/data/}{here}. 
+Overall, before you work on some processing on your own, it is a very good idea to check if sentinel-hub already has the data, or at least parts of it.
+
+\paragraph{Scihub} (\href{https://scihub.copernicus.eu/}{here}) is the open access hub for sentinel data.
+
+\paragraph{Eumetsat} contains Sentinel-3 L2 water products \href{https://coda.eumetsat.int/#/home}{here}.
+For some reason, people have decided that S3-L2-W should be hosted on another page than all the other Sentinel products.
+
 
 \paragraph{CHIRPS} is ...
 
@@ -125,10 +144,13 @@ It also now made a contract with Finnish mini-SAR-company Iceye, publishing thei
 \paragraph{Kaggle} (see \href{https://www.kaggle.com/search?q=sentinel}{here}) is a useful source for ready-labeled datasets for training.
 
 \paragraph{Amazon S3} keeps a lot of satellite data as COGs. \begin{itemize}
-    \item Sentinel 1 from \href{https://registry.opendata.aws/sentinel-1/}{here}
+    \item Sentinel 1 from \href{https://registry.opendata.aws/sentinel-1/}{here} \begin{itemize}
+            \item The above page does not seem to conform to STAC 1.0. Maybe \href{https://raw.githubusercontent.com/scottyhq/sentinel1-rtc-stac/main/13SBD/catalog.json}{the US-specific data} is a bit better.
+        \end{itemize}
     \item Sentinel 2 from \href{https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/2020/S2A_36QWD_20200701_0_L2A/TCI.tif}{here}
     \item Landsat from \href{https://landsat-pds.s3.amazonaws.com/c1/L8/139/045/LC08_L1TP_139045_20170304_20170316_01_T1/LC08_L1TP_139045_20170304_20170316_01_T1}{here}
 \end{itemize}
+The coverage is still pretty inconsistent and spotty. It makes sense to fall back to updated, curated lists like \href{https://github.com/Fernerkundung/awesome-sentinel}{this one}.
 
 
 \subsection{Obtaining data}
@@ -254,6 +276,24 @@ In geo-science, actually obtaining data is an art... unfortunately. At least, OS
     
     # %%
     
+\end{lstlisting}
+
+
+Where STAC/COG data is not available, you'll have to fall back to proprietary solutions. One nice library is ESA's \inlinecode{sentinelsat}.
+\begin{lstlisting}[language=bash]
+conda install sentinelsat -y
+
+# sentinelsat is a python-tool exclusively for querying sentinel meta-data 
+# and for downloading sentinel data from scihub.
+sentinelsat \\
+    --user <username> \\
+    --password <password> \\
+    --geometry ./aoi.json \\
+    --sentinel 3 \\
+    --instrument OLCI \\
+    --cloud 10 \\  # max cloud cover in percent
+    --download \\  # will download the actual files (not cut to AOI)
+    --limit 2
 \end{lstlisting}
 
 
@@ -548,4 +588,165 @@ model.fit(trainGen, epochs=epochs, validation_data=validGen, callbacks=callbacks
 valPreds = model.predict(validGen)
 
 \end{lstlisting}
+
+
+
+\subsection{SNAP}
+Realistically, a lot of the geo-processing is better done in a dedicated tool.
+This holds especially true for L1-products: you don't want to code all the pre-processing by hand.
+SAR-satellites commonly only have a L1 product, so there is always some pre-processing required. 
+Sentinel-1, for example, only offers L2 data over open ocean.
+
+
+\subsubsection{Optical}
+
+\begin{itemize}
+    \item OWT: optical water type. Nice with sentinel 2 and 3. \begin{itemize}
+        \item GLASS-6C-Normalized: 6 spectral signatures of lake-waters: clear/low-chloro, peat/high-humic, chloro-med, chloro-high, bright/sediment-med, bright/sediment-high
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{SAR}
+
+SAR-preprocessing:
+\begin{itemize}
+    \item TOPSAR-Split: 
+    \item Orbit-files: updated orbit-info is available a couple of weeks after acquisition.
+    \item Co-registration
+    \item Coherence: removes base-noise (some objects on the ground do send off a tiny bit of radar on their own.)
+    \item TOPSAR-deburst: moving-window averaging
+    \item Multilook: Smoothing out speckle by looking at a location through multiple images.
+    \item Terrain-Correction: radar is side-looking; has foreshortening etc. 
+\end{itemize}
+
+SAR-analysis
+\begin{itemize}
+    \item Radar vegetation index
+    \item SAR/Urban areas/Speckle divergence
+\end{itemize}
+
+\subsubsection{General}
+
+Classification:
+\begin{itemize}
+    \item raster/classification/supervised/Random-forrest
+\end{itemize}
+
+\subsubsection{Automation}
+For the automation of tasks, SNAP provides a CLI \href{http://step.esa.int/docs/tutorials/SNAP_CommandLine_Tutorial.pdf}{here}
+
+
+
+
+\subsection{Geoserver}
+
+
+
+
+
+\subsection{Example: Ocean categorization}
+
+\subsubsection{Phase 0: research}
+Inspiration came from finding the OWC Classifier in SNAP. The classifier knows of a few types of water and their spectral signatures.
+It's designed to work with Sentinel-3 data.
+Specifically I red on \href{https://forum.step.esa.int/t/owt-classification/11360}{STEP} that it's working with OLCI-L2 atmospherically corrected water spectra.
+
+OLCI is simply the Ocean and Land Colour Instrument - one of the sensors next to the temperature-, SAR- and humidity-sensors on Sentinel 3.
+
+It has two operation modes: above land and above water.
+
+In the L2-product, cloud-pixels are discarded.
+The above-land-L2 product, OL\_2\_LFR (full-res) and OL\_2\_LRR (reduced-res) are already analyzed: they contain Global Vegetation Index and Terrestrial Chlorophyll Index.
+The above-water-L2 product, OL\_2\_WRR and OL\_2\_WFR are also analysed: Chlorophyll-a concentration, Total suspended matter concentration, Aerosol load
+Unfortunately, however, L2-water-products are not disseminated via scihub. Instead, that data is found on eumetsat. After further research, I also found an AWS bucket here: https://meeo-s3.s3.amazonaws.com/index.html/Ag11hncyrvjCMREETSJjwK/26HzHFuYgMiBqXBNNxcRQdYMEE2y/6GmKi5Q7qbosp2mrF6U1GoGLApWdrRAVnsTdVYL27Dzu/3dGB8bvDxnJ26DPd93LRs1dSHxcEA1MrTtEkbucmy7UEbcyWdsb
+
+\subsubsection{Phase 1: data}
+
+\subsubsection{Phase 2: processing}
+Created a graph in SNAP.
+
+\begin{lstlisting}[language=xml]
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Read">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>C:\Users\lang_m13\Desktop\snap_workspace\S3B_OL_2_WRR____20211103T090328_20211103T094745_20211103T113121_2657_058_378______MAR_O_NR_003.SEN3\xfdumanifest.xml</file>
+    </parameters>
+  </node>
+  <node id="Subset">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands/>
+      <region>0,0,0,0</region>
+      <referenceBand/>
+      <geoRegion>POLYGON ((6.779224872589111 57.80636978149414, 17.677661895751953 57.80636978149414, 17.677661895751953 51.95401382446289, 6.779224872589111 51.95401382446289, 6.779224872589111 57.80636978149414, 6.779224872589111 57.80636978149414))</geoRegion>
+      <subSamplingX>1</subSamplingX>
+      <subSamplingY>1</subSamplingY>
+      <fullSwath>false</fullSwath>
+      <tiePointGridNames/>
+      <copyMetadata>true</copyMetadata>
+    </parameters>
+  </node>
+  <node id="OWTClassification">
+    <operator>OWTClassification</operator>
+    <sources>
+      <sourceProduct refid="Subset"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <owtType>COASTAL</owtType>
+      <reflectancesPrefix>Oa</reflectancesPrefix>
+      <inputReflectanceIs>RADIANCE_REFLECTANCES</inputReflectanceIs>
+      <writeInputReflectances>false</writeInputReflectances>
+    </parameters>
+  </node>
+  <node id="Write">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="OWTClassification"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>C:\Users\lang_m13\Desktop\snap_workspace\OWTClassification.tif</file>
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
+  <applicationData id="Presentation">
+    <Description/>
+    <node id="Read">
+            <displayPosition x="27.0" y="34.0"/>
+    </node>
+    <node id="Subset">
+      <displayPosition x="96.0" y="76.0"/>
+    </node>
+    <node id="OWTClassification">
+      <displayPosition x="113.0" y="132.0"/>
+    </node>
+    <node id="Write">
+            <displayPosition x="190.0" y="199.0"/>
+    </node>
+  </applicationData>
+</graph>
+\end{lstlisting}
+
+Can be run from command line in a \href{https://hub.docker.com/r/mundialis/esa-snap}{SNAP-docker-container} with 
+\begin{lstlisting}[language=bash]
+    path/to/snap/bin/gpt path/to/s3_l2_olci_wrr_graph.xml -t target.tiff -f GeoTIFF path/to/sourcefile.xml
+\end{lstlisting}
+Note that the \inlinecode{sourcefile.xml} will overwrite the \inlinecode{read/parameter/file} value in the graph-file.
+There is a nice tutorial on headless-SNAP \href{http://step.esa.int/docs/tutorials/SNAP_CommandLine_Tutorial.pdf}{here}.
+
+Especially convenient is the fact that one can  insert variables in the form \inlinecode{\$\{variableName\}} in place
+of a parameter value. You can then replace the variableName with a value at the command line.
+For example, if a parameter for a file included the variable for \inlinecode{\$\{myFilename\}}
+\begin{lstlisting}
+    <parameters>
+     <file>${myFilename}</file>
+    </parameters>
+\end{lstlisting}
+and then call gpt using \inlinecode{gpt mygraph.xml -PmyFilename=path/to/my/file}.
+
 
