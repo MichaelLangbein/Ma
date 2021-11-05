@@ -135,14 +135,6 @@ We can take the expression for conditional probability and condition \emph{every
 \end{equation}
 
 
-\subsubsection{Uncountable sets and infinitessimals}
-
-Conventional probability restricts \samplespace 's to only include sigma-algebras, that is, sets of which every subset is guaranteed to be measurable. This is necessary because it turns out that some uncountable sets do indeed have subsets that you cannot assign a probability to. However, we can sidestep this difficulty by restricting ourselves only to countable sets. If we need continuity, we can include infinitessimals in that set.
-
- 
- 
-
-
 \subsection{Decomposing variance - the road to sensitivity analysis}
 
 \paragraph{Expressing variance as expectation} ...
@@ -187,31 +179,45 @@ Conventional probability restricts \samplespace 's to only include sigma-algebra
             &= E_{V_{Y|X}} + V_{E_{Y|X}}
     \end{aligned}
 \end{equation}
- 
- 
- \subsubsection{Probabilistic fallacies}
- \begin{itemize}
-     \item T-Test interpretation: If $\probFunct[A|B] = x$, then this does \emph{not} mean that $\probFunct[A|\overline{B}] = 1 - x$.
-     \item Prosecutors fallacy aka. inverse fallacy: $P(A|B) \neq P(B|A)$
- \end{itemize}
 
- \paragraph{$\probFunct[A|\overline{B}] \neq 1 - \probFunct[A | B]$}. 
- \begin{proof}
-     By contradiction. 
-     \begin{equation}
-         \begin{aligned}
-            \probFunct[A|B]                 &= 1 - \probFunct[A | \overline{B}] \\
-                                            &= \frac{  \probFunct[B] - \probFunct[A \intersection \overline{B}]  }{  \probFunct[B]  }  \\
-            \probFunct[A|B] \probFunct[B]   &=         \probFunct[B] - \probFunct[A \intersection \overline{B}] \\
-            \probFunct[A \intersection B]   &= \probFunct[B] - \probFunct[A \intersection \overline{B}] \\
-            \probFunct[A \intersection B] + \probFunct[A \intersection \overline{B}]  &= \probFunct[B] \\
-            \probFunct[A] &= \probFunct[B]
-         \end{aligned}
-     \end{equation}
-     Thus $\probFunct[A|\overline{B}] \neq 1 - \probFunct[A | B]$. But not that it \emph{does} hold true that $\probFunct[\overline{A}|B] = 1 - \probFunct[A | B]$
- \end{proof}
- 
 
+\begin{figure}[h]
+    \caption{Illustration of the law of total variance}
+    \centering
+      \includegraphics[width=0.5\textwidth]{images/law_of_total_variance.jpg}
+\end{figure}
+ 
+ 
+\subsection{Probability density functions}
+Up to now we have been dealing with probability mass functions on discrete variables.
+That works just as well with discrete variables, but we need to accommodate some details.
+For example, we can only define probability density in therms of cumulative probability functions.
+
+Let $P(x) := Pr(X > x)$ be a cumulative probability function.
+Then the probability density at $x$ is $\frac{d P}{d x}(x)$.
+
+\paragraph{As an exercise,} consider $x \tilde Exp(x)$. We want to calculate $E(x | x > x_0)$. 
+We'll start with $P(x | x > x_0)$.
+We have:
+\begin{equation}
+    \begin{aligned}
+        P(X | X > x_0) &= \left( \text{ using the fact that } P(B|A) = \frac{P(A \land B)}{P(A)} \right) \\
+                          &= \frac{ P(X = x \land X > x_0) }{ P(X > x_0) } \\
+                          &= \frac{ s_{x_0} P(X=x) }{ P(x > x_0) }  (\text{ with $s_{x_0}$ the step-function at $x_0$}) \\
+                          &= \frac{ s_{x_0} P(X=x) }{ \int_{x_0}^\infty p(x) dx }
+    \end{aligned}
+\end{equation}
+
+This leads us to the expectation:
+
+\begin{equation}
+    \begin{aligned}
+        E(X | X > x_0)  &= \int_{-\infty}^\infty x p(X | X > x_0) dx \\
+                        &= \frac{ s_{x_0} \int_{-\infty}^\infty x p(x) dx }{ \int_{x_0}^\infty p(x) dx } \\
+                        &= \frac{ \int_{x_0}^\infty x p(x) dx }{ \int_{x_0}^\infty p(x) dx } \\
+                        &= \frac{ s_{x_0} E(X) }{ P(X > x_0) } 
+    \end{aligned}
+\end{equation}
 
 
 \subsection{Probability distributions}
@@ -229,3 +235,28 @@ There is an abundance of ready made probability distributions to chose from, cov
 A remarkable feature of the Poisson-distribution is that it has only a parameter for the mean, but always the same variance.
 
 \paragraph{The geometric family} based on repeating an experiment until it succeeds. 
+
+
+
+\subsubsection{Probabilistic fallacies}
+\begin{itemize}
+    \item T-Test interpretation: If $\probFunct[A|B] = x$, then this does \emph{not} mean that $\probFunct[A|\overline{B}] = 1 - x$.
+    \item Prosecutors fallacy aka. inverse fallacy: $P(A|B) \neq P(B|A)$
+\end{itemize}
+
+\paragraph{$\probFunct[A|\overline{B}] \neq 1 - \probFunct[A | B]$}. 
+\begin{proof}
+    By contradiction. 
+    \begin{equation}
+        \begin{aligned}
+           \probFunct[A|B]                 &= 1 - \probFunct[A | \overline{B}] \\
+                                           &= \frac{  \probFunct[B] - \probFunct[A \intersection \overline{B}]  }{  \probFunct[B]  }  \\
+           \probFunct[A|B] \probFunct[B]   &=         \probFunct[B] - \probFunct[A \intersection \overline{B}] \\
+           \probFunct[A \intersection B]   &= \probFunct[B] - \probFunct[A \intersection \overline{B}] \\
+           \probFunct[A \intersection B] + \probFunct[A \intersection \overline{B}]  &= \probFunct[B] \\
+           \probFunct[A] &= \probFunct[B]
+        \end{aligned}
+    \end{equation}
+    Thus $\probFunct[A|\overline{B}] \neq 1 - \probFunct[A | B]$. But not that it \emph{does} hold true that $\probFunct[\overline{A}|B] = 1 - \probFunct[A | B]$
+\end{proof}
+
