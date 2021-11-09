@@ -1,0 +1,27 @@
+\section{Geospatial consulting}
+
+\subsection{Customer needs}
+
+\begin{itemize}
+    \item 80\% of customers have small amounts of static geospatial data. They have mostly frontend-needs. \begin{itemize}
+        \item Think of a canoe-renting-company wanting to show their  routes
+        \item Tools here are openlayers, cesium, threejs, and file based data.
+        \item Additional location data can be sprinkled in using overpass, a  geolocation-api etc.
+    \end{itemize}
+    \item The next 15\% actually have their own dynamic spatial data - mostly vector-based, mostly point-measures. 
+    They do want some degree of data-analysis. \begin{itemize}
+        \item This calls for some postgis-analysis if there is a lot of data, or geopandas otherwise. Potentially some 3rd party OGC-services added in.
+        \item Examples would be logistics companies, data-sensor-maintainance, social-networks
+        \item At this level accessing public data (that is, from government institutions) starts becoming important.
+    \end{itemize}
+    \item The rest is a small set of customers that actually care about continuous delivery of analyzed raster data.\begin{itemize}
+        \item Those would be customers that strongly depend  on environmental data. 
+        Examples would be agriculture, forestry, hydrology, engineering-buros, preservation, shipping, ...
+        \item Tools of the trade:\begin{itemize}
+            \item sentinel-hub for a preview of the available data \& timeseries-gifs,
+            \item SNAP, rasterio, tensorflow for the analysis
+            \item postgis for metadata, STAC \& COG (for really large data) or geoserver (otherwise) for hosting the analyzed data.
+            \item docker and potentially cubernetes to package and deploy the analysis pipeline.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
