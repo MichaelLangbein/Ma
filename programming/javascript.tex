@@ -1,5 +1,8 @@
 \section{Javascript}
-At its heart, javascript is a simple language. Its has however two very unconventional features that are not used in any other languages: \emph{this} and \emph{prototpye}s.  
+At its heart, javascript is a simple language. 
+Its has however two very unconventional features that are not used in any other languages: \emph{this} and \emph{prototpye}s.
+It also has a hugely chaotic development, making simple things really hard over and over again. 
+For almost every programming concept there are many conflicting ways to do it. Try importing a AMD package into a typescript project using webpack and react.
 
 \begin{itemize}
     \item Javascript does not have methods. It has properties that refer to functions.
@@ -343,22 +346,26 @@ console.log("this is root, running in zone ", Zone.current.name);
 \subsection{Module system}
 
 
-\begin{table}[ht]
-    \begin{tabularx}{1.2\textwidth}{XXXXXX}
-        & CommonJs                                                            & NodeJs                                                                   & AMD                                                                              & UMD                                                           & ES2015 aka. ES6                                           \\
-        used by         & formerly node                                                       & node                                                                     & requirejs                                                                        &                                                               &                                                           \\
-        module-file     & \inlinecode{exports.area = (r) = PI * r * r;}                       & \inlinecode{module.exports = \{area: (r) = PI * r * r; \}}               & \inlinecode{define}                                                              & First tries AMD, then commonJs, then exports as global.       & \inlinecode{export const sqrt = Math.sqrt;}               \\
-        user-file       & \inlinecode{const module = require('./module.js'); module.area(4);} & \inlinecode{const module = require('./module.js'); module.area(4);}      & \inlinecode{require, import, module}                                             &                                                               & \inlinecode{\{import \{ sqrt \} from 'module';\}}         \\
-        loads modules   & synchronously                                                       & synchronously                                                            & asynchronously                                                                   &                                                               &                                                           \\
-        implementations & webpack, browserify                                                 & node, webpack, browserify                                                & requirejs                                                                        &                                                               & webpack, babel                                            \\
-        Notes           & Used to be a candidate for node, but now abandoned.                 &                                                                          & Does not work well with node (there is amdefine to help, but not ideal, either). &                                                               & Official JS standard, but so far not implemented in any browser or nodejs.
+\begin{table}[H]
+\tiny
+    \begin{tabularx}{1.0\textwidth}{XXXXXX}
+                        & CommonJs                                                                                   & NodeJs                                                                                      & AMD                                                                              & UMD                                                      & ES2015 aka. ES6                                           \\
+                        \hline                                                                                                                                                                                                                                                                                                                                                                                 
+        used by         & formerly node                                                                              & node                                                                                        & requirejs                                                                        &                                                          &                                                           \\
+        module-file     & \shortstack[l]{ \inlinecode{exports.area=} \\ \inlinecode{(r)=>PI*r*r;} }                  & \shortstack[l]{\inlinecode{module.exports=} \\ \inlinecode{\{area:(r)=>PI*r*r;\}} }         & \inlinecode{define}                                                              & First tries AMD, then commonJs, then exports as global.  & \inlinecode{export const sqrt = Math.sqrt;}               \\
+        user-file       & \shortstack[l]{ \inlinecode{const m = require('./mod.js'); } \\ \inlinecode{m.area(4);} }  & \shortstack[l]{ \inlinecode{const m = require('./mod.js');} \\ \inlinecode{m.area(4);} }    & \inlinecode{require, import, module}                                             &                                                          & \inlinecode{import \{ sqrt \} from 'mod';}                \\
+        loads modules   & synchronously                                                                              & synchronously                                                                               & asynchronously                                                                   &                                                          &                                                           \\
+        implementations & webpack, browserify                                                                        & node, webpack, browserify                                                                   & requirejs                                                                        &                                                          & webpack, babel                                            \\
+        Notes           & Used to be a candidate for node, but now abandoned.                                        &                                                                                             & Does not work well with node (there is amdefine to help, but not ideal, either). &                                                          & Official JS standard, but so far not implemented in any browser or nodejs.
     \end{tabularx}
 \end{table}
 
-    
+
+
+
 
 \subsubsection{Building with webpack}
-My builder of choice is webpack. Basically, webpack makes ES6-import and -export work. There is some nice documentation \href{https://what-problem-does-it-solve.com/webpack/index.html}{here}.
+The most common bundler is webpack. Basically, webpack makes ES6-import and -export work. There is some nice documentation \href{https://what-problem-does-it-solve.com/webpack/index.html}{here}.
 
 paragraph{General concepts}: Some concepts and nomenclature.
 
@@ -562,6 +569,7 @@ to this code:
 
 
 \section{CSS}
+CSS is so full of ideosyncracies it's really hard to keep track of them all. Here's an attempt to list the worst offenders.
 
 \subsection{Position}
 \begin{itemize}
@@ -573,16 +581,27 @@ to this code:
 \end{itemize}
 
 \subsection{Display}
-Per default, divs are dispayed in blockstyle, while spans are displayed inlinestyle.
+Per default, div's are displayed in block-style, while spans are displayed inline-style.
 \begin{itemize}
     \item \textbf{block}
     \item \textbf{inline}
-    \item \textbf{inline-block}: inline, but allows width, heigth, padding etc.
+    \item \textbf{inline-block}: inline, but allows width, height, padding etc.
     \item \textbf{none}
     \item \textbf{table}
     \item \textbf{grid}
     \item \textbf{flex} see \ref{flexbox}
 \end{itemize}
 
+\subsection{Resize}
+\begin{itemize}
+    \item \inlinecode{resize} \begin{itemize}
+        \item Only works when \inlinecode{overflow != visible}
+        \item Adds widget to bottom right
+        \item Can be moved to bottom left by changing the read direction: \inlinecode{direction: rtl}
+    \end{itemize}
+\end{itemize}
+
 \subsubsection{Flexbox}\label{flexbox}
 
+\subsection{Critical rendering path} 
+Some info \href{https://developers.google.com/web/fundamentals/performance/critical-rendering-path/optimizing-critical-rendering-path}{by google}.
