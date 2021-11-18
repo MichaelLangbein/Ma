@@ -601,7 +601,32 @@ Per default, div's are displayed in block-style, while spans are displayed inlin
     \end{itemize}
 \end{itemize}
 
+\subsubsection{Pseudoclasses}
+\begin{itemize}
+    \item \inlinecode{p::before} \begin{itemize}
+        \item injects a new pseudo-element inside of p, but before any other content of p.
+        \item only works with \inlinecode{content: ''} \begin{itemize}
+            \item \inlinecode{content: 'hello'} adds some 'hello' text into the element. Commonly we just use \inlinecode{content: ''} because we only need the content-filed, no actual content.
+        \end{itemize}
+        \item pseudo-classes don't work on \inlinecode{img} elements, or any elements that have no content.
+    \end{itemize}
+\end{itemize}
+
 \subsubsection{Flexbox}\label{flexbox}
+Flexbox handles the proportions of items in a row or column.
+\begin{itemize}
+    \item \inlinecode{flex} \begin{itemize}
+        \item alignment \begin{itemize}
+            \item flexbox solves the age-old "center a div" problem. Boxes with \inlinecode{display: flex} have a primary and secondary axis. \begin{itemize}
+                \item \inlinecode{justify-content: center} centers along primary axis
+                \item \inlinecode{align-items: center} centers along the secondary axis
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Grid}
+Grid handles the proportions of columns and rows in two dimensions. It's basically what used to be table-based layout, but responsive.
 
 \subsection{Critical rendering path} 
 Some info \href{https://developers.google.com/web/fundamentals/performance/critical-rendering-path/optimizing-critical-rendering-path}{by google}.
