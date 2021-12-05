@@ -312,6 +312,39 @@ function simulationTick() {
 }
 \end{lstlisting}
 
+
+\subsection{Modularization}
+It's actually a little hard to split d3-code into sub-functions. Mostly because it relies so heavily on passing along context using \inlinecode{this}. But there is a way. Note how this requires the use of the \inlinecode{svg} namespace
+\begin{lstlisting}
+const data = [{
+    name: 'node1'
+}, {
+    name: 'node2'
+}, {
+    name: 'node3'
+}, {
+    name: 'node4'
+}];
+
+
+const root = select('#container').append('svg').attr('width', '100%').attr('height', '100%');
+
+function createNode(d) {
+    // note the namespace here: https://stackoverflow.com/questions/49999268/creating-and-appending-detached-elements-with-d3-create
+    const g = create('svg:g');
+    g.append('rect').attr('width', 100).attr('height', 30).attr('fill', 'green');
+    g.append('text').text(d.name).attr('text-anchor', 'middle').attr('x', 50).attr('y', 20);
+    return g.node();
+}
+
+root.selectAll('.node')
+    .data(data)
+    .enter()
+        .append(d => createNode(d))
+        .attr('transform', (d, i) => `translate(${20 + i * 20}, ${20 + i * 20})`);
+\end{lstlisting}
+
+
 \subsection{Layout}
 Layout is a way how d3 arranges data for you - commonly in a tree, or a circle-diagram or comparable. First you wrap your data in a \inlinecode{hierarchy}, then you call a layout-function (like for example \inlinecode{cluster}) on it.
 \begin{lstlisting}
