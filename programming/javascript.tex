@@ -569,27 +569,31 @@ to this code:
 
 
 \section{CSS}
-CSS is so full of ideosyncracies it's really hard to keep track of them all. Here's an attempt to list the worst offenders.
+CSS is so full of idiosyncrasies it's really hard to keep track of them all. Here's an attempt to list the worst offenders.
 
 \subsection{Position}
 \begin{itemize}
-    \item \textbf{static}: the default
-    \item \textbf{relative}: default + allows top, bottom, left and right
-    \item \textbf{fixed}: relative to viewport
-    \item \textbf{absolute}: relative to nearest positioned parent (positioned: anything but static)
-    \item \textbf{sticky}: like fixed, but relative to container instead of viewport.
+    \item \textbf{static}: The default
+    \item \textbf{relative}: Default + allows top, bottom, left and right
+    \item \textbf{absolute}: Relative to nearest positioned parent (positioned: anything but static)
+    \item \textbf{fixed}: Similar to absolute, but positioned relative to the browser window. Scrolling will not move this element.
+    \item \textbf{sticky}: Element is positioned relative until a specified offset position is met by scrolling, then the element is positioned ‘fixed’ in that position on the scrolling element.
 \end{itemize}
 
 \subsection{Display}
 Per default, div's are displayed in block-style, while spans are displayed inline-style.
 \begin{itemize}
-    \item \textbf{block}
-    \item \textbf{inline}
-    \item \textbf{inline-block}: inline, but allows width, height, padding etc.
-    \item \textbf{none}
+    \item \textbf{block}: Element starts on a new line & takes up the entire width.
+            May contain other block or inline elements.
+            Elements that are block-level by default include <div>, <p>, <h1>-<h6>, <ul>, <li>, & <canvas>.
+    \item \textbf{inline}: Element can start anywhere on an existing line.
+            Height and width properties have no effect.
+            Elements that are inline by default include <span>, <input>, <button>, &<img>.
+    \item \textbf{inline-block}: Element is displayed inline but height and width may be defined. May also be used with grid, flex, or table as these are block-level elements.
+    \item \textbf{none}: Removes this element & all children (to just make an item invisible but still take up space on the page use the visibility property)
     \item \textbf{table}
-    \item \textbf{grid}
-    \item \textbf{flex} see \ref{flexbox}
+    \item \textbf{grid}: Element is displayed block-level with inner content in grid layout.
+    \item \textbf{flex} Element is displayed block-level with inner content in flexbox layout. See \ref{flexbox}
 \end{itemize}
 
 \subsection{Resize}
@@ -609,6 +613,7 @@ Per default, div's are displayed in block-style, while spans are displayed inlin
             \item \inlinecode{content: 'hello'} adds some 'hello' text into the element. Commonly we just use \inlinecode{content: ''} because we only need the content-filed, no actual content.
         \end{itemize}
         \item pseudo-classes don't work on \inlinecode{img} elements, or any elements that have no content.
+        \item \inlinecode{::before} inside a flex-box becomes a flex-item itself, therefore impacting the spacing of the other flex-items.
     \end{itemize}
 \end{itemize}
 
