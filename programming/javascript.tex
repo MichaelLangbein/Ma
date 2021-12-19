@@ -572,6 +572,7 @@ to this code:
 CSS is so full of idiosyncrasies it's really hard to keep track of them all. Here's an attempt to list the worst offenders.
 
 \subsection{Position}
+Position in general describes how an element relates to its parent.
 \begin{itemize}
     \item \textbf{static}: The default
     \item \textbf{relative}: Default + allows top, bottom, left and right
@@ -581,19 +582,26 @@ CSS is so full of idiosyncrasies it's really hard to keep track of them all. Her
 \end{itemize}
 
 \subsection{Display}
+Display refers to how an element relates to its peers or its children.
 Per default, div's are displayed in block-style, while spans are displayed inline-style.
 \begin{itemize}
-    \item \textbf{block}: Element starts on a new line & takes up the entire width.
+    \item \textbf{block}: Element starts on a new line and takes up the entire width.
             May contain other block or inline elements.
-            Elements that are block-level by default include <div>, <p>, <h1>-<h6>, <ul>, <li>, & <canvas>.
+            Elements that are block-level by default include <div>, <p>, <h1>-<h6>, <ul>, <li>, and <canvas>.
     \item \textbf{inline}: Element can start anywhere on an existing line.
             Height and width properties have no effect.
-            Elements that are inline by default include <span>, <input>, <button>, &<img>.
+            Elements that are inline by default include <span>, <input>, <button>, and<img>.
     \item \textbf{inline-block}: Element is displayed inline but height and width may be defined. May also be used with grid, flex, or table as these are block-level elements.
-    \item \textbf{none}: Removes this element & all children (to just make an item invisible but still take up space on the page use the visibility property)
+    \item \textbf{none}: Removes this element and all children (to just make an item invisible but still take up space on the page use the visibility property)
     \item \textbf{table}
     \item \textbf{grid}: Element is displayed block-level with inner content in grid layout.
     \item \textbf{flex} Element is displayed block-level with inner content in flexbox layout. See \ref{flexbox}
+\end{itemize}
+
+\subsection{Box-sizing}
+Information from \href{https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing}{here}
+\begin{itemize}
+    \item 
 \end{itemize}
 
 \subsection{Resize}
@@ -605,6 +613,23 @@ Per default, div's are displayed in block-style, while spans are displayed inlin
     \end{itemize}
 \end{itemize}
 
+\subsection{Selectors}
+\begin{itemize}
+    \item \inlinecode{.class1.class2}: selects all elements with both class1 and class2 within its own class-attribute
+    \item \inlinecode{.class1 .class2}: selects all elements with class2 that are descendants of class1 (does not have to be immediate ancestor!)
+    \item \inlinecode{element.class}: selects al element with class
+    \item \inlinecode{div,p}: selects all div and all p
+    \item \inlinecode{div p}: selects all p inside div
+    \item \inlinecode{div>p}: selects all p that are \emph{immediate} descendants of div
+    \item \inlinecode{div+p}: first p after div
+    \item \inlinecode{div~p}: every p that comes after an div
+    \item \inlinecode{[attr]}: every element with attribute attr
+    \item \inlinecode{[attr=val]}:
+    \item \inlinecode{[attr~=val]}:
+    \item \inlinecode{[attr*=val]}: where attr contains the substring 'val'
+    \item \inlinecode{::after}: inserted after the content of an element, but still inside of it.
+\end{itemize}
+
 \subsubsection{Pseudoclasses}
 \begin{itemize}
     \item \inlinecode{p::before} \begin{itemize}
@@ -614,20 +639,25 @@ Per default, div's are displayed in block-style, while spans are displayed inlin
         \end{itemize}
         \item pseudo-classes don't work on \inlinecode{img} elements, or any elements that have no content.
         \item \inlinecode{::before} inside a flex-box becomes a flex-item itself, therefore impacting the spacing of the other flex-items.
+        \item often require \inlinecode{display: block;} or \inlinecode{position: absolute;} (I think that's because browser per default assumes that this should be an inline-element?)
     \end{itemize}
 \end{itemize}
 
 \subsubsection{Flexbox}\label{flexbox}
 Flexbox handles the proportions of items in a row or column.
+Parent properties:
 \begin{itemize}
-    \item \inlinecode{flex} \begin{itemize}
-        \item alignment \begin{itemize}
-            \item flexbox solves the age-old "center a div" problem. Boxes with \inlinecode{display: flex} have a primary and secondary axis. \begin{itemize}
-                \item \inlinecode{justify-content: center} centers along primary axis
-                \item \inlinecode{align-items: center} centers along the secondary axis
-            \end{itemize}
-        \end{itemize}
-    \end{itemize}
+    \item \inlinecode{display: flex;}
+    \item \inlinecode{flex-direction: colum | row} sets primary axis direction
+    \item \inlinecode{justify-content: center;} centers along primary axis
+    \item \inlinecode{align-items: center;} centers along the secondary axis
+\end{itemize}
+Child properties. Children start at their flex-basis width and their size increases at a \emph{rate} of flex-grow.
+\begin{itemize}
+    \item \inlinecode{flex-grow}: fraction taken by element if more space available than required. Default 0 means: don't resize me even if more space is available.
+    \item \inlinecode{flex-shrink}: fraction taken by element if less space available than required. Default is 1, which means: shrink all elements at the same rate.
+    \item \inlinecode{flex-basis: 20\%, 5rem, auto, content, ...}: the default size of element before remaining space is distributed. Default is auto, which means: use my width. Contrary to min-width, flex-basis may get lower.
+    \item \inlinecode{flex 0 1 auto}: shorthand for grow, shrink, basis.
 \end{itemize}
 
 \subsubsection{Grid}
