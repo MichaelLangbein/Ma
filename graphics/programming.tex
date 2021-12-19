@@ -312,8 +312,41 @@ function simulationTick() {
 }
 \end{lstlisting}
 
+
+\subsection{Modularization}
+It's actually a little hard to split d3-code into sub-functions. Mostly because it relies so heavily on passing along context using \inlinecode{this}. But there is a way. Note how this requires the use of the \inlinecode{svg} namespace
+\begin{lstlisting}
+const data = [{
+    name: 'node1'
+}, {
+    name: 'node2'
+}, {
+    name: 'node3'
+}, {
+    name: 'node4'
+}];
+
+
+const root = select('#container').append('svg').attr('width', '100%').attr('height', '100%');
+
+function createNode(d) {
+    // note the namespace here: https://stackoverflow.com/questions/49999268/creating-and-appending-detached-elements-with-d3-create
+    const g = create('svg:g');
+    g.append('rect').attr('width', 100).attr('height', 30).attr('fill', 'green');
+    g.append('text').text(d.name).attr('text-anchor', 'middle').attr('x', 50).attr('y', 20);
+    return g.node();
+}
+
+root.selectAll('.node')
+    .data(data)
+    .enter()
+        .append(d => createNode(d))
+        .attr('transform', (d, i) => `translate(${20 + i * 20}, ${20 + i * 20})`);
+\end{lstlisting}
+
+
 \subsection{Layout}
-Layout is a way how d3 arranges data for you - commonly in a tree, or a circle-diagram or comparable. First you wrap your data in a \inlinecode{hierarchy}, then you call a layout-function (like for example \inlinecode{cluster}) on it.
+Layout is a way how d3 arranges data for you - commonly in a tree, or a circle-diagram or comparable. In this example below you wrap your data in a \inlinecode{hierarchy} (which, I think, might be a layout itself), then you call a layout-function (like for example \inlinecode{cluster}) on it.
 \begin{lstlisting}
     import { select, cluster, curveBundle, lineRadial, dsv, hierarchy } from 'd3';
 
@@ -579,6 +612,57 @@ Layout is a way how d3 arranges data for you - commonly in a tree, or a circle-d
     
     main();
 \end{lstlisting}
+
+
+\subsection{Generators, components and layouts}
+The imformation here stems from \href{https://livebook.manning.com/book/d3-js-in-action/chapter-5/7}{manning}.
+The three main types of functions in D3 can be classified as generators, components and layouts. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{images/d3_comps_gens_lays.jpg}
+\end{figure}
+
+
+\subsubsection{Layouts}
+
+Layouts don’t draw the data, nor are they called like components or referred to in the drawing code like generators.
+Rather, they’re a preprocessing step that formats your data so that it’s ready to be displayed in the form you’ve chosen.
+Layouts take a set of input data, apply an algorithm or heuristic,
+and output the resulting positions/shapes for a cohesive display of the data.
+You can update a layout, and then if you rebind that altered data to your graphical objects, you can use the D3 enter/update/exit syntax to update your layout.
+
+Layouts: 
+\begin{itemize}
+    \item [[Bundle|Bundle-Layout]] - apply Holten's hierarchical bundling algorithm to edges.
+    \item [[Chord|Chord-Layout]] - produce a chord diagram from a matrix of relationships.
+    \item [[Cluster|Cluster-Layout]] - cluster entities into a dendrogram.
+    \item [[Force|Force-Layout]] - position linked nodes using physical simulation.
+    \item [[Hierarchy|Hierarchy-Layout]] - derive a custom hierarchical layout implementation.
+    \item [[Histogram|Histogram-Layout]] - compute the distribution of data using quantized bins.
+    \item [[Pack|Pack-Layout]] - produce a hierarchical layout using recursive circle-packing.
+    \item [[Partition|Partition-Layout]] - recursively partition a node tree into a sunburst or icicle.
+    \item [[Pie|Pie-Layout]] - compute the start and end angles for arcs in a pie or donut chart.
+    \item [[Stack|Stack-Layout]] - compute the baseline for each series in a stacked bar or area chart.
+    \item [[Tree|Tree-Layout]] - position a tree of nodes tidily.
+    \item [[Treemap|Treemap-Layout]] - use recursive spatial subdivision to display a tree of nodes.
+\end{itemize}
+
+Some layouts are even dynamic through time: for example, you \inlinecode{start()} a \inlinecode{d3.layout.force()} instance and then listen for layout updates on 'tick' events.
+
+
+\subsubsection{Generators}
+Contrary to layouts, generators work on single data-points. They don't modify the data-points, either,
+but use their (x- and y-)properties for drawing.
+\begin{itemize}
+    \item \inlinecode{d3.line}:	Generates path data for a multi-segment line (typically for line charts)
+    \item \inlinecode{d3.area}:	Generates path data for an area (typically for stacked line charts and stream-graphs)
+    \item \inlinecode{d3.stack}:	Generates stack data from multi-series data
+    \item \inlinecode{d3.arc}:	Generates path data for an arc (typically for pie charts)
+    \item \inlinecode{d3.pie}:	Generates pie angle data from array of data
+    \item \inlinecode{d3.symbol}:	Generates path data for symbols such as plus, star, diamond
+\end{itemize}
+
 
 
 \subsection{WASM}
@@ -1746,13 +1830,3 @@ export class Engine {
 
 }
 \end{lstlisting}
-
-\subsubsection{Shader gallery}
-
-
-\subsection{CSS}
-
-\subsubsection{Positioning}
-\subsubsection{Events}
-\subsubsection{Animations}
-
