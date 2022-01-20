@@ -696,8 +696,8 @@ def pFunc(arg):
     return ', '.join(globalData) + str(arg)
 
 if __name__ == '__main__':  # really important to prevent infinite forking
-    with Pool(4) as p:
-        results = p.map(pFunc, perProcessData)
+    with Pool(4) as p:  # context makes sure processes are properly joined
+        results = p.map(pFunc, perProcessData)  # map blocks the parent process until all children have been closed
         print(results)
 \end{lstlisting}
 
