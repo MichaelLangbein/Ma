@@ -681,6 +681,27 @@ add3Wrapped.lift(val)
 \end{lstlisting}
 
 
+\subsection{Multiprocessing}
+In python's default implementation, CPython, there is no real multithreading (it can use threads, but they are all on the same CPU).
+The only way for CPython to do parallelism is using multiprocessing.
+Fortunately, even though processes have no shared memory, as long as shared data is read-only, it can still be easily shared.
+
+\begin{lstlisting}[language=python]
+from multiprocessing import Pool
+
+globalData = ['some', 'data']
+perProcessData = [1, 2, 3, 4]
+
+def pFunc(arg):
+    return ', '.join(globalData) + str(arg)
+
+if __name__ == '__main__':  # really important to prevent infinite forking
+    with Pool(4) as p:
+        results = p.map(pFunc, perProcessData)
+        print(results)
+\end{lstlisting}
+
+
 \subsection{Multimedia: Pygame}
 
 In general when we want to do  a bigger multimedia-app, pygame is a save choice. It's python's equivalent of the Processing framework for Java. 
