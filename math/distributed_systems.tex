@@ -26,7 +26,7 @@ We implement distributed systems when our system becomes too big to be run from 
 \end{itemize}
 
 \subsection{Axioms}
-\paragraph{The locality axiom} states that a subsystems behaviour is only influenced by its inedge border.
+\paragraph{The locality axiom} states that a subsystems behavior is only influenced by its inedge border.
 \paragraph{The fault axiom} states that there exists a (malicious) program $F$ that can mimic other programs, so that it behaves towards node $a$ like $X$, and towards $b$ like $Y$. 
 
 \subsection{Theorems}
@@ -68,7 +68,7 @@ But there is another, more general proof, which we can use for the following the
 
 
 \subsubsection{When timing does and does not matter}
-Operations on a single machine have a total order, on distributed machines we can at least hope to acchieve a partial order.
+Operations on a single machine have a total order, on distributed machines we can at least hope to achieve a partial order.
 Consider a transition function from one state to another. When is a transition function commutative? That would mean that the timing in which input arrives at a state machine does not matter. We know this is not always true. Just consider the state function $f(s, x) = sx + x$. 
 $$ f : S \times X \to S$$
 Theorem:
@@ -83,7 +83,7 @@ $$ f: \text{some property} \then f(f(s_0, x_0), x_1) = f(f(s_0, x_1), x_0)$$
 \subsubsection{CAP-Theorem}
 
 
-\subsection{Important alogrithms}
+\subsection{Important algorithms}
 
 \subsubsection{one-, two- and tree-phase commit}
 
@@ -113,7 +113,7 @@ If a distributed database provides the acid-properties, then it must chose consi
 
 
 \subsubsection{Normalisation}
-Normalisation is a way of structuring a relational database such that logical errors are minimized. 
+Normalization is a way of structuring a relational database such that logical errors are minimized. 
 
 \begin{lstlisting}[language=python]
 from DB import DB

@@ -4,9 +4,9 @@
 
 \subsubsection{Probability space}
 
-Probability works on some basic entites:
+Probability works on some basic entities:
 \begin{itemize}
-    \item \samplespace is a nonempty set called the samplespace. 
+    \item \samplespace is a nonempty set called the sample-space. 
     \item $\omega \in \samplespace$ is called an outcome
     \item $E \subseteq \samplespace$ is called an event
 \end{itemize}
@@ -20,7 +20,7 @@ Probability works on some basic entites:
     \end{itemize}
 \end{definition}
 
-A probability measure together with a samplespace is called a probability space. 
+A probability measure together with a sample-space is called a probability space. 
 
 
 We define the probability of an event as: 
@@ -35,6 +35,14 @@ Note that a random variable strictly takes a single $\omega$ as argument, not a 
 We then calculate the probability that a random variable $X$ has a certain value $x$ as such: 
 
 $$ \probFunct[X=x] = \sum_{X^{-1}(x)} \probFunct[\omega] $$
+
+
+\begin{figure}[H]
+    \caption{From sample-space to probability of a random variable}
+    \centering
+      \includegraphics[width=0.85\textwidth]{images/prob.png}
+\end{figure}
+
 
 \begin{definition}[Expectation]
     The expectation of a random variable is defined as 
